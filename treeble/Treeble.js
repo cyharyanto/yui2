@@ -66,6 +66,10 @@ DS.TYPE_TREELIST = 9;
  *			This is only appropriate for DataSources that always return the
  *			entire data set.  If this is not provided,
  *			<code>totalRecordsExpr</code> must be specified.</dd>
+ *		<dt>paginateChildren</dt>
+ *		<dd>(optional) Pass <code>true</code> to paginate the result after merging
+ *			child nodes into the list.  The default (<code>false</code>) is to
+ *			paginate only top-level nodes, so all children are visible.</dd>
  *		</dl>
  */
 util.TreebleDataSource = function(oLiveData, oConfigs)
@@ -186,20 +190,110 @@ function countVisibleNodes(
 		total = this._topNodeTotal;
 	}
 
-	for (var i=0; i<open.length; i++)
+	if (this.paginateChildren)
 	{
-		var node = open[i];
-		if (node.open)
+		for (var i=0; i<open.length; i++)
 		{
-			total += node.childTotal;
-			total += countVisibleNodes(node.children);
+			var node = open[i];
+			if (node.open)
+			{
+				total += node.childTotal;
+				total += countVisibleNodes(node.children);
+			}
 		}
 	}
 
 	return total;
 }
 
-function getVisibleSlices(
+function getVisibleSlicesPgTop(
+	/* int */			skip,
+	/* int */			show,
+	/* DataSource */	ds,
+	/* array */			open,
+
+	// not sent by initiator
+
+	/* array */			path)
+{
+	open = open.concat(
+	{
+		index:      -1,
+		open:       true,
+		childTotal: 0,
+		children:   null
+	});
+
+	if (!path)
+	{
+		path = [];
+	}
+
+	var slices = [],
+		send   = false;
+
+	var m = 0, prev = -1, presend = false;
+	for (var i=0; i<open.length; i++)
+	{
+		var node = open[i];
+		if (!node.open)
+		{
+			continue;
+		}
+
+		var delta = node.index - prev;
+
+		if (m + delta >= skip + show ||
+			node.index == -1)
+		{
+			slices.push(
+			{
+				ds:    ds,
+				path:  path.slice(0),
+				start: send ? m : skip,
+				end:   skip + show - 1
+			});
+
+			if (m + delta == skip + show)
+			{
+				slices = slices.concat(
+					getVisibleSlicesPgTop(0, node.childTotal, node.ds,
+										  node.children, path.concat(node.index)));
+			}
+
+			return slices;
+		}
+		else if (!send && m + delta == skip)
+		{
+			presend = true;
+		}
+		else if (m + delta > skip)
+		{
+			slices.push(
+			{
+				ds:    ds,
+				path:  path.slice(0),
+				start: skip,
+				end:   m + delta - 1
+			});
+			send = true;
+		}
+
+		m += delta;
+
+		if (send && node.childTotal > 0)
+		{
+			slices = slices.concat(
+				getVisibleSlicesPgTop(0, node.childTotal, node.ds,
+									  node.children, path.concat(node.index)));
+		}
+
+		prev = node.index;
+		send = send || presend;
+	}
+}
+
+function getVisibleSlicesPgAll(
 	/* int */			skip,
 	/* int */			show,
 	/* DataSource */	rootDS,
@@ -281,9 +375,9 @@ function getVisibleSlices(
 
 		if (node.childTotal > 0)
 		{
-			var info = getVisibleSlices(skip, show, rootDS, node.children,
-										path.concat(node.index),
-										node, pre+n, send, slices);
+			var info = getVisibleSlicesPgAll(skip, show, rootDS, node.children,
+											 path.concat(node.index),
+											 node, pre+n, send, slices);
 			if (info instanceof Array)
 			{
 				return info;
@@ -733,8 +827,16 @@ lang.extend(util.TreebleDataSource, DS,
 
 		this._generating_requests = true;
 
-		this._slices = getVisibleSlices(oRequest.startIndex, oRequest.results,
-										this.liveData, this._open);
+		if (this.paginateChildren)
+		{
+			this._slices = getVisibleSlicesPgAll(oRequest.startIndex, oRequest.results,
+												 this.liveData, this._open);
+		}
+		else
+		{
+			this._slices = getVisibleSlicesPgTop(oRequest.startIndex, oRequest.results,
+												 this.liveData, this._open);
+		}
 
 		requestSlices.call(this, oRequest);
 

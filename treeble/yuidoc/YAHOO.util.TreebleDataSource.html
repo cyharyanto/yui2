@@ -125,6 +125,10 @@ the total number of records, e.g., <code>.meta.totalRecords</code>.
 This is only appropriate for DataSources that always return the
 entire data set.  If this is not provided,
 <code>totalRecordsExpr</code> must be specified.</dd>
+<dt>paginateChildren</dt>
+<dd>(optional) Pass <code>true</code> to paginate the result after merging
+child nodes into the list.  The default (<code>false</code>) is to
+paginate only top-level nodes, so all children are visible.</dd>
 </dl></span>
                                                 </dd>
                                         </dl>
