@@ -38,7 +38,7 @@ DS.TYPE_TREELIST = 9;
  * @extends YAHOO.util.DataSourceBase 
  * @constructor
  * @param oLiveData {DataSource}  Pointer to root of the DataSource tree.
- * @param oConfigs {object} Object literal of configuration values.  Required params are:
+ * @param oConfigs {Object} Object literal of configuration values.  Required params are:
  *		<dl>
  *		<dt>generateRequest</dt>
  *		<dd>(required) The function to convert the output from
