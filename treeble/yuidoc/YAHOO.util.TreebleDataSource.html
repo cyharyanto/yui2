@@ -97,10 +97,6 @@ and they must all use the same schema.
                                                     <code><span property="yui:name">oConfigs</span>
                                                     &lt;<span property="yui:type">object} Object literal of configuration values.  Required params are:
 <dl>
-<dt>childNodesKey</dt>
-<dd>(required) The name of the key inside a node which contains the data
-used to construct the DataSource for retrieving the children.
-This data is passed <code>DataSource.parseDataSource()</code>.</dd>
 <dt>generateRequest</dt>
 <dd>(required) The function to convert the output from
 <code>DataTable.generateTreebleDataSourceRequest()</code> into
@@ -110,6 +106,11 @@ takes two arguments: state {sort,dir,startIndex,results</span>&gt;
                                                     <span property="yui:description">  and path
 (an array of node indices telling how to reach the node).
 </dd>
+<dt>childNodesKey</dt>
+<dd>(semi-optional) The name of the key inside a node which contains the data
+used to construct the DataSource for retrieving the children.
+This data is passed to <code>DataSource.parseDataSource()</code>.</dd>
+This config is only required if you provide a custom parser.
 <dt>startIndexExpr</dt>
 <dd>(optional) OGNL expression telling how to extract the startIndex
 from the received data, e.g., <code>.meta.startIndex</code>.

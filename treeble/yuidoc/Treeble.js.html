@@ -89,10 +89,6 @@
 <span class="cm"> * @param oLiveData {DataSource}  Pointer to root of the DataSource tree.</span>
 <span class="cm"> * @param oConfigs {object} Object literal of configuration values.  Required params are:</span>
 <span class="cm"> *		&lt;dl&gt;</span>
-<span class="cm"> *		&lt;dt&gt;childNodesKey&lt;/dt&gt;</span>
-<span class="cm"> *		&lt;dd&gt;(required) The name of the key inside a node which contains the data</span>
-<span class="cm"> *			used to construct the DataSource for retrieving the children.</span>
-<span class="cm"> *			This data is passed &lt;code&gt;DataSource.parseDataSource()&lt;/code&gt;.&lt;/dd&gt;</span>
 <span class="cm"> *		&lt;dt&gt;generateRequest&lt;/dt&gt;</span>
 <span class="cm"> *		&lt;dd&gt;(required) The function to convert the output from</span>
 <span class="cm"> *			&lt;code&gt;DataTable.generateTreebleDataSourceRequest()&lt;/code&gt; into</span>
@@ -100,6 +96,11 @@
 <span class="cm"> *			takes two arguments: state {sort,dir,startIndex,results} and path</span>
 <span class="cm"> *			(an array of node indices telling how to reach the node).</span>
 <span class="cm"> *			&lt;/dd&gt;</span>
+<span class="cm"> *		&lt;dt&gt;childNodesKey&lt;/dt&gt;</span>
+<span class="cm"> *		&lt;dd&gt;(semi-optional) The name of the key inside a node which contains the data</span>
+<span class="cm"> *			used to construct the DataSource for retrieving the children.</span>
+<span class="cm"> *			This data is passed to &lt;code&gt;DataSource.parseDataSource()&lt;/code&gt;.&lt;/dd&gt;</span>
+<span class="cm"> *			This config is only required if you provide a custom parser.</span>
 <span class="cm"> *		&lt;dt&gt;startIndexExpr&lt;/dt&gt;</span>
 <span class="cm"> *		&lt;dd&gt;(optional) OGNL expression telling how to extract the startIndex</span>
 <span class="cm"> *			from the received data, e.g., &lt;code&gt;.meta.startIndex&lt;/code&gt;.</span>
@@ -123,19 +124,34 @@
 <span class="cm"> */</span>
 <span class="nx">util</span><span class="p">.</span><span class="nx">TreebleDataSource</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">oLiveData</span><span class="p">,</span> <span class="nx">oConfigs</span><span class="p">)</span>
 <span class="p">{</span>
+	<span class="nx">oConfigs</span> <span class="o">=</span> <span class="nx">oConfigs</span> <span class="o">||</span> <span class="p">{};</span>
+
 	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oLiveData</span> <span class="k">instanceof</span> <span class="nx">util</span><span class="p">.</span><span class="nx">DataSourceBase</span><span class="p">)</span>
 	<span class="p">{</span>
 		<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;TreebleDataSource requires DataSource&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;TreebleDataSource&#39;</span><span class="p">);</span>
 		<span class="k">return</span><span class="p">;</span>
 	<span class="p">}</span>
 
-	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oConfigs</span> <span class="o">||</span> <span class="o">!</span><span class="nx">oConfigs</span><span class="p">.</span><span class="nx">childNodesKey</span><span class="p">)</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oConfigs</span><span class="p">.</span><span class="nx">childNodesKey</span><span class="p">)</span>
 	<span class="p">{</span>
-		<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;TreebleDataSource requires childNodesKey configuration&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;TreebleDataSource&#39;</span><span class="p">);</span>
-		<span class="k">return</span><span class="p">;</span>
+		<span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="nx">oLiveData</span><span class="p">.</span><span class="nx">responseSchema</span><span class="p">.</span><span class="nx">fields</span><span class="p">;</span>
+		<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">fields</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span>
+		<span class="p">{</span>
+			<span class="k">if</span> <span class="p">(</span><span class="nx">lang</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">fields</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nx">fields</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">parser</span> <span class="o">==</span> <span class="s1">&#39;datasource&#39;</span><span class="p">)</span>
+			<span class="p">{</span>
+				<span class="nx">oConfigs</span><span class="p">.</span><span class="nx">childNodesKey</span> <span class="o">=</span> <span class="nx">fields</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">key</span><span class="p">;</span>
+				<span class="k">break</span><span class="p">;</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+
+		<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oConfigs</span><span class="p">.</span><span class="nx">childNodesKey</span><span class="p">)</span>
+		<span class="p">{</span>
+			<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;TreebleDataSource requires childNodesKey configuration&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;TreebleDataSource&#39;</span><span class="p">);</span>
+			<span class="k">return</span><span class="p">;</span>
+		<span class="p">}</span>
 	<span class="p">}</span>
 
-	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oConfigs</span> <span class="o">||</span> <span class="o">!</span><span class="nx">oConfigs</span><span class="p">.</span><span class="nx">generateRequest</span><span class="p">)</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oConfigs</span><span class="p">.</span><span class="nx">generateRequest</span><span class="p">)</span>
 	<span class="p">{</span>
 		<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;TreebleDataSource requires generateRequest configuration&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;TreebleDataSource&#39;</span><span class="p">);</span>
 		<span class="k">return</span><span class="p">;</span>
@@ -247,7 +263,7 @@
 			<span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">open</span><span class="p">)</span>
 			<span class="p">{</span>
 				<span class="nx">total</span> <span class="o">+=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">childTotal</span><span class="p">;</span>
-				<span class="nx">total</span> <span class="o">+=</span> <span class="nx">countVisibleNodes</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">children</span><span class="p">);</span>
+				<span class="nx">total</span> <span class="o">+=</span> <span class="nx">countVisibleNodes</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">node</span><span class="p">.</span><span class="nx">children</span><span class="p">);</span>
 			<span class="p">}</span>
 		<span class="p">}</span>
 	<span class="p">}</span>
