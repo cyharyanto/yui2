@@ -40,10 +40,6 @@ DS.TYPE_TREELIST = 9;
  * @param oLiveData {DataSource}  Pointer to root of the DataSource tree.
  * @param oConfigs {object} Object literal of configuration values.  Required params are:
  *		<dl>
- *		<dt>childNodesKey</dt>
- *		<dd>(required) The name of the key inside a node which contains the data
- *			used to construct the DataSource for retrieving the children.
- *			This data is passed <code>DataSource.parseDataSource()</code>.</dd>
  *		<dt>generateRequest</dt>
  *		<dd>(required) The function to convert the output from
  *			<code>DataTable.generateTreebleDataSourceRequest()</code> into
@@ -51,6 +47,11 @@ DS.TYPE_TREELIST = 9;
  *			takes two arguments: state {sort,dir,startIndex,results} and path
  *			(an array of node indices telling how to reach the node).
  *			</dd>
+ *		<dt>childNodesKey</dt>
+ *		<dd>(semi-optional) The name of the key inside a node which contains the data
+ *			used to construct the DataSource for retrieving the children.
+ *			This data is passed to <code>DataSource.parseDataSource()</code>.</dd>
+ *			This config is only required if you provide a custom parser.
  *		<dt>startIndexExpr</dt>
  *		<dd>(optional) OGNL expression telling how to extract the startIndex
  *			from the received data, e.g., <code>.meta.startIndex</code>.
@@ -74,19 +75,34 @@ DS.TYPE_TREELIST = 9;
  */
 util.TreebleDataSource = function(oLiveData, oConfigs)
 {
+	oConfigs = oConfigs || {};
+
 	if (!oLiveData instanceof util.DataSourceBase)
 	{
 		YAHOO.log('TreebleDataSource requires DataSource', 'error', 'TreebleDataSource');
 		return;
 	}
 
-	if (!oConfigs || !oConfigs.childNodesKey)
+	if (!oConfigs.childNodesKey)
 	{
-		YAHOO.log('TreebleDataSource requires childNodesKey configuration', 'error', 'TreebleDataSource');
-		return;
+		var fields = oLiveData.responseSchema.fields;
+		for (var i=0; i<fields.length; i++)
+		{
+			if (lang.isObject(fields[i]) && fields[i].parser == 'datasource')
+			{
+				oConfigs.childNodesKey = fields[i].key;
+				break;
+			}
+		}
+
+		if (!oConfigs.childNodesKey)
+		{
+			YAHOO.log('TreebleDataSource requires childNodesKey configuration', 'error', 'TreebleDataSource');
+			return;
+		}
 	}
 
-	if (!oConfigs || !oConfigs.generateRequest)
+	if (!oConfigs.generateRequest)
 	{
 		YAHOO.log('TreebleDataSource requires generateRequest configuration', 'error', 'TreebleDataSource');
 		return;
@@ -198,7 +214,7 @@ function countVisibleNodes(
 			if (node.open)
 			{
 				total += node.childTotal;
-				total += countVisibleNodes(node.children);
+				total += countVisibleNodes.call(this, node.children);
 			}
 		}
 	}

@@ -375,7 +375,7 @@ YAHOO.util.Event.onDOMReady(function(){
 				}
 			),
 			{
-				paginateChildren:       false,
+				paginateChildren:       true,
 				generateRequest:        localGenerateRequest,
 				totalRecordsReturnExpr: '.meta.totalRecords'
 			}
@@ -384,14 +384,14 @@ YAHOO.util.Event.onDOMReady(function(){
 		//Attribute Config
 		{
 			paginator: new YAHOO.widget.Paginator({
-				rowsPerPage:1,
+				rowsPerPage:5,
 				rowsPerPageOptions:[1,2,5,10,25,50],
 				containers:'table-pagination',
 				template:'{FirstPageLink}{PreviousPageLink}{PageLinks}{NextPageLink}{LastPageLink}{RowsPerPageDropdown}'
 			}),
-			initialRequest: {startIndex:0,results:1},
+			initialRequest: {startIndex:0,results:5},
 			dynamicData: true,
-			displayAllRecords: true,
+			displayAllRecords: false,
 			generateRequest: DT.generateTreebleDataSourceRequest,
 			handleDataReturnPayload: function(oRequest, oResponse, oPayload)
 			{
@@ -449,7 +449,7 @@ YAHOO.util.Event.onDOMReady(function(){
 
 <div id="table"></div>
 <div id="table-pagination"></div>
-<p><a href="pg_all.html">I want to paginate children instead</a></p>
+<p><a href="index.html">I want to paginate only top-level nodes instead</a></p>
 
 </body>
 </html>
