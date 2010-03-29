@@ -273,6 +273,7 @@ _hide : function() {
     }
     this.isActive = false;
     this.getDataTable()._oCellEditor =  null;
+    Dom.removeClass(this.getTdEl(), 'yui-dt-target');
 },
 
 
@@ -617,8 +618,9 @@ move : function() {
     // Move Editor
     var elContainer = this.getContainerEl(),
         elTd = this.getTdEl(),
-        x = Dom.getX(elTd),
-        y = Dom.getY(elTd);
+        xy = Dom.getXY(elTd),
+        x = xy[0],
+        y = xy[1];
 
     //TODO: remove scrolling logic
     // SF doesn't get xy for cells in scrolling table
@@ -654,6 +656,62 @@ show : function() {
     this.resetForm();
     this.isActive = true;
     elContainer.style.display = "";
+
+    // constrain to viewport
+    var cell = this.getTdEl();
+    var xy   = Dom.getXY(elContainer);
+    var x    = xy[0];
+    var y    = xy[1];
+    var w    = elContainer.offsetWidth;
+    var h    = elContainer.offsetHeight;
+    var vw   = Dom.getViewportWidth();
+    var vh   = Dom.getViewportHeight();
+
+    var anyMoved = false;
+    do {
+        var moved = false;
+        if (x + w > vw) {
+            x -= w;
+            if (x < 0) {
+                var t = this.getDataTable().getContainerEl();
+                x += Math.min(cell.offsetWidth, Dom.getX(t) + t.clientWidth - Dom.getX(cell));
+                if (x < 0) x = 0;
+                y += cell.offsetHeight;
+                if (y + h > vh) {
+                    y -= cell.offsetHeight + h;
+                    if (y < 0) y = 0;
+                }
+            }
+
+            elContainer.style.left = x + "px";
+            elContainer.style.top  = y + "px";
+            moved                  = true;
+        }
+        else if (y + cell.offsetHeight + h > vh) {
+            y -= h;
+            if (y < 0) {
+                y = 0;
+                x += cell.offsetWidth;
+                if (x + w > vw) {
+                    x -= cell.offsetWidth + w;
+                    if (x < 0) x = 0;
+                }
+            }
+
+            elContainer.style.left = x + "px";
+            elContainer.style.top  = y + "px";
+            moved                  = true;
+        }
+        else if (!anyMoved && !this.disableBtns) {
+            y                   += cell.offsetHeight;
+            elContainer.style.top = y + "px";
+        }
+        anyMoved = anyMoved || moved;
+    }
+        while (moved);
+
+    Dom.addClass(cell, 'yui-dt-target');
+
     if(elIFrame) {
         elIFrame.style.width = elContainer.offsetWidth + "px";
         elIFrame.style.height = elContainer.offsetHeight + "px";
