@@ -32,6 +32,7 @@ DS.TYPE_TREELIST = 9;
  * The tree of DataSources must be homogeneous, i.e., all of the same type,
  * and they must all use the same schema.
  *
+ * @module Treeble
  * @namespace YAHOO.util
  * @class YAHOO.util.TreebleDataSource
  * @extends YAHOO.util.DataSourceBase 
