@@ -67,20 +67,20 @@
 		DS     = util.DataSourceBase,
 		DT     = widget.DataTable;
 
-	YAHOO.hacked.ScrollingDataTable = function(elContainer,aColumnDefs,oDataSource,oConfigs)
+	YAHOO.hacked.DataTable = function(elContainer,aColumnDefs,oDataSource,oConfigs)
 	{
 		if (YAHOO.lang.isFunction(oConfigs.handleDataReturnPayload)) {
 			this.handleDataReturnPayload = oConfigs.handleDataReturnPayload;
 		}
 
-		YAHOO.hacked.ScrollingDataTable.superclass.constructor.apply(this, arguments);
+		YAHOO.hacked.DataTable.superclass.constructor.apply(this, arguments);
 	};
 
-	YAHOO.lang.extend(YAHOO.hacked.ScrollingDataTable, YAHOO.widget.ScrollingDataTable,
+	YAHOO.lang.extend(YAHOO.hacked.DataTable, YAHOO.widget.DataTable,
 	{
 		initAttributes : function()
 		{
-			YAHOO.hacked.ScrollingDataTable.superclass.initAttributes.apply(this, arguments);
+			YAHOO.hacked.DataTable.superclass.initAttributes.apply(this, arguments);
 
 			/**
 			 * @attribute displayAllRecords
@@ -321,7 +321,7 @@ YAHOO.util.Event.onDOMReady(function(){
 		return state;
 	};
 
-	YAHOO.example.localDataTable = new YAHOO.hacked.ScrollingDataTable(
+	YAHOO.example.localDataTable = new YAHOO.hacked.DataTable(
 
 		//Root element id
 		"table", 
