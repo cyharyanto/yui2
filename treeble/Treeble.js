@@ -38,7 +38,8 @@ DS.TYPE_TREELIST = 9;
  * @extends YAHOO.util.DataSourceBase 
  * @constructor
  * @param oLiveData {DataSource}  The top-level DataSource.
- *		You must pass a treebleConfig object as part of this object's configuration:
+ *		You must pass a treebleConfig object as part of this object's configuration.
+ *		This object can contain the following configuration:
  *		<dl>
  *		<dt>generateRequest</dt>
  *		<dd>(required) The function to convert the output from
@@ -67,7 +68,7 @@ DS.TYPE_TREELIST = 9;
  *			entire data set.  If this is not provided,
  *			<code>totalRecordsExpr</code> must be specified.</dd>
  *		</dl>
- * @param oConfigs {Object} Object literal of configuration values.  Required params are:
+ * @param oConfigs {Object} Object literal of configuration values.
  *		<dl>
  *		<dt>paginateChildren</dt>
  *		<dd>(optional) Pass <code>true</code> to paginate the result after merging

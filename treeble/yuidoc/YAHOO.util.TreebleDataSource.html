@@ -90,7 +90,8 @@ and they must all use the same schema.
                                                 <dd rel="yui:parameter">
                                                     <code><span property="yui:name">oLiveData</span>
                                                     &lt;<span property="yui:type">DataSource}  The top-level DataSource.
-You must pass a treebleConfig object as part of this object's configuration:
+You must pass a treebleConfig object as part of this object's configuration.
+This object can contain the following configuration:
 <dl>
 <dt>generateRequest</dt>
 <dd>(required) The function to convert the output from
@@ -126,7 +127,7 @@ entire data set.  If this is not provided,
                                                     <code><span property="yui:name">oConfigs</span>
                                                     &lt;<span property="yui:type">Object</span>&gt;
                                                     </code>
-                                                    <span property="yui:description">  Object literal of configuration values.  Required params are:
+                                                    <span property="yui:description">  Object literal of configuration values.
 <dl>
 <dt>paginateChildren</dt>
 <dd>(optional) Pass <code>true</code> to paginate the result after merging

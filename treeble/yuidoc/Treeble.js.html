@@ -87,7 +87,8 @@
 <span class="cm"> * @extends YAHOO.util.DataSourceBase </span>
 <span class="cm"> * @constructor</span>
 <span class="cm"> * @param oLiveData {DataSource}  The top-level DataSource.</span>
-<span class="cm"> *		You must pass a treebleConfig object as part of this object&#39;s configuration:</span>
+<span class="cm"> *		You must pass a treebleConfig object as part of this object&#39;s configuration.</span>
+<span class="cm"> *		This object can contain the following configuration:</span>
 <span class="cm"> *		&lt;dl&gt;</span>
 <span class="cm"> *		&lt;dt&gt;generateRequest&lt;/dt&gt;</span>
 <span class="cm"> *		&lt;dd&gt;(required) The function to convert the output from</span>
@@ -116,7 +117,7 @@
 <span class="cm"> *			entire data set.  If this is not provided,</span>
 <span class="cm"> *			&lt;code&gt;totalRecordsExpr&lt;/code&gt; must be specified.&lt;/dd&gt;</span>
 <span class="cm"> *		&lt;/dl&gt;</span>
-<span class="cm"> * @param oConfigs {Object} Object literal of configuration values.  Required params are:</span>
+<span class="cm"> * @param oConfigs {Object} Object literal of configuration values.</span>
 <span class="cm"> *		&lt;dl&gt;</span>
 <span class="cm"> *		&lt;dt&gt;paginateChildren&lt;/dt&gt;</span>
 <span class="cm"> *		&lt;dd&gt;(optional) Pass &lt;code&gt;true&lt;/code&gt; to paginate the result after merging</span>
