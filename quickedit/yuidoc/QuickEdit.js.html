@@ -1,0 +1,680 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: QuickEdit   QuickEdit.js  (YUI Library)</title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
+        <h3>QuickEdit&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
+            &gt; <a href="./module_quickedit.html" title="QuickEdit">QuickEdit</a>
+                
+                 &gt; QuickEdit.js (source view) 
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                    <div id="srcout">
+                        <style>
+                            #doc3 .classopts { display:none; }
+                        </style>
+                        <div class="highlight"><pre><span class="cm">/**********</span>
+<span class="cm">*</span>
+<span class="cm">* Quick Edit extension to YUI 2 DataTable</span>
+<span class="cm">* Author: lindalj@yahoo-inc.com / John Lindal</span>
+<span class="cm">* @submodule Quick Edit</span>
+<span class="cm">* @class YAHOO.widget.DataTable</span>
+<span class="cm">***********/</span>
+<span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+
+    <span class="kd">var</span> <span class="nx">lang</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">lang</span><span class="p">,</span>
+        <span class="nx">Dom</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">Dom</span><span class="p">;</span>
+
+    <span class="cm">/**</span>
+<span class="cm">    * The QuickEditDataTable class extends the DataTable class to provide</span>
+<span class="cm">    * Quick Edit mode.</span>
+<span class="cm">    *</span>
+<span class="cm">    * @module QuickEdit</span>
+<span class="cm">    * @namespace YAHOO.widget</span>
+<span class="cm">    * @class QuickEditDataTable</span>
+<span class="cm">    * @extends YAHOO.widget.DataTable</span>
+<span class="cm">    * @constructor</span>
+<span class="cm">    * @param elContainer {HTMLElement} Container element for the TABLE.</span>
+<span class="cm">    * @param aColumnDefs {Object[]} Array of object literal Column definitions.</span>
+<span class="cm">    * @param oDataSource {YAHOO.util.DataSource} DataSource instance.</span>
+<span class="cm">    * @param oConfigs {object} (optional) Object literal of configuration values.</span>
+<span class="cm">    */</span>
+    <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">QuickEditDataTable</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">elContainer</span><span class="p">,</span><span class="nx">aColumnDefs</span><span class="p">,</span><span class="nx">oDataSource</span><span class="p">,</span><span class="nx">oConfigs</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">QuickEditDataTable</span><span class="p">.</span><span class="nx">superclass</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">elContainer</span><span class="p">,</span><span class="nx">aColumnDefs</span><span class="p">,</span><span class="nx">oDataSource</span><span class="p">,</span><span class="nx">oConfigs</span><span class="p">);</span> 
+
+        <span class="k">this</span><span class="p">.</span><span class="nx">hasQEMessages</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+    <span class="p">};</span>
+
+    <span class="kd">var</span> <span class="nx">QEDT</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">QuickEditDataTable</span><span class="p">,</span>
+        <span class="nx">quick_edit_re</span>             <span class="o">=</span> <span class="sr">/yui-quick-edit-key:([^\s]+)/</span><span class="p">,</span>
+        <span class="nx">qe_row_status_even_prefix</span> <span class="o">=</span> <span class="s1">&#39;yui-quick-edit-even-has&#39;</span><span class="p">,</span>
+        <span class="nx">qe_row_status_odd_prefix</span>  <span class="o">=</span> <span class="s1">&#39;yui-quick-edit-odd-has&#39;</span><span class="p">,</span>
+        <span class="nx">qe_row_status_pattern</span>     <span class="o">=</span> <span class="s1">&#39;(?:^|\\s)(?:yui-quick-edit-(even|odd)-has([a-z]+))(?= |$)&#39;</span><span class="p">,</span>
+        <span class="nx">qe_row_status_re</span>          <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">qe_row_status_pattern</span><span class="p">),</span>
+        <span class="nx">qe_cell_status_prefix</span>     <span class="o">=</span> <span class="s1">&#39;yui-quick-edit-has&#39;</span><span class="p">,</span>
+        <span class="nx">qe_cell_status_pattern</span>    <span class="o">=</span> <span class="s1">&#39;(?:^|\\s)(?:&#39;</span> <span class="o">+</span> <span class="nx">qe_cell_status_prefix</span> <span class="o">+</span> <span class="s1">&#39;([a-z]+))(?= |$)&#39;</span><span class="p">,</span>
+        <span class="nx">qe_cell_status_re</span>         <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">qe_cell_status_pattern</span><span class="p">);</span>
+
+    <span class="nx">QEDT</span><span class="p">.</span><span class="nx">status_order</span> <span class="o">=</span>
+    <span class="p">[</span>
+        <span class="s1">&#39;error&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;warn&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;success&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;info&#39;</span>
+    <span class="p">];</span>
+
+    <span class="nx">getStatusPrecedence</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span>
+        <span class="cm">/* string */</span>    <span class="nx">status</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">QEDT</span><span class="p">.</span><span class="nx">status_order</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">status</span> <span class="o">==</span> <span class="nx">QEDT</span><span class="p">.</span><span class="nx">status_order</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+            <span class="p">{</span>
+                <span class="k">return</span> <span class="nx">i</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nx">QEDT</span><span class="p">.</span><span class="nx">status_order</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+    <span class="p">};</span>
+
+    <span class="nx">statusTakesPrecendence</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span>
+        <span class="cm">/* string */</span>    <span class="nx">orig_status</span><span class="p">,</span>
+        <span class="cm">/* string */</span>    <span class="nx">new_status</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span><span class="o">!</span><span class="nx">orig_status</span> <span class="o">||</span> <span class="nx">getStatusPrecedence</span><span class="p">(</span><span class="nx">new_status</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nx">getStatusPrecedence</span><span class="p">(</span><span class="nx">orig_status</span><span class="p">));</span>
+    <span class="p">};</span>
+
+    <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">lang</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span> 
+        <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">QuickEditDataTable</span><span class="p">,</span>
+        <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">DataTable</span><span class="p">,</span> 
+    <span class="p">{</span>
+        <span class="cm">/**</span>
+<span class="cm">         * Switch to Quick Edit mode.  Columns that have quickEdit defined will</span>
+<span class="cm">         * be editable.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method startQuickEdit</span>
+<span class="cm">         */</span>
+        <span class="nx">startQuickEdit</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+            <span class="k">this</span><span class="p">.</span><span class="nx">fireEvent</span><span class="p">(</span><span class="s1">&#39;clearErrorNotification&#39;</span><span class="p">);</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nx">YAHOO</span><span class="p">.</span><span class="nx">lang</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">collapseAllRows</span><span class="p">))</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">collapseAllRows</span><span class="p">();</span>
+            <span class="p">}</span>
+
+            <span class="kd">var</span> <span class="nx">cols</span>        <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getColumnSet</span><span class="p">().</span><span class="nx">keys</span><span class="p">;</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveSort</span> <span class="o">=</span> <span class="p">[];</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveEdit</span> <span class="o">=</span> <span class="p">{};</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveFmt</span>  <span class="o">=</span> <span class="p">{};</span>
+            <span class="kd">var</span> <span class="nx">sortable</span>    <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">cols</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">col</span>  <span class="o">=</span> <span class="nx">cols</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+                <span class="nx">sortable</span> <span class="o">=</span> <span class="nx">sortable</span> <span class="o">||</span> <span class="nx">col</span><span class="p">.</span><span class="nx">sortable</span><span class="p">;</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveSort</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">sortable</span><span class="p">);</span>
+                <span class="nx">col</span><span class="p">.</span><span class="nx">sortable</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+                <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveEdit</span><span class="p">[</span> <span class="nx">col</span><span class="p">.</span><span class="nx">key</span> <span class="p">]</span> <span class="o">=</span> <span class="nx">col</span><span class="p">.</span><span class="nx">editor</span><span class="p">;</span>
+                <span class="nx">col</span><span class="p">.</span><span class="nx">editor</span>                 <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">col</span><span class="p">.</span><span class="nx">hidden</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span> <span class="o">||</span> <span class="nx">col</span><span class="p">.</span><span class="nx">qeFormatter</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="kd">var</span> <span class="nx">fn</span><span class="p">;</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span> <span class="o">&amp;&amp;</span> <span class="nx">lang</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">formatter</span><span class="p">))</span> <span class="p">{</span>
+                        <span class="nx">fn</span> <span class="o">=</span> <span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">formatter</span><span class="p">;</span>
+                    <span class="p">}</span>
+                    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">lang</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">qeFormatter</span><span class="p">))</span> <span class="p">{</span>
+                        <span class="nx">fn</span> <span class="o">=</span> <span class="nx">col</span><span class="p">.</span><span class="nx">qeFormatter</span><span class="p">;</span>
+                    <span class="p">}</span>
+                    <span class="k">else</span> <span class="p">{</span>
+                        <span class="nx">fn</span> <span class="o">=</span> <span class="nx">QEDT</span><span class="p">.</span><span class="nx">textQuickEditFormatter</span><span class="p">;</span>
+                    <span class="p">}</span>
+
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="kd">var</span> <span class="nx">fmt</span>                 <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_wrapFormatter</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">col</span><span class="p">.</span><span class="nx">formatter</span><span class="p">);</span>
+                        <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveFmt</span><span class="p">[</span><span class="nx">col</span><span class="p">.</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">col</span><span class="p">.</span><span class="nx">formatter</span><span class="p">;</span>
+                        <span class="nx">col</span><span class="p">.</span><span class="nx">formatter</span>           <span class="o">=</span> <span class="nx">fmt</span><span class="p">;</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+
+            <span class="nx">Dom</span><span class="p">.</span><span class="nx">addClass</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">getContainerEl</span><span class="p">(),</span> <span class="s1">&#39;yui-dt-quick-edit&#39;</span><span class="p">);</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;tbodyKeyEvent&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_moveFocus</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+
+            <span class="kd">var</span> <span class="nx">pg</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;paginator&#39;</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">pg</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">pg</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;containers&#39;</span><span class="p">);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">c</span> <span class="k">instanceof</span> <span class="nb">Array</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="nx">c</span> <span class="o">=</span> <span class="p">[</span><span class="nx">c</span><span class="p">];</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">c</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">Dom</span><span class="p">.</span><span class="nx">setStyle</span><span class="p">(</span><span class="nx">c</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="s1">&#39;display&#39;</span><span class="p">,</span> <span class="s1">&#39;none&#39;</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nx">sortable</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">_initTheadEl</span><span class="p">();</span>
+            <span class="p">}</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
+        <span class="p">},</span>
+
+        <span class="nx">_wrapFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">editFmt</span><span class="p">,</span> <span class="nx">origFmt</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">oRecord</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">editFmt</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+                <span class="p">}</span>
+                <span class="k">else</span> <span class="p">{</span>
+                    <span class="nx">origFmt</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">};</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Switch out of Quick Edit mode.  THIS DISCARDS ALL DATA!  If you</span>
+<span class="cm">         * want to save the data, call getQuickEditChanges() BEFORE calling</span>
+<span class="cm">         * this function.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method cancelQuickEdit</span>
+<span class="cm">         */</span>
+        <span class="nx">cancelQuickEdit</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+            <span class="k">this</span><span class="p">.</span><span class="nx">fireEvent</span><span class="p">(</span><span class="s1">&#39;clearErrorNotification&#39;</span><span class="p">);</span>
+
+            <span class="kd">var</span> <span class="nx">cols</span>     <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getColumnSet</span><span class="p">().</span><span class="nx">keys</span><span class="p">;</span>
+            <span class="kd">var</span> <span class="nx">sortable</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">cols</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">col</span>      <span class="o">=</span> <span class="nx">cols</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+                <span class="nx">col</span><span class="p">.</span><span class="nx">sortable</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveSort</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+                <span class="nx">sortable</span>     <span class="o">=</span> <span class="nx">sortable</span> <span class="o">||</span> <span class="nx">col</span><span class="p">.</span><span class="nx">sortable</span><span class="p">;</span>
+                <span class="nx">col</span><span class="p">.</span><span class="nx">editor</span>   <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveEdit</span><span class="p">[</span> <span class="nx">col</span><span class="p">.</span><span class="nx">key</span> <span class="p">];</span>
+            <span class="p">}</span>
+            <span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveSort</span><span class="p">;</span>
+            <span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveEdit</span><span class="p">;</span>
+
+            <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">key</span> <span class="k">in</span> <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveFmt</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">lang</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">qeSaveFmt</span><span class="p">,</span> <span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="kd">var</span> <span class="nx">col</span>       <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getColumn</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+                    <span class="nx">col</span><span class="p">.</span><span class="nx">formatter</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveFmt</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+            <span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveFmt</span><span class="p">;</span>
+
+            <span class="nx">Dom</span><span class="p">.</span><span class="nx">removeClass</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">getContainerEl</span><span class="p">(),</span> <span class="s1">&#39;yui-dt-quick-edit&#39;</span><span class="p">);</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">unsubscribe</span><span class="p">(</span><span class="s1">&#39;tbodyKeyEvent&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_moveFocus</span><span class="p">);</span>
+
+            <span class="kd">var</span> <span class="nx">pg</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;paginator&#39;</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">pg</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">pg</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;containers&#39;</span><span class="p">);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">c</span> <span class="k">instanceof</span> <span class="nb">Array</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="nx">c</span> <span class="o">=</span> <span class="p">[</span><span class="nx">c</span><span class="p">];</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">c</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">Dom</span><span class="p">.</span><span class="nx">setStyle</span><span class="p">(</span><span class="nx">c</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="s1">&#39;display&#39;</span><span class="p">,</span> <span class="s1">&#39;block&#39;</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nx">sortable</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">_initTheadEl</span><span class="p">();</span>
+            <span class="p">}</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Return the changed values.  For each row, an object is created</span>
+<span class="cm">         * with only the changed values.  The object keys are the column keys.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method getQuickEditChanges</span>
+<span class="cm">         * @return {mixed} array if all validation passed, false otherwise</span>
+<span class="cm">         */</span>
+        <span class="nx">getQuickEditChanges</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">validateQuickEdit</span><span class="p">())</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="kd">var</span> <span class="nx">changes</span> <span class="o">=</span> <span class="p">[];</span>
+
+            <span class="kd">var</span> <span class="nx">tr</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getFirstTrEl</span><span class="p">();</span>
+            <span class="k">while</span> <span class="p">(</span><span class="nx">tr</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">rec</span>  <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getRecord</span><span class="p">(</span><span class="nx">tr</span><span class="p">);</span>
+                <span class="kd">var</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Dom</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="nx">quick_edit_re</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">tr</span><span class="p">);</span>
+
+                <span class="kd">var</span> <span class="nx">change</span> <span class="o">=</span> <span class="p">{};</span>
+                <span class="nx">changes</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">change</span><span class="p">);</span>
+
+                <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">list</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="kd">var</span> <span class="nx">m</span>    <span class="o">=</span> <span class="nx">quick_edit_re</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">list</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">className</span><span class="p">);</span>
+                    <span class="kd">var</span> <span class="nx">key</span>  <span class="o">=</span> <span class="nx">m</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+                    <span class="kd">var</span> <span class="nx">col</span>  <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getColumn</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+                    <span class="kd">var</span> <span class="nx">prev</span> <span class="o">=</span> <span class="nx">rec</span><span class="p">.</span><span class="nx">getData</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+
+                    <span class="kd">var</span> <span class="nx">val</span> <span class="o">=</span> <span class="nx">list</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">value</span><span class="p">;</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">parser</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="nx">val</span> <span class="o">=</span> <span class="nx">col</span><span class="p">.</span><span class="nx">parser</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">val</span><span class="p">);</span>
+                    <span class="p">}</span>
+
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">quickEditChanged</span> <span class="o">?</span> <span class="nx">col</span><span class="p">.</span><span class="nx">quickEditChanged</span><span class="p">(</span><span class="nx">prev</span><span class="p">,</span> <span class="nx">val</span><span class="p">)</span> <span class="o">:</span>
+                            <span class="nx">val</span> <span class="o">!==</span> <span class="p">(</span><span class="nx">prev</span> <span class="o">?</span> <span class="nx">prev</span><span class="p">.</span><span class="nx">toString</span><span class="p">()</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">))</span> <span class="p">{</span>
+                        <span class="nx">change</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">val</span><span class="p">;</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+
+                <span class="nx">tr</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getNextTrEl</span><span class="p">(</span><span class="nx">tr</span><span class="p">);</span>
+            <span class="p">}</span>
+
+            <span class="k">return</span> <span class="nx">changes</span><span class="p">;</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Copy value from first cell to all other cells in the column.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method _quickEditCopyDown</span>
+<span class="cm">         * @param e {Event} triggering event</span>
+<span class="cm">         * @param cell {Element} cell from which to copy</span>
+<span class="cm">         * @private</span>
+<span class="cm">         */</span>
+        <span class="nx">_quickEditCopyDown</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span>
+            <span class="cm">/* event */</span>     <span class="nx">e</span><span class="p">,</span>
+            <span class="cm">/* element */</span>   <span class="nx">cell</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="kd">var</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Dom</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="nx">quick_edit_re</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">cell</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">list</span> <span class="o">||</span> <span class="o">!</span><span class="nx">list</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">list</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">;</span>
+            <span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">cell</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getBelowTdEl</span><span class="p">(</span><span class="nx">cell</span><span class="p">);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">cell</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">break</span><span class="p">;</span>
+                <span class="p">}</span>
+
+                <span class="nx">list</span> <span class="o">=</span> <span class="nx">Dom</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="nx">quick_edit_re</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">cell</span><span class="p">);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">list</span> <span class="o">&amp;&amp;</span> <span class="nx">list</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">list</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Validate the quick edit data.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method validateQuickEdit</span>
+<span class="cm">         * @return {boolean} true if all validation checks pass</span>
+<span class="cm">         */</span>
+        <span class="nx">validateQuickEdit</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+            <span class="k">this</span><span class="p">.</span><span class="nx">clearMessages</span><span class="p">();</span>
+            <span class="kd">var</span> <span class="nx">status</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+            <span class="kd">var</span> <span class="nx">e1</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getTbodyEl</span><span class="p">().</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">);</span>
+            <span class="kd">var</span> <span class="nx">e2</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getTbodyEl</span><span class="p">().</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;textarea&#39;</span><span class="p">);</span>
+
+            <span class="nx">status</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_validateElements</span><span class="p">(</span><span class="nx">e1</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">status</span><span class="p">;</span>	<span class="c1">// status last to guarantee call</span>
+            <span class="nx">status</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_validateElements</span><span class="p">(</span><span class="nx">e2</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">status</span><span class="p">;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">status</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">fireEvent</span><span class="p">(</span><span class="s1">&#39;notifyErrors&#39;</span><span class="p">);</span>
+            <span class="p">}</span>
+
+            <span class="k">return</span> <span class="nx">status</span><span class="p">;</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Validate the given form fields.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method _validateElements</span>
+<span class="cm">         * @param e {Array} Array of form fields.</span>
+<span class="cm">         * @return {boolean} true if all validation checks pass</span>
+<span class="cm">         * @private</span>
+<span class="cm">         */</span>
+        <span class="nx">_validateElements</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span>
+            <span class="cm">/* array */</span> <span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="kd">var</span> <span class="nx">status</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+            <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">e</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">col</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getColumn</span><span class="p">(</span><span class="nx">e</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">continue</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="kd">var</span> <span class="nx">msg_list</span> <span class="o">=</span> <span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span> <span class="o">?</span> <span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span><span class="p">.</span><span class="nx">msg</span> <span class="o">:</span> <span class="kc">null</span><span class="p">;</span>
+<span class="cm">/*</span>
+<span class="cm">                // see yui3-gallery:gallery-formmgr for an example of validateFromCSSData()</span>
+
+<span class="cm">                var info = validateFromCSSData(e[i], msg_list);</span>
+<span class="cm">                if (info.error) {</span>
+<span class="cm">                    this.displayMessage(e[i], info.error, &#39;error&#39;);</span>
+<span class="cm">                    status = false;</span>
+<span class="cm">                }</span>
+<span class="cm">                if (!info.keepGoing) {</span>
+<span class="cm">                    continue;</span>
+<span class="cm">                }</span>
+<span class="cm">*/</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span>
+                        <span class="o">&amp;&amp;</span> <span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span><span class="p">.</span><span class="nx">regex</span> <span class="k">instanceof</span> <span class="nb">RegExp</span>
+                        <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span><span class="p">.</span><span class="nx">regex</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">e</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">value</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">displayMessage</span><span class="p">(</span><span class="nx">e</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">msg_list</span> <span class="o">?</span> <span class="nx">msg_list</span><span class="p">.</span><span class="nx">regex</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">);</span>
+                    <span class="nx">status</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+                    <span class="k">continue</span><span class="p">;</span>
+                <span class="p">}</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span>
+                        <span class="o">&amp;&amp;</span> <span class="nx">lang</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span><span class="p">.</span><span class="nx">fn</span><span class="p">)</span>
+                        <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span><span class="p">.</span><span class="nx">fn</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">e</span><span class="p">[</span><span class="nx">i</span><span class="p">]))</span> <span class="p">{</span>
+                    <span class="nx">status</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+                    <span class="k">continue</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+
+            <span class="k">return</span> <span class="nx">status</span><span class="p">;</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Clear all validation messages in quick edit mode.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method clearMessages</span>
+<span class="cm">         */</span>
+        <span class="nx">clearMessages</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+            <span class="k">this</span><span class="p">.</span><span class="nx">hasQEMessages</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+            <span class="k">this</span><span class="p">.</span><span class="nx">fireEvent</span><span class="p">(</span><span class="s1">&#39;clearErrorNotification&#39;</span><span class="p">);</span>
+
+            <span class="kd">var</span> <span class="nx">list</span> <span class="o">=</span> <span class="nx">Dom</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="nx">qe_row_status_re</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">getTbodyEl</span><span class="p">());</span>
+            <span class="nx">Dom</span><span class="p">.</span><span class="nx">removeClass</span><span class="p">(</span><span class="nx">list</span><span class="p">,</span> <span class="nx">qe_row_status_re</span><span class="p">);</span>
+
+            <span class="nx">list</span> <span class="o">=</span> <span class="nx">Dom</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="nx">qe_cell_status_re</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">getTbodyEl</span><span class="p">());</span>
+            <span class="nx">Dom</span><span class="p">.</span><span class="nx">removeClass</span><span class="p">(</span><span class="nx">list</span><span class="p">,</span> <span class="nx">qe_cell_status_re</span><span class="p">);</span>
+
+            <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">list</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">m</span> <span class="o">=</span> <span class="nx">Dom</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="nx">QEDT</span><span class="p">.</span><span class="nx">CLASS_QE_ERROR_TEXT</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">list</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">m</span> <span class="o">&amp;&amp;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">m</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Display a message for a quick edit field.  If an existing message with</span>
+<span class="cm">         * a higher precedence is already visible, it will not be replaced.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method displayMessage</span>
+<span class="cm">         * @param e {Element} form field</span>
+<span class="cm">         * @param msg {String} message to display</span>
+<span class="cm">         * @param type {String} message type: error, warn, success, info</span>
+<span class="cm">         * @param scroll {boolean} If false, does not scroll, even if this is the first message to display.</span>
+<span class="cm">         */</span>
+        <span class="nx">displayMessage</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span>
+            <span class="cm">/* element */</span>   <span class="nx">e</span><span class="p">,</span>
+            <span class="cm">/* string */</span>    <span class="nx">msg</span><span class="p">,</span>
+            <span class="cm">/* string */</span>    <span class="nx">type</span><span class="p">,</span>
+            <span class="cm">/* boolean */</span>   <span class="nx">scroll</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nx">lang</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="nx">scroll</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nx">scroll</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="kd">var</span> <span class="nx">row</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getTrEl</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">statusTakesPrecendence</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_getElementStatus</span><span class="p">(</span><span class="nx">row</span><span class="p">,</span> <span class="nx">qe_row_status_re</span><span class="p">),</span> <span class="nx">type</span><span class="p">))</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">hasQEMessages</span> <span class="o">&amp;&amp;</span> <span class="nx">scroll</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">getFirstTdEl</span><span class="p">(</span><span class="nx">row</span><span class="p">).</span><span class="nx">scrollIntoView</span><span class="p">();</span>
+                <span class="p">}</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="nx">Dom</span><span class="p">.</span><span class="nx">hasClass</span><span class="p">(</span><span class="nx">row</span><span class="p">,</span> <span class="s1">&#39;yui-dt-even&#39;</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="nx">Dom</span><span class="p">.</span><span class="nx">replaceClass</span><span class="p">(</span><span class="nx">row</span><span class="p">,</span> <span class="nx">qe_row_status_re</span><span class="p">,</span> <span class="nx">qe_row_status_even_prefix</span> <span class="o">+</span> <span class="nx">type</span><span class="p">);</span>
+                <span class="p">}</span>
+                <span class="k">else</span> <span class="p">{</span>
+                    <span class="nx">Dom</span><span class="p">.</span><span class="nx">replaceClass</span><span class="p">(</span><span class="nx">row</span><span class="p">,</span> <span class="nx">qe_row_status_re</span><span class="p">,</span> <span class="nx">qe_row_status_odd_prefix</span> <span class="o">+</span> <span class="nx">type</span><span class="p">);</span>
+                <span class="p">}</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">hasQEMessages</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="kd">var</span> <span class="nx">cell</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getTdEl</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">statusTakesPrecendence</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_getElementStatus</span><span class="p">(</span><span class="nx">cell</span><span class="p">,</span> <span class="nx">qe_cell_status_re</span><span class="p">),</span> <span class="nx">type</span><span class="p">))</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="kd">var</span> <span class="nx">m</span> <span class="o">=</span> <span class="nx">Dom</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="nx">QEDT</span><span class="p">.</span><span class="nx">CLASS_QE_ERROR_TEXT</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">cell</span><span class="p">);</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">m</span> <span class="o">&amp;&amp;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="nx">m</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">msg</span><span class="p">;</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+
+                <span class="nx">Dom</span><span class="p">.</span><span class="nx">replaceClass</span><span class="p">(</span><span class="nx">cell</span><span class="p">,</span> <span class="nx">qe_cell_status_re</span><span class="p">,</span> <span class="nx">qe_cell_status_prefix</span> <span class="o">+</span> <span class="nx">type</span><span class="p">);</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">hasQEMessages</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Return the status of the field.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method _getElementStatus</span>
+<span class="cm">         * @param e {Element} form field</span>
+<span class="cm">         * @param r {RegExp} regex to match against className</span>
+<span class="cm">         * @private</span>
+<span class="cm">         */</span>
+        <span class="nx">_getElementStatus</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span>
+            <span class="cm">/* string/object */</span> <span class="nx">e</span><span class="p">,</span>
+            <span class="cm">/* regex */</span>         <span class="nx">r</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="kd">var</span> <span class="nx">m</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">className</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="nx">r</span><span class="p">);</span>
+            <span class="k">return</span> <span class="p">((</span><span class="nx">m</span> <span class="o">&amp;&amp;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="o">?</span> <span class="nx">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">:</span> <span class="kc">false</span><span class="p">);</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Shift the focus up/down within a column.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method _moveFocus</span>
+<span class="cm">         * @param cssClass {String} Extra class to apply to the row.</span>
+<span class="cm">         * @return {Element} reference to the new row</span>
+<span class="cm">         * @private</span>
+<span class="cm">         */</span>
+        <span class="nx">_moveFocus</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">e</span>   <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">event</span><span class="p">;</span>
+            <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">Event</span><span class="p">.</span><span class="nx">getCharCode</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">ctrlKey</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">key</span> <span class="o">==</span> <span class="mi">38</span> <span class="o">||</span> <span class="nx">key</span> <span class="o">==</span> <span class="mi">40</span><span class="p">))</span> <span class="p">{</span>    <span class="c1">// Ctrl-up/down</span>
+                <span class="kd">var</span> <span class="nx">target</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">Event</span><span class="p">.</span><span class="nx">getTarget</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+                <span class="kd">var</span> <span class="nx">cell</span>   <span class="o">=</span> <span class="p">(</span><span class="nx">key</span> <span class="o">==</span> <span class="mi">38</span> <span class="o">?</span> <span class="k">this</span><span class="p">.</span><span class="nx">getAboveTdEl</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">getBelowTdEl</span><span class="p">(</span><span class="nx">target</span><span class="p">));</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">cell</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="kd">var</span> <span class="nx">input</span> <span class="o">=</span> <span class="nx">Dom</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="nx">quick_edit_re</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">cell</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="nx">input</span><span class="p">.</span><span class="nx">focus</span><span class="p">();</span>
+                        <span class="nx">input</span><span class="p">.</span><span class="nx">select</span><span class="p">();</span>
+                        <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">Event</span><span class="p">.</span><span class="nx">stopEvent</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">});</span>
+
+    <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">lang</span><span class="p">.</span><span class="nx">augmentObject</span><span class="p">(</span><span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">QuickEditDataTable</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="nx">CLASS_QE_ERROR_TEXT</span>     <span class="o">:</span> <span class="s1">&#39;yui-quick-edit-message-text&#39;</span><span class="p">,</span>
+        <span class="nx">MARKUP_QE_ERROR_DISPLAY</span> <span class="o">:</span> <span class="s1">&#39;&lt;div class=&quot;yui-quick-edit-message-text&quot;&gt;&lt;/div&gt;&#39;</span><span class="p">,</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Called with exactly the same arguments as any other cell</span>
+<span class="cm">         * formatter, this function displays an input field.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method textQuickEditFormatter</span>
+<span class="cm">         * @static</span>
+<span class="cm">         */</span>
+        <span class="nx">textQuickEditFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">markup</span> <span class="o">=</span>
+                <span class="s1">&#39;&lt;input type=&quot;text&quot; class=&quot;{yiv} yui-quick-edit yui-quick-edit-key:{key}&quot;/&gt;&#39;</span> <span class="o">+</span>
+                <span class="nx">QEDT</span><span class="p">.</span><span class="nx">MARKUP_QE_ERROR_DISPLAY</span><span class="p">;</span>
+
+            <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">lang</span><span class="p">.</span><span class="nx">substitute</span><span class="p">(</span><span class="nx">markup</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="nx">key</span><span class="o">:</span> <span class="nx">oColumn</span><span class="p">.</span><span class="nx">key</span><span class="p">,</span>
+                <span class="nx">yiv</span><span class="o">:</span> <span class="nx">oColumn</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span> <span class="o">?</span> <span class="p">(</span><span class="nx">oColumn</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span><span class="p">.</span><span class="nx">css</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span>
+            <span class="p">});</span>
+
+            <span class="nx">el</span><span class="p">.</span><span class="nx">firstChild</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">oData</span><span class="p">;</span>
+
+            <span class="nx">QEDT</span><span class="p">.</span><span class="nx">copyDownFormatter</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Called with exactly the same arguments as any other cell</span>
+<span class="cm">         * formatter, this function displays a textarea field.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method textQuickEditFormatter</span>
+<span class="cm">         * @static</span>
+<span class="cm">         */</span>
+        <span class="nx">textareaQuickEditFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span> <span class="p">{</span>
+
+            <span class="kd">var</span> <span class="nx">markup</span> <span class="o">=</span>
+                <span class="s1">&#39;&lt;textarea class=&quot;{yiv} yui-quick-edit yui-quick-edit-key:{key}&quot;/&gt;&#39;</span> <span class="o">+</span>
+                <span class="nx">QEDT</span><span class="p">.</span><span class="nx">MARKUP_QE_ERROR_DISPLAY</span><span class="p">;</span>
+
+            <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">lang</span><span class="p">.</span><span class="nx">substitute</span><span class="p">(</span><span class="nx">markup</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="nx">key</span><span class="o">:</span> <span class="nx">oColumn</span><span class="p">.</span><span class="nx">key</span><span class="p">,</span>
+                <span class="nx">yiv</span><span class="o">:</span> <span class="nx">oColumn</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span> <span class="o">?</span> <span class="p">(</span><span class="nx">oColumn</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span><span class="p">.</span><span class="nx">css</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span>
+            <span class="p">});</span>
+
+            <span class="nx">el</span><span class="p">.</span><span class="nx">firstChild</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">oData</span><span class="p">;</span>
+
+            <span class="nx">QEDT</span><span class="p">.</span><span class="nx">copyDownFormatter</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Called with exactly the same arguments as any other cell</span>
+<span class="cm">         * formatter, this function displays an email address without the</span>
+<span class="cm">         * anchor tag.  Use this as the column&#39;s qeFormatter if the column</span>
+<span class="cm">         * should not be editable in Quick Edit mode.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method readonlyLinkQuickEditFormatter</span>
+<span class="cm">         * @static</span>
+<span class="cm">         */</span>
+        <span class="nx">readonlyEmailQuickEditFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="p">(</span><span class="nx">oData</span> <span class="o">?</span> <span class="nx">oData</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Called with exactly the same arguments as any other cell</span>
+<span class="cm">         * formatter, this function displays a link without the anchor tag.</span>
+<span class="cm">         * Use this as the column&#39;s qeFormatter if the column should not be</span>
+<span class="cm">         * editable in Quick Edit mode.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method readonlyLinkQuickEditFormatter</span>
+<span class="cm">         * @static</span>
+<span class="cm">         */</span>
+         <span class="nx">readonlyLinkQuickEditFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span>
+         <span class="p">{</span>
+            <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">oData</span><span class="p">;</span>
+        <span class="p">},</span>
+
+        <span class="cm">/**</span>
+<span class="cm">         * Called with exactly the same arguments as a normal cell</span>
+<span class="cm">         * formatter, this function inserts a &quot;Copy down&quot; button if the</span>
+<span class="cm">         * cell is in the first row of the DataTable.  Call this at the end</span>
+<span class="cm">         * of your QuickEdit formatter.</span>
+<span class="cm">         *</span>
+<span class="cm">         * @method copyDownFormatter</span>
+<span class="cm">         * @static</span>
+<span class="cm">         */</span>
+        <span class="nx">copyDownFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">oColumn</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">copyDown</span> <span class="o">&amp;&amp;</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">getRecordSet</span><span class="p">().</span><span class="nx">getRecordIndex</span><span class="p">(</span><span class="nx">oRecord</span><span class="p">)</span> <span class="o">==</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">getState</span><span class="p">().</span><span class="nx">pagination</span><span class="p">.</span><span class="nx">recordOffset</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">button</span>       <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;button&#39;</span><span class="p">);</span>
+                <span class="nx">button</span><span class="p">.</span><span class="nx">title</span>     <span class="o">=</span> <span class="s1">&#39;Copy down&#39;</span><span class="p">;</span>
+                <span class="nx">button</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">&#39;&amp;darr;&#39;</span>
+
+                <span class="kd">var</span> <span class="nx">msg</span> <span class="o">=</span> <span class="nx">Dom</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="nx">QEDT</span><span class="p">.</span><span class="nx">CLASS_QE_ERROR_TEXT</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">el</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+                <span class="nx">el</span><span class="p">.</span><span class="nx">insertBefore</span><span class="p">(</span><span class="nx">button</span><span class="p">,</span> <span class="nx">msg</span><span class="p">);</span>
+
+                <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">Event</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">button</span><span class="p">,</span> <span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_quickEditCopyDown</span><span class="p">,</span> <span class="nx">el</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">});</span>
+
+<span class="p">})();</span>
+</pre></div>
+
+                    </div>
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="module_quickedit.html" title="QuickEdit">QuickEdit</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class=""><a href="YAHOO.widget.DataTable.html" title="YAHOO.widget.DataTable">YAHOO.widget.DataTable</a></li>
+                                <li class=""><a href="YAHOO.widget.QuickEditDataTable.html" title="YAHOO.widget.QuickEditDataTable">YAHOO.widget.QuickEditDataTable</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class=""><a href="classmap.js.html" title="classmap.js">classmap.js</a></li>
+                                <li class="selected"><a href="QuickEdit.js.html" title="QuickEdit.js">QuickEdit.js</a></li>
+                        </ul>
+                    </div>
+
+
+
+
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+        Copyright &copy; 2010 Yahoo! Inc. All rights reserved.
+	</div>
+</div>
+<script type="text/javascript">
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.QuickEditDataTable.html#method_cancelQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "cancelQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_clearMessages", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "clearMessages"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_copyDownFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "copyDownFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_displayMessage", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "displayMessage"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_getQuickEditChanges", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "getQuickEditChanges"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_readonlyLinkQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "readonlyLinkQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_startQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "startQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_validateQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "validateQuickEdit"}];
+    YAHOO.yuidoc.init();
+</script>
+</body>
+</html>
