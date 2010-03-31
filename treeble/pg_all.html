@@ -384,13 +384,16 @@ YAHOO.util.Event.onDOMReady(function(){
 							"id","quantity","year","title",
 							{key: 'kiddies', parser: 'datasource'}
 						]
+					},
+					treebleConfig:
+					{
+						generateRequest:        localGenerateRequest,
+						totalRecordsReturnExpr: '.meta.totalRecords'
 					}
 				}
 			),
 			{
-				paginateChildren:       true,
-				generateRequest:        localGenerateRequest,
-				totalRecordsReturnExpr: '.meta.totalRecords'
+				paginateChildren: true
 			}
 		),
 
