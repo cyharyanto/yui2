@@ -66,7 +66,8 @@ DS.TYPE_TREELIST = 9;
  *			the total number of records, e.g., <code>.meta.totalRecords</code>.
  *			This is only appropriate for DataSources that always return the
  *			entire data set.  If this is not provided,
- *			<code>totalRecordsExpr</code> must be specified.</dd>
+ *			<code>totalRecordsExpr</code> must be specified.  If both are provided,
+ *			<code>totalRecordsExpr</code> takes priority.</dd>
  *		</dl>
  * @param oConfigs {Object} Object literal of configuration values.
  *		<dl>
