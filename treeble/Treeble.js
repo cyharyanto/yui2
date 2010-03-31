@@ -50,8 +50,8 @@ DS.TYPE_TREELIST = 9;
  *		<dt>childNodesKey</dt>
  *		<dd>(semi-optional) The name of the key inside a node which contains the data
  *			used to construct the DataSource for retrieving the children.
- *			This data is passed to <code>DataSource.parseDataSource()</code>.</dd>
- *			This config is only required if you provide a custom parser.
+ *			This data is passed to <code>DataSource.parseDataSource()</code>.
+ *			This config is only required if you provide a custom parser.</dd>
  *		<dt>startIndexExpr</dt>
  *		<dd>(optional) OGNL expression telling how to extract the startIndex
  *			from the received data, e.g., <code>.meta.startIndex</code>.
