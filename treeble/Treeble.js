@@ -37,8 +37,8 @@ DS.TYPE_TREELIST = 9;
  * @class YAHOO.util.TreebleDataSource
  * @extends YAHOO.util.DataSourceBase 
  * @constructor
- * @param oLiveData {DataSource}  Pointer to root of the DataSource tree.
- * @param oConfigs {Object} Object literal of configuration values.  Required params are:
+ * @param oLiveData {DataSource}  The top-level DataSource.
+ *		You must pass a treebleConfig object as part of this object's configuration:
  *		<dl>
  *		<dt>generateRequest</dt>
  *		<dd>(required) The function to convert the output from
@@ -48,9 +48,8 @@ DS.TYPE_TREELIST = 9;
  *			(an array of node indices telling how to reach the node).
  *			</dd>
  *		<dt>childNodesKey</dt>
- *		<dd>(semi-optional) The name of the key inside a node which contains the data
- *			used to construct the DataSource for retrieving the children.
- *			This data is passed to <code>DataSource.parseDataSource()</code>.
+ *		<dd>(semi-optional) The name of the key inside a node which contains
+ *			the data used to construct the DataSource for retrieving the children.
  *			This config is only required if you provide a custom parser.</dd>
  *		<dt>startIndexExpr</dt>
  *		<dd>(optional) OGNL expression telling how to extract the startIndex
@@ -67,6 +66,9 @@ DS.TYPE_TREELIST = 9;
  *			This is only appropriate for DataSources that always return the
  *			entire data set.  If this is not provided,
  *			<code>totalRecordsExpr</code> must be specified.</dd>
+ *		</dl>
+ * @param oConfigs {Object} Object literal of configuration values.  Required params are:
+ *		<dl>
  *		<dt>paginateChildren</dt>
  *		<dd>(optional) Pass <code>true</code> to paginate the result after merging
  *			child nodes into the list.  The default (<code>false</code>) is to
@@ -83,28 +85,28 @@ util.TreebleDataSource = function(oLiveData, oConfigs)
 		return;
 	}
 
-	if (!oConfigs.childNodesKey)
+	if (!oLiveData.treebleConfig.childNodesKey)
 	{
 		var fields = oLiveData.responseSchema.fields;
 		for (var i=0; i<fields.length; i++)
 		{
 			if (lang.isObject(fields[i]) && fields[i].parser == 'datasource')
 			{
-				oConfigs.childNodesKey = fields[i].key;
+				oLiveData.treebleConfig.childNodesKey = fields[i].key;
 				break;
 			}
 		}
 
-		if (!oConfigs.childNodesKey)
+		if (!oLiveData.treebleConfig.childNodesKey)
 		{
-			YAHOO.log('TreebleDataSource requires childNodesKey configuration', 'error', 'TreebleDataSource');
+			YAHOO.log('TreebleDataSource requires treebleConfig.childNodesKey configuration to be set on top-level DataSource', 'error', 'TreebleDataSource');
 			return;
 		}
 	}
 
-	if (!oConfigs.generateRequest)
+	if (!oLiveData.treebleConfig.generateRequest)
 	{
-		YAHOO.log('TreebleDataSource requires generateRequest configuration', 'error', 'TreebleDataSource');
+		YAHOO.log('TreebleDataSource requires treebleConfig.generateRequest configuration to be set on top-level DataSource', 'error', 'TreebleDataSource');
 		return;
 	}
 
@@ -472,7 +474,7 @@ function requestSlices(
 		request.startIndex = req.start;
 		request.results    = req.end - req.start + 1;
 
-		req.txId = req.ds.sendRequest(this.generateRequest(request, req.path),
+		req.txId = req.ds.sendRequest(req.ds.treebleConfig.generateRequest(request, req.path),
 		{
 			success:  treeSuccess,
 			failure:  treeFailure,
@@ -521,11 +523,10 @@ function treeSuccess(oRequest, oParsedResponse, reqIndex)
 	req.resp  = oParsedResponse;
 	req.error = false;
 
-	// TODO: worth avoiding eval?
 	var dataStartIndex = 0;
-	if (this.startIndexExpr)
+	if (req.ds.treebleConfig.startIndexExpr)
 	{
-		eval('dataStartIndex=req.resp'+this.startIndexExpr);
+		eval('dataStartIndex=req.resp'+req.ds.treebleConfig.startIndexExpr);
 	}
 
 	var sliceStartIndex = req.start - dataStartIndex;
@@ -534,18 +535,17 @@ function treeSuccess(oRequest, oParsedResponse, reqIndex)
 
 	var parent = (req.path.length > 0 ? getNode.call(this, req.path) : null);
 	var open   = (parent !== null ? parent.children : this._open);
-	if (!populateOpen(parent, open, req.data, req.start, this.childNodesKey))
+	if (!populateOpen(parent, open, req.data, req.start, req.ds.treebleConfig.childNodesKey))
 	{
 		treeFailure.apply(this, arguments);
 		return;
 	}
 
-	// TODO: worth avoiding eval?
-	if (!parent && this.totalRecordsExpr)
+	if (!parent && req.ds.treebleConfig.totalRecordsExpr)
 	{
-		eval('this._topNodeTotal=oParsedResponse'+this.totalRecordsExpr);
+		eval('this._topNodeTotal=oParsedResponse'+req.ds.treebleConfig.totalRecordsExpr);
 	}
-	else if (!parent && this.totalRecordsReturnExpr)
+	else if (!parent && req.ds.treebleConfig.totalRecordsReturnExpr)
 	{
 		this._topNodeTotal = oParsedResponse.results.length;
 	}
@@ -642,14 +642,13 @@ function checkFinished()
 		response.results = response.results.concat(data);
 	}
 
-	// TODO: worth avoiding eval?
-	if (this.totalRecordsExpr)
+	if (this.liveData.treebleConfig.totalRecordsExpr)
 	{
-		eval('response'+this.totalRecordsExpr+'='+countVisibleNodes.call(this));
+		eval('response'+this.liveData.treebleConfig.totalRecordsExpr+'='+countVisibleNodes.call(this));
 	}
-	else if (this.totalRecordsReturnExpr)
+	else if (this.liveData.treebleConfig.totalRecordsReturnExpr)
 	{
-		eval('response'+this.totalRecordsReturnExpr+'='+countVisibleNodes.call(this));
+		eval('response'+this.liveData.treebleConfig.totalRecordsReturnExpr+'='+countVisibleNodes.call(this));
 	}
 
 	DS.issueCallback(this._callback.callback, [this._callback.request, response], false, this._callback.caller);
@@ -707,12 +706,11 @@ function toggleSuccess(oRequest, oParsedResponse, args)
 	var node       = args[0];
 	var completion = args[1];
 
-	// TODO: worth avoiding eval?
-	if (this.totalRecordsExpr)
+	if (node.ds.treebleConfig.totalRecordsExpr)
 	{
-		eval('node.childTotal=oParsedResponse'+this.totalRecordsExpr);
+		eval('node.childTotal=oParsedResponse'+node.ds.treebleConfig.totalRecordsExpr);
 	}
-	else if (this.totalRecordsReturnExpr)
+	else if (node.ds.treebleConfig.totalRecordsReturnExpr)
 	{
 		node.childTotal = oParsedResponse.results.length;
 	}
@@ -794,7 +792,7 @@ lang.extend(util.TreebleDataSource, DS,
 			{
 				request.startIndex = 0;
 				request.results    = 0;
-				node.ds.sendRequest(this.generateRequest(request, path),
+				node.ds.sendRequest(node.ds.treebleConfig.generateRequest(request, path),
 				{
 					success:  toggleSuccess,
 					failure:  toggleFailure,
@@ -901,7 +899,8 @@ DS.parseDataSource = function(oData)
 		var ds = new util.FunctionDataSource(fn,
 		{
 			responseSchema:  this.responseSchema,
-			maxCacheEntries: this.maxCacheEntries
+			maxCacheEntries: this.maxCacheEntries,
+			treebleConfig:   this.treebleConfig
 		});
 
 		if (scope)
@@ -912,19 +911,38 @@ DS.parseDataSource = function(oData)
 	}
 	else if (!lang.isUndefined(oData.dataType))
 	{
+		var treebleConfig = this.treebleConfig;
+		if (oData.dataType == DS.TYPE_JSARRAY ||
+			oData.dataType == DS.TYPE_JSON)
+		{
+			treebleConfig = cloneObject(treebleConfig);
+			delete treebleConfig.startIndexExpr;
+			delete treebleConfig.totalRecordsExpr;
+		}
+
 		return new util.DataSource(oData.liveData,
 		{
 			dataType:        oData.dataType,
 			responseSchema:  this.responseSchema,
-			maxCacheEntries: this.maxCacheEntries
+			maxCacheEntries: this.maxCacheEntries,
+			treebleConfig:   treebleConfig
 		});
 	}
 	else
 	{
+		var treebleConfig = this.treebleConfig;
+		if (lang.isArray(oData))
+		{
+			treebleConfig = cloneObject(treebleConfig);
+			delete treebleConfig.startIndexExpr;
+			delete treebleConfig.totalRecordsExpr;
+		}
+
 		return new util.DataSource(oData,
 		{
 			responseSchema:  this.responseSchema,
-			maxCacheEntries: this.maxCacheEntries
+			maxCacheEntries: this.maxCacheEntries,
+			treebleConfig:   treebleConfig
 		});
 	}
 };

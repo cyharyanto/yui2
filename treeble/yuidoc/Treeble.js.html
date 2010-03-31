@@ -86,8 +86,8 @@
 <span class="cm"> * @class YAHOO.util.TreebleDataSource</span>
 <span class="cm"> * @extends YAHOO.util.DataSourceBase </span>
 <span class="cm"> * @constructor</span>
-<span class="cm"> * @param oLiveData {DataSource}  Pointer to root of the DataSource tree.</span>
-<span class="cm"> * @param oConfigs {Object} Object literal of configuration values.  Required params are:</span>
+<span class="cm"> * @param oLiveData {DataSource}  The top-level DataSource.</span>
+<span class="cm"> *		You must pass a treebleConfig object as part of this object&#39;s configuration:</span>
 <span class="cm"> *		&lt;dl&gt;</span>
 <span class="cm"> *		&lt;dt&gt;generateRequest&lt;/dt&gt;</span>
 <span class="cm"> *		&lt;dd&gt;(required) The function to convert the output from</span>
@@ -97,9 +97,8 @@
 <span class="cm"> *			(an array of node indices telling how to reach the node).</span>
 <span class="cm"> *			&lt;/dd&gt;</span>
 <span class="cm"> *		&lt;dt&gt;childNodesKey&lt;/dt&gt;</span>
-<span class="cm"> *		&lt;dd&gt;(semi-optional) The name of the key inside a node which contains the data</span>
-<span class="cm"> *			used to construct the DataSource for retrieving the children.</span>
-<span class="cm"> *			This data is passed to &lt;code&gt;DataSource.parseDataSource()&lt;/code&gt;.</span>
+<span class="cm"> *		&lt;dd&gt;(semi-optional) The name of the key inside a node which contains</span>
+<span class="cm"> *			the data used to construct the DataSource for retrieving the children.</span>
 <span class="cm"> *			This config is only required if you provide a custom parser.&lt;/dd&gt;</span>
 <span class="cm"> *		&lt;dt&gt;startIndexExpr&lt;/dt&gt;</span>
 <span class="cm"> *		&lt;dd&gt;(optional) OGNL expression telling how to extract the startIndex</span>
@@ -116,6 +115,9 @@
 <span class="cm"> *			This is only appropriate for DataSources that always return the</span>
 <span class="cm"> *			entire data set.  If this is not provided,</span>
 <span class="cm"> *			&lt;code&gt;totalRecordsExpr&lt;/code&gt; must be specified.&lt;/dd&gt;</span>
+<span class="cm"> *		&lt;/dl&gt;</span>
+<span class="cm"> * @param oConfigs {Object} Object literal of configuration values.  Required params are:</span>
+<span class="cm"> *		&lt;dl&gt;</span>
 <span class="cm"> *		&lt;dt&gt;paginateChildren&lt;/dt&gt;</span>
 <span class="cm"> *		&lt;dd&gt;(optional) Pass &lt;code&gt;true&lt;/code&gt; to paginate the result after merging</span>
 <span class="cm"> *			child nodes into the list.  The default (&lt;code&gt;false&lt;/code&gt;) is to</span>
@@ -132,28 +134,28 @@
 		<span class="k">return</span><span class="p">;</span>
 	<span class="p">}</span>
 
-	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oConfigs</span><span class="p">.</span><span class="nx">childNodesKey</span><span class="p">)</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oLiveData</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">childNodesKey</span><span class="p">)</span>
 	<span class="p">{</span>
 		<span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="nx">oLiveData</span><span class="p">.</span><span class="nx">responseSchema</span><span class="p">.</span><span class="nx">fields</span><span class="p">;</span>
 		<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">fields</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span>
 		<span class="p">{</span>
 			<span class="k">if</span> <span class="p">(</span><span class="nx">lang</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">fields</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nx">fields</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">parser</span> <span class="o">==</span> <span class="s1">&#39;datasource&#39;</span><span class="p">)</span>
 			<span class="p">{</span>
-				<span class="nx">oConfigs</span><span class="p">.</span><span class="nx">childNodesKey</span> <span class="o">=</span> <span class="nx">fields</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">key</span><span class="p">;</span>
+				<span class="nx">oLiveData</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">childNodesKey</span> <span class="o">=</span> <span class="nx">fields</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">key</span><span class="p">;</span>
 				<span class="k">break</span><span class="p">;</span>
 			<span class="p">}</span>
 		<span class="p">}</span>
 
-		<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oConfigs</span><span class="p">.</span><span class="nx">childNodesKey</span><span class="p">)</span>
+		<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oLiveData</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">childNodesKey</span><span class="p">)</span>
 		<span class="p">{</span>
-			<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;TreebleDataSource requires childNodesKey configuration&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;TreebleDataSource&#39;</span><span class="p">);</span>
+			<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;TreebleDataSource requires treebleConfig.childNodesKey configuration to be set on top-level DataSource&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;TreebleDataSource&#39;</span><span class="p">);</span>
 			<span class="k">return</span><span class="p">;</span>
 		<span class="p">}</span>
 	<span class="p">}</span>
 
-	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oConfigs</span><span class="p">.</span><span class="nx">generateRequest</span><span class="p">)</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oLiveData</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">generateRequest</span><span class="p">)</span>
 	<span class="p">{</span>
-		<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;TreebleDataSource requires generateRequest configuration&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;TreebleDataSource&#39;</span><span class="p">);</span>
+		<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;TreebleDataSource requires treebleConfig.generateRequest configuration to be set on top-level DataSource&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;TreebleDataSource&#39;</span><span class="p">);</span>
 		<span class="k">return</span><span class="p">;</span>
 	<span class="p">}</span>
 
@@ -521,7 +523,7 @@
 		<span class="nx">request</span><span class="p">.</span><span class="nx">startIndex</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">start</span><span class="p">;</span>
 		<span class="nx">request</span><span class="p">.</span><span class="nx">results</span>    <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">end</span> <span class="o">-</span> <span class="nx">req</span><span class="p">.</span><span class="nx">start</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
 
-		<span class="nx">req</span><span class="p">.</span><span class="nx">txId</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">sendRequest</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">generateRequest</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">path</span><span class="p">),</span>
+		<span class="nx">req</span><span class="p">.</span><span class="nx">txId</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">sendRequest</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">generateRequest</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">path</span><span class="p">),</span>
 		<span class="p">{</span>
 			<span class="nx">success</span><span class="o">:</span>  <span class="nx">treeSuccess</span><span class="p">,</span>
 			<span class="nx">failure</span><span class="o">:</span>  <span class="nx">treeFailure</span><span class="p">,</span>
@@ -570,11 +572,10 @@
 	<span class="nx">req</span><span class="p">.</span><span class="nx">resp</span>  <span class="o">=</span> <span class="nx">oParsedResponse</span><span class="p">;</span>
 	<span class="nx">req</span><span class="p">.</span><span class="nx">error</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
 
-	<span class="c1">// TODO: worth avoiding eval?</span>
 	<span class="kd">var</span> <span class="nx">dataStartIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-	<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">startIndexExpr</span><span class="p">)</span>
+	<span class="k">if</span> <span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">startIndexExpr</span><span class="p">)</span>
 	<span class="p">{</span>
-		<span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;dataStartIndex=req.resp&#39;</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">startIndexExpr</span><span class="p">);</span>
+		<span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;dataStartIndex=req.resp&#39;</span><span class="o">+</span><span class="nx">req</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">startIndexExpr</span><span class="p">);</span>
 	<span class="p">}</span>
 
 	<span class="kd">var</span> <span class="nx">sliceStartIndex</span> <span class="o">=</span> <span class="nx">req</span><span class="p">.</span><span class="nx">start</span> <span class="o">-</span> <span class="nx">dataStartIndex</span><span class="p">;</span>
@@ -583,18 +584,17 @@
 
 	<span class="kd">var</span> <span class="nx">parent</span> <span class="o">=</span> <span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">path</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="nx">getNode</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">path</span><span class="p">)</span> <span class="o">:</span> <span class="kc">null</span><span class="p">);</span>
 	<span class="kd">var</span> <span class="nx">open</span>   <span class="o">=</span> <span class="p">(</span><span class="nx">parent</span> <span class="o">!==</span> <span class="kc">null</span> <span class="o">?</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">children</span> <span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_open</span><span class="p">);</span>
-	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">populateOpen</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="nx">open</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">data</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">start</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">childNodesKey</span><span class="p">))</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">populateOpen</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="nx">open</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">data</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">start</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">childNodesKey</span><span class="p">))</span>
 	<span class="p">{</span>
 		<span class="nx">treeFailure</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
 		<span class="k">return</span><span class="p">;</span>
 	<span class="p">}</span>
 
-	<span class="c1">// TODO: worth avoiding eval?</span>
-	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">parent</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="p">)</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">parent</span> <span class="o">&amp;&amp;</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="p">)</span>
 	<span class="p">{</span>
-		<span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;this._topNodeTotal=oParsedResponse&#39;</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="p">);</span>
+		<span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;this._topNodeTotal=oParsedResponse&#39;</span><span class="o">+</span><span class="nx">req</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="p">);</span>
 	<span class="p">}</span>
-	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">parent</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">totalRecordsReturnExpr</span><span class="p">)</span>
+	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">parent</span> <span class="o">&amp;&amp;</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsReturnExpr</span><span class="p">)</span>
 	<span class="p">{</span>
 		<span class="k">this</span><span class="p">.</span><span class="nx">_topNodeTotal</span> <span class="o">=</span> <span class="nx">oParsedResponse</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
 	<span class="p">}</span>
@@ -691,14 +691,13 @@
 		<span class="nx">response</span><span class="p">.</span><span class="nx">results</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
 	<span class="p">}</span>
 
-	<span class="c1">// TODO: worth avoiding eval?</span>
-	<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="p">)</span>
+	<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">liveData</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="p">)</span>
 	<span class="p">{</span>
-		<span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;response&#39;</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="o">+</span><span class="s1">&#39;=&#39;</span><span class="o">+</span><span class="nx">countVisibleNodes</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+		<span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;response&#39;</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">liveData</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="o">+</span><span class="s1">&#39;=&#39;</span><span class="o">+</span><span class="nx">countVisibleNodes</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
 	<span class="p">}</span>
-	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">totalRecordsReturnExpr</span><span class="p">)</span>
+	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">liveData</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsReturnExpr</span><span class="p">)</span>
 	<span class="p">{</span>
-		<span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;response&#39;</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">totalRecordsReturnExpr</span><span class="o">+</span><span class="s1">&#39;=&#39;</span><span class="o">+</span><span class="nx">countVisibleNodes</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+		<span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;response&#39;</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">liveData</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsReturnExpr</span><span class="o">+</span><span class="s1">&#39;=&#39;</span><span class="o">+</span><span class="nx">countVisibleNodes</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
 	<span class="p">}</span>
 
 	<span class="nx">DS</span><span class="p">.</span><span class="nx">issueCallback</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_callback</span><span class="p">.</span><span class="nx">callback</span><span class="p">,</span> <span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">_callback</span><span class="p">.</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">],</span> <span class="kc">false</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_callback</span><span class="p">.</span><span class="nx">caller</span><span class="p">);</span>
@@ -756,12 +755,11 @@
 	<span class="kd">var</span> <span class="nx">node</span>       <span class="o">=</span> <span class="nx">args</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
 	<span class="kd">var</span> <span class="nx">completion</span> <span class="o">=</span> <span class="nx">args</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
 
-	<span class="c1">// TODO: worth avoiding eval?</span>
-	<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="p">)</span>
+	<span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="p">)</span>
 	<span class="p">{</span>
-		<span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;node.childTotal=oParsedResponse&#39;</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="p">);</span>
+		<span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;node.childTotal=oParsedResponse&#39;</span><span class="o">+</span><span class="nx">node</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="p">);</span>
 	<span class="p">}</span>
-	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">totalRecordsReturnExpr</span><span class="p">)</span>
+	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsReturnExpr</span><span class="p">)</span>
 	<span class="p">{</span>
 		<span class="nx">node</span><span class="p">.</span><span class="nx">childTotal</span> <span class="o">=</span> <span class="nx">oParsedResponse</span><span class="p">.</span><span class="nx">results</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
 	<span class="p">}</span>
@@ -843,7 +841,7 @@
 			<span class="p">{</span>
 				<span class="nx">request</span><span class="p">.</span><span class="nx">startIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
 				<span class="nx">request</span><span class="p">.</span><span class="nx">results</span>    <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-				<span class="nx">node</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">sendRequest</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">generateRequest</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">path</span><span class="p">),</span>
+				<span class="nx">node</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">sendRequest</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">generateRequest</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">path</span><span class="p">),</span>
 				<span class="p">{</span>
 					<span class="nx">success</span><span class="o">:</span>  <span class="nx">toggleSuccess</span><span class="p">,</span>
 					<span class="nx">failure</span><span class="o">:</span>  <span class="nx">toggleFailure</span><span class="p">,</span>
@@ -950,7 +948,8 @@
 		<span class="kd">var</span> <span class="nx">ds</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">util</span><span class="p">.</span><span class="nx">FunctionDataSource</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span>
 		<span class="p">{</span>
 			<span class="nx">responseSchema</span><span class="o">:</span>  <span class="k">this</span><span class="p">.</span><span class="nx">responseSchema</span><span class="p">,</span>
-			<span class="nx">maxCacheEntries</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">maxCacheEntries</span>
+			<span class="nx">maxCacheEntries</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">maxCacheEntries</span><span class="p">,</span>
+			<span class="nx">treebleConfig</span><span class="o">:</span>   <span class="k">this</span><span class="p">.</span><span class="nx">treebleConfig</span>
 		<span class="p">});</span>
 
 		<span class="k">if</span> <span class="p">(</span><span class="nx">scope</span><span class="p">)</span>
@@ -961,19 +960,38 @@
 	<span class="p">}</span>
 	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">lang</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="nx">oData</span><span class="p">.</span><span class="nx">dataType</span><span class="p">))</span>
 	<span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">treebleConfig</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">;</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">oData</span><span class="p">.</span><span class="nx">dataType</span> <span class="o">==</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">TYPE_JSARRAY</span> <span class="o">||</span>
+			<span class="nx">oData</span><span class="p">.</span><span class="nx">dataType</span> <span class="o">==</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">TYPE_JSON</span><span class="p">)</span>
+		<span class="p">{</span>
+			<span class="nx">treebleConfig</span> <span class="o">=</span> <span class="nx">cloneObject</span><span class="p">(</span><span class="nx">treebleConfig</span><span class="p">);</span>
+			<span class="k">delete</span> <span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">startIndexExpr</span><span class="p">;</span>
+			<span class="k">delete</span> <span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="p">;</span>
+		<span class="p">}</span>
+
 		<span class="k">return</span> <span class="k">new</span> <span class="nx">util</span><span class="p">.</span><span class="nx">DataSource</span><span class="p">(</span><span class="nx">oData</span><span class="p">.</span><span class="nx">liveData</span><span class="p">,</span>
 		<span class="p">{</span>
 			<span class="nx">dataType</span><span class="o">:</span>        <span class="nx">oData</span><span class="p">.</span><span class="nx">dataType</span><span class="p">,</span>
 			<span class="nx">responseSchema</span><span class="o">:</span>  <span class="k">this</span><span class="p">.</span><span class="nx">responseSchema</span><span class="p">,</span>
-			<span class="nx">maxCacheEntries</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">maxCacheEntries</span>
+			<span class="nx">maxCacheEntries</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">maxCacheEntries</span><span class="p">,</span>
+			<span class="nx">treebleConfig</span><span class="o">:</span>   <span class="nx">treebleConfig</span>
 		<span class="p">});</span>
 	<span class="p">}</span>
 	<span class="k">else</span>
 	<span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">treebleConfig</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">;</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">lang</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">oData</span><span class="p">))</span>
+		<span class="p">{</span>
+			<span class="nx">treebleConfig</span> <span class="o">=</span> <span class="nx">cloneObject</span><span class="p">(</span><span class="nx">treebleConfig</span><span class="p">);</span>
+			<span class="k">delete</span> <span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">startIndexExpr</span><span class="p">;</span>
+			<span class="k">delete</span> <span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsExpr</span><span class="p">;</span>
+		<span class="p">}</span>
+
 		<span class="k">return</span> <span class="k">new</span> <span class="nx">util</span><span class="p">.</span><span class="nx">DataSource</span><span class="p">(</span><span class="nx">oData</span><span class="p">,</span>
 		<span class="p">{</span>
 			<span class="nx">responseSchema</span><span class="o">:</span>  <span class="k">this</span><span class="p">.</span><span class="nx">responseSchema</span><span class="p">,</span>
-			<span class="nx">maxCacheEntries</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">maxCacheEntries</span>
+			<span class="nx">maxCacheEntries</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">maxCacheEntries</span><span class="p">,</span>
+			<span class="nx">treebleConfig</span><span class="o">:</span>   <span class="nx">treebleConfig</span>
 		<span class="p">});</span>
 	<span class="p">}</span>
 <span class="p">};</span>

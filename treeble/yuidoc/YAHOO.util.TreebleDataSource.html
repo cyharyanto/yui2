@@ -89,13 +89,8 @@ and they must all use the same schema.
                                             <dt>Parameters:</dt>
                                                 <dd rel="yui:parameter">
                                                     <code><span property="yui:name">oLiveData</span>
-                                                    &lt;<span property="yui:type">DataSource</span>&gt;
-                                                    </code>
-                                                    <span property="yui:description">   Pointer to root of the DataSource tree.</span>
-                                                </dd>
-                                                <dd rel="yui:parameter">
-                                                    <code><span property="yui:name">oConfigs</span>
-                                                    &lt;<span property="yui:type">Object} Object literal of configuration values.  Required params are:
+                                                    &lt;<span property="yui:type">DataSource}  The top-level DataSource.
+You must pass a treebleConfig object as part of this object's configuration:
 <dl>
 <dt>generateRequest</dt>
 <dd>(required) The function to convert the output from
@@ -107,9 +102,8 @@ takes two arguments: state {sort,dir,startIndex,results</span>&gt;
 (an array of node indices telling how to reach the node).
 </dd>
 <dt>childNodesKey</dt>
-<dd>(semi-optional) The name of the key inside a node which contains the data
-used to construct the DataSource for retrieving the children.
-This data is passed to <code>DataSource.parseDataSource()</code>.
+<dd>(semi-optional) The name of the key inside a node which contains
+the data used to construct the DataSource for retrieving the children.
 This config is only required if you provide a custom parser.</dd>
 <dt>startIndexExpr</dt>
 <dd>(optional) OGNL expression telling how to extract the startIndex
@@ -126,6 +120,14 @@ the total number of records, e.g., <code>.meta.totalRecords</code>.
 This is only appropriate for DataSources that always return the
 entire data set.  If this is not provided,
 <code>totalRecordsExpr</code> must be specified.</dd>
+</dl></span>
+                                                </dd>
+                                                <dd rel="yui:parameter">
+                                                    <code><span property="yui:name">oConfigs</span>
+                                                    &lt;<span property="yui:type">Object</span>&gt;
+                                                    </code>
+                                                    <span property="yui:description">  Object literal of configuration values.  Required params are:
+<dl>
 <dt>paginateChildren</dt>
 <dd>(optional) Pass <code>true</code> to paginate the result after merging
 child nodes into the list.  The default (<code>false</code>) is to
