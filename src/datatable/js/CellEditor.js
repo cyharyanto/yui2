@@ -659,6 +659,9 @@ show : function() {
 
     // constrain to viewport
     var cell = this.getTdEl();
+    var cxy  = Dom.getXY(cell);
+    var cx   = cxy[0];
+    var cy   = cxy[1];
     var xy   = Dom.getXY(elContainer);
     var x    = xy[0];
     var y    = xy[1];
@@ -672,39 +675,57 @@ show : function() {
         var moved = false;
         if (x + w > vw) {
             x -= w;
+
+            e.style.left = x + "px";
+            if (w < e.offsetWidth) {  // YUI calendar expands when shifted inside viewport
+                x -= (e.offsetWidth - w);
+                w  = e.offsetWidth;
+            }
+
             if (x < 0) {
                 var t = this.getDataTable().getContainerEl();
                 x += Math.min(cell.offsetWidth, Dom.getX(t) + t.clientWidth - Dom.getX(cell));
                 if (x < 0) x = 0;
-                y += cell.offsetHeight;
-                if (y + h > vh) {
-                    y -= cell.offsetHeight + h;
-                    if (y < 0) y = 0;
+                if (y === xy[1]) {
+                    y += cell.offsetHeight;
+                    if (y + h > vh) {
+                        y -= cell.offsetHeight + h;
+                        if (y < 0) y = 0;
+                    }
                 }
             }
 
-            elContainer.style.left = x + "px";
-            elContainer.style.top  = y + "px";
-            moved                  = true;
+            e.style.left = x + "px";
+            e.style.top  = y + "px";
+            moved        = true;
         }
-        else if (y + cell.offsetHeight + h > vh) {
-            y -= h;
+        else if (y + (y > cy || !anyMoved ? cell.offsetHeight : 0) + h > vh) {
+
+            if (anyMoved && y + cell.offsetHeight < vh) {
+                y -= (h - cell.offsetHeight);
+            }
+            else {
+                y -= h;
+            }
+
             if (y < 0) {
                 y = 0;
-                x += cell.offsetWidth;
-                if (x + w > vw) {
-                    x -= cell.offsetWidth + w;
-                    if (x < 0) x = 0;
+                if (x === xy[0]) {
+                    x += cell.offsetWidth;
+                    if (x + w > vw) {
+                        x -= cell.offsetWidth + w;
+                        if (x < 0) x = 0;
+                    }
                 }
             }
 
-            elContainer.style.left = x + "px";
-            elContainer.style.top  = y + "px";
-            moved                  = true;
+            e.style.left = x + "px";
+            e.style.top  = y + "px";
+            moved        = true;
         }
         else if (!anyMoved && !this.disableBtns) {
-            y                   += cell.offsetHeight;
-            elContainer.style.top = y + "px";
+            y          += cell.offsetHeight;
+            e.style.top = y + "px";
         }
         anyMoved = anyMoved || moved;
     }
