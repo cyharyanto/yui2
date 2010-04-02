@@ -24,13 +24,13 @@ DS.TYPE_TREELIST = 9;
  */
 
 /**
- * TreebleDataSource class converts tree of data into a flat list of
+ * TreebleDataSource converts a tree of DataSources into a flat list of
  * visible items.  This list of items can then be paginated by DataTable.
- * The merged list must be paginated because the number of child nodes
- * might be very large.
+ * The merged list must be paginated if the number of child nodes might be
+ * very large.  To turn on this feature, set paginateChildren:true.
  * 
- * The tree of DataSources must be homogeneous, i.e., all of the same type,
- * and they must all use the same schema.
+ * The total number of items available from each DataSources must remain
+ * constant.
  *
  * @module Treeble
  * @namespace YAHOO.util
@@ -109,6 +109,12 @@ util.TreebleDataSource = function(oLiveData, oConfigs)
 	if (!oLiveData.treebleConfig.generateRequest)
 	{
 		YAHOO.log('TreebleDataSource requires treebleConfig.generateRequest configuration to be set on top-level DataSource', 'error', 'TreebleDataSource');
+		return;
+	}
+
+	if (!oLiveData.treebleConfig.totalRecordsExpr && !oLiveData.treebleConfig.totalRecordsReturnExpr)
+	{
+		YAHOO.log('TreebleDataSource requires either treebleConfig.totalRecordsExpr or treebleConfig.totalRecordsReturnExpr configuration to be set on top-level DataSource', 'error', 'TreebleDataSource');
 		return;
 	}
 

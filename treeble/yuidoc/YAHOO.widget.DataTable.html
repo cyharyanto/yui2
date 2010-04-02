@@ -59,10 +59,8 @@
   
 
                     <div class="summary description" property="yui:description">
-                        Treeble extensions to DataTable.
-We don't create a new DataTreeble class because that complicates
-existing extensions to DataTable.  Existing extensions should work
-transparently when given a TreebleDataSource.
+                        This is only needed for local data sources or when paginating only
+top-level nodes, and it will be obsolete when YUI 2.9 is released.
                     </div>
 
                     
@@ -126,6 +124,37 @@ transparently when given a TreebleDataSource.
                                                     </code></dt>
                                                     <dd property="yui:returnInfo">Pagination and sorting state formatted for TreebleDataSource.</dd>
                                                 </dl>
+
+
+             
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:method" resource="#method_render">
+                                    <h4>
+                                        <a name="method_render">render</a></h4>
+                                    <div class="detail" >
+                                        <code>
+                                        
+                                        
+                                        
+                                        void
+                                            <strong property="yui:name">render</strong>
+                                           (
+                                            )
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Override to provide option to display all returned records, even if
+that is more than what paginator says is visible.
+                                        </div>
+
+                                        <div class="description">
+
+
 
 
              
@@ -236,11 +265,128 @@ transparently when given a TreebleDataSource.
                     </div>
 
                     <div rel="yui:events" resource="#events">
+                        <div class="section method details">
+                            <h3 id="events">Events</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:event" resource="#event_beforeDisplayAllRecordsChange">
+                                    <h4>
+                                        <a name="event_beforeDisplayAllRecordsChange">beforeDisplayAllRecordsChange</a></h4>
+                                    <div class="detail">
+                                        <code>
+                                        
+                                        
+                                        
+                                            <strong property="yui:name">beforeDisplayAllRecordsChange</strong>
+
+                                            (
+                                                
+                                                        
+                                                         event
+                                                    
+                                                
+                                            )
+
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Fires before the value for the configuration attribute 'displayAllRecords' changes. Return false to cancel the attribute change.
+                                        </div>
+
+                                        <div class="description">
+
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                            <code><span property="yui:name">event</span>
+                                                                &lt;<span property="yui:type">{oldValue: any, newValue: any}</span>&gt;
+                                                            </code>
+                                                            <span property="yui:description">An object containing the previous attribute value and the new value.</span>
+                                                        </dd>
+                                                        
+                                                </dl>
+
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                                    <div class="" rel="yui:event" resource="#event_displayAllRecordsChange">
+                                    <h4>
+                                        <a name="event_displayAllRecordsChange">displayAllRecordsChange</a></h4>
+                                    <div class="detail">
+                                        <code>
+                                        
+                                        
+                                        
+                                            <strong property="yui:name">displayAllRecordsChange</strong>
+
+                                            (
+                                                
+                                                        
+                                                         event
+                                                    
+                                                
+                                            )
+
+                                        </code>
+                                        
+                                        <div class="description" property="yui:description">
+                                            Fires when the value for the configuration attribute 'displayAllRecords' changes.
+                                        </div>
+
+                                        <div class="description">
+
+
+                                                <dl rel="yui:parameters">
+                                                    <dt>Parameters:</dt>
+                                                        <dd rel="yui:parameter">
+                                                            <code><span property="yui:name">event</span>
+                                                                &lt;<span property="yui:type">{oldValue: any, newValue: any}</span>&gt;
+                                                            </code>
+                                                            <span property="yui:description">An object containing the previous attribute value and the new value.</span>
+                                                        </dd>
+                                                        
+                                                </dl>
+
+
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    </div>
+                            </div>
+                        </div>
 
 
                     </div>
 
                     <div rel="yui:attributes" resource="#configattributes">
+                        <div class="section field details">
+                            <h3 id="configattributes">Configuration Attributes</h3>
+                            <div class="content">
+                                    <div class="" rel="yui:attribute" resource="#config_displayAllRecords">
+                                    <h4><a name="config_displayAllRecords">displayAllRecords</a>
+                                        <code>- <span property="yui:type">Boolean</span></code>
+                                    </h4>
+                                    <div class="detail">
+                                        <div class="description" property="yui:description">
+                                            Set to true if you want to show all the records that were
+returned, not just the records that fall inside the paginator window.
+                                        </div>
+                                    </div>
+ 
+     
+                                    <div class="default">
+                                        Default Value: 0
+                                    </div>        
+
+                                    <hr />
+                                    </div>        
+
+                            </div>
+                        </div>
 
                     </div>
 
@@ -268,6 +414,7 @@ transparently when given a TreebleDataSource.
                         <h4>Files</h4>
                         <ul class="content">        
                                 <li class=""><a href="classmap.js.html" title="classmap.js">classmap.js</a></li>
+                                <li class=""><a href="Treeble-280patch.js.html" title="Treeble-280patch.js">Treeble-280patch.js</a></li>
                                 <li class=""><a href="Treeble.js.html" title="Treeble.js">Treeble.js</a></li>
                         </ul>
                     </div>
@@ -277,12 +424,26 @@ transparently when given a TreebleDataSource.
                         <h4>Methods</h4>
                         <ul class="content">        
                                 <li class=""><a href="#method_DataTable.generateTreebleDataSourceRequest" title="DataTable.generateTreebleDataSourceRequest">DataTable.generateTreebleDataSourceRequest</a></li>
+                                <li class=""><a href="#method_render" title="render">render</a></li>
                                 <li class=""><a href="#method_rowIsOpen" title="rowIsOpen">rowIsOpen</a></li>
                                 <li class=""><a href="#method_toggleRow" title="toggleRow">toggleRow</a></li>
                         </ul>
                     </div>
 
+                    <div id="eventsList" class="module">
+                        <h4>Events</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#event_beforeDisplayAllRecordsChange" title="beforeDisplayAllRecordsChange">beforeDisplayAllRecordsChange</a></li>
+                                <li class=""><a href="#event_displayAllRecordsChange" title="displayAllRecordsChange">displayAllRecordsChange</a></li>
+                        </ul>
+                    </div>
 
+                    <div id="configList" class="module">
+                        <h4>Configuration Attributes</h4>
+                        <ul class="content">        
+                                <li class=""><a href="#config_displayAllRecords" title="displayAllRecords">displayAllRecords</a></li>
+                        </ul>
+                    </div>
 
             </div>
 		</div>
@@ -293,7 +454,7 @@ transparently when given a TreebleDataSource.
 	</div>
 </div>
 <script type="text/javascript">
-    var ALL_YUI_PROPS = [{"url": "YAHOO.util.TreebleDataSource.html#method_DataSourceBase.parseDataSource", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "DataSourceBase.parseDataSource"}, {"url": "YAHOO.widget.DataTable.html#method_DataTable.generateTreebleDataSourceRequest", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "DataTable.generateTreebleDataSourceRequest"}, {"url": "YAHOO.util.TreebleDataSource.html#method_isOpen", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "isOpen"}, {"url": "YAHOO.widget.DataTable.html#method_rowIsOpen", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "rowIsOpen"}, {"url": "YAHOO.util.TreebleDataSource.html#method_toggle", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "toggle"}, {"url": "YAHOO.widget.DataTable.html#method_toggleRow", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "toggleRow"}];
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.DataTable.html#event_beforeDisplayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "beforeDisplayAllRecordsChange"}, {"url": "YAHOO.widget.DataTable.html#method_DataTable.generateTreebleDataSourceRequest", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "DataTable.generateTreebleDataSourceRequest"}, {"url": "YAHOO.widget.DataTable.html#config_displayAllRecords", "access": "", "host": "YAHOO.widget.DataTable", "type": "config", "name": "displayAllRecords"}, {"url": "YAHOO.widget.DataTable.html#event_displayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "displayAllRecordsChange"}, {"url": "YAHOO.widget.DataTable.html#method_render", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "render"}, {"url": "YAHOO.widget.DataTable.html#method_rowIsOpen", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "rowIsOpen"}, {"url": "YAHOO.widget.DataTable.html#method_toggleRow", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "toggleRow"}];
     YAHOO.yuidoc.init();
 </script>
 </body>

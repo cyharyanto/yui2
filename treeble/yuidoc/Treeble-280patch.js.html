@@ -1,0 +1,283 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: Treeble   Treeble-280patch.js  (YUI Library)</title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
+        <h3>Treeble&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
+            &gt; <a href="./module_treeble.html" title="Treeble">Treeble</a>
+                
+                 &gt; Treeble-280patch.js (source view) 
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                    <div id="srcout">
+                        <style>
+                            #doc3 .classopts { display:none; }
+                        </style>
+                        <div class="highlight"><pre><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+
+
+<span class="cm">/**</span>
+<span class="cm"> * This is only needed for local data sources or when paginating only</span>
+<span class="cm"> * top-level nodes, and it will be obsolete when YUI 2.9 is released.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @module Treeble</span>
+<span class="cm"> * @namespace YAHOO.widget</span>
+<span class="cm"> * @class YAHOO.widget.DataTable</span>
+<span class="cm"> */</span>
+
+	<span class="kd">var</span> <span class="nx">lang</span>   <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">lang</span><span class="p">,</span>
+		<span class="nx">util</span>   <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">util</span><span class="p">,</span>
+		<span class="nx">widget</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">,</span>
+		<span class="nx">ua</span>     <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">ua</span><span class="p">,</span>
+
+		<span class="nx">Dom</span>    <span class="o">=</span> <span class="nx">util</span><span class="p">.</span><span class="nx">Dom</span><span class="p">,</span>
+		<span class="nx">Ev</span>     <span class="o">=</span> <span class="nx">util</span><span class="p">.</span><span class="nx">Event</span><span class="p">,</span>
+		<span class="nx">DS</span>     <span class="o">=</span> <span class="nx">util</span><span class="p">.</span><span class="nx">DataSourceBase</span><span class="p">,</span>
+		<span class="nx">DT</span>     <span class="o">=</span> <span class="nx">widget</span><span class="p">.</span><span class="nx">DataTable</span><span class="p">;</span>
+
+	<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">DataTable</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">load</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">oConfig</span><span class="p">)</span> <span class="p">{</span>
+		<span class="nx">oConfig</span> <span class="o">=</span> <span class="nx">oConfig</span> <span class="o">||</span> <span class="p">{};</span>
+
+		<span class="p">(</span><span class="nx">oConfig</span><span class="p">.</span><span class="nx">datasource</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">_oDataSource</span><span class="p">).</span><span class="nx">sendRequest</span><span class="p">(</span>
+			<span class="nx">oConfig</span><span class="p">.</span><span class="nx">request</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;initialRequest&#39;</span><span class="p">),</span>
+			<span class="nx">oConfig</span><span class="p">.</span><span class="nx">callback</span> <span class="o">||</span> <span class="p">{</span>
+				<span class="nx">success</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onDataReturnInitializeTable</span><span class="p">,</span>
+				<span class="nx">failure</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onDataReturnInitializeTable</span><span class="p">,</span>
+				<span class="nx">scope</span><span class="o">:</span> <span class="k">this</span><span class="p">,</span>
+				<span class="nx">argument</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">getState</span><span class="p">()</span>
+			<span class="p">}</span>
+		<span class="p">);</span>
+	<span class="p">};</span>
+
+	<span class="kd">var</span> <span class="nx">origInitAttributes</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">DataTable</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">initAttributes</span><span class="p">;</span>
+	<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">DataTable</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">initAttributes</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span>
+	<span class="p">{</span>
+		<span class="nx">origInitAttributes</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+
+		<span class="cm">/**</span>
+<span class="cm">		 * @attribute displayAllRecords</span>
+<span class="cm">		 * @description Set to true if you want to show all the records that were</span>
+<span class="cm">		 * returned, not just the records that fall inside the paginator window.</span>
+<span class="cm">		 * @type Boolean</span>
+<span class="cm">		 * @default 0</span>
+<span class="cm">		 */</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">setAttributeConfig</span><span class="p">(</span><span class="s2">&quot;displayAllRecords&quot;</span><span class="p">,</span> <span class="p">{</span>
+			<span class="nx">value</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+			<span class="nx">validator</span><span class="o">:</span> <span class="nx">lang</span><span class="p">.</span><span class="nx">isBoolean</span>
+		<span class="p">});</span>
+	<span class="p">};</span>
+
+	<span class="cm">/**</span>
+<span class="cm">	 * Override to provide option to display all returned records, even if</span>
+<span class="cm">	 * that is more than what paginator says is visible.</span>
+<span class="cm">	 *</span>
+<span class="cm">	 * @method render</span>
+<span class="cm">	 */</span>
+	<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">DataTable</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span> <span class="nx">render</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+		<span class="k">this</span><span class="p">.</span><span class="nx">_oChainRender</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
+
+		<span class="k">this</span><span class="p">.</span><span class="nx">fireEvent</span><span class="p">(</span><span class="s2">&quot;beforeRenderEvent&quot;</span><span class="p">);</span>
+
+		<span class="kd">var</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">j</span><span class="p">,</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">len</span><span class="p">,</span> <span class="nx">allRecords</span><span class="p">;</span>
+
+		<span class="kd">var</span> <span class="nx">oPaginator</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;paginator&#39;</span><span class="p">);</span>
+		<span class="c1">// Paginator is enabled, show a subset of Records and update Paginator UI</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">oPaginator</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;displayAllRecords&#39;</span><span class="p">))</span> <span class="p">{</span>
+			<span class="nx">allRecords</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_oRecordSet</span><span class="p">.</span><span class="nx">getRecords</span><span class="p">(</span>
+							<span class="nx">oPaginator</span><span class="p">.</span><span class="nx">getStartIndex</span><span class="p">());</span>
+		<span class="p">}</span>
+		<span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">oPaginator</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">allRecords</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_oRecordSet</span><span class="p">.</span><span class="nx">getRecords</span><span class="p">(</span>
+							<span class="nx">oPaginator</span><span class="p">.</span><span class="nx">getStartIndex</span><span class="p">(),</span>
+							<span class="nx">oPaginator</span><span class="p">.</span><span class="nx">getRowsPerPage</span><span class="p">());</span>
+		<span class="p">}</span>
+		<span class="c1">// Not paginated, show all records</span>
+		<span class="k">else</span> <span class="p">{</span>
+			<span class="nx">allRecords</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_oRecordSet</span><span class="p">.</span><span class="nx">getRecords</span><span class="p">();</span>
+		<span class="p">}</span>
+
+		<span class="c1">// From the top, update in-place existing rows, so as to reuse DOM elements</span>
+		<span class="kd">var</span> <span class="nx">elTbody</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_elTbody</span><span class="p">,</span>
+			<span class="nx">loopN</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s2">&quot;renderLoopSize&quot;</span><span class="p">),</span>
+			<span class="nx">nRecordsLength</span> <span class="o">=</span> <span class="nx">allRecords</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+
+		<span class="c1">// Table has rows</span>
+		<span class="k">if</span><span class="p">(</span><span class="nx">nRecordsLength</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">elTbody</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span><span class="p">;</span>
+			<span class="k">while</span><span class="p">(</span><span class="nx">elTbody</span><span class="p">.</span><span class="nx">lastChild</span><span class="p">)</span> <span class="p">{</span>
+				<span class="nx">elTbody</span><span class="p">.</span><span class="nx">removeChild</span><span class="p">(</span><span class="nx">elTbody</span><span class="p">.</span><span class="nx">lastChild</span><span class="p">);</span>
+			<span class="p">}</span>
+			<span class="nx">elTbody</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+
+			<span class="c1">// Set up the loop Chain to render rows</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">_oChainRender</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span>
+				<span class="nx">method</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">oArg</span><span class="p">)</span> <span class="p">{</span>
+					<span class="k">if</span><span class="p">((</span><span class="k">this</span> <span class="k">instanceof</span> <span class="nx">DT</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">_sId</span><span class="p">)</span> <span class="p">{</span>
+						<span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">oArg</span><span class="p">.</span><span class="nx">nCurrentRecord</span><span class="p">,</span>
+							<span class="nx">endRecordIndex</span> <span class="o">=</span> <span class="p">((</span><span class="nx">oArg</span><span class="p">.</span><span class="nx">nCurrentRecord</span><span class="o">+</span><span class="nx">oArg</span><span class="p">.</span><span class="nx">nLoopLength</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nx">nRecordsLength</span><span class="p">)</span> <span class="o">?</span>
+									<span class="nx">nRecordsLength</span> <span class="o">:</span> <span class="p">(</span><span class="nx">oArg</span><span class="p">.</span><span class="nx">nCurrentRecord</span><span class="o">+</span><span class="nx">oArg</span><span class="p">.</span><span class="nx">nLoopLength</span><span class="p">),</span>
+							<span class="nx">elRow</span><span class="p">,</span> <span class="nx">nextSibling</span><span class="p">;</span>
+
+						<span class="nx">elTbody</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span><span class="p">;</span>
+
+						<span class="k">for</span><span class="p">(;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">endRecordIndex</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+							<span class="nx">elRow</span> <span class="o">=</span> <span class="nx">Dom</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">allRecords</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">getId</span><span class="p">());</span>
+							<span class="nx">elRow</span> <span class="o">=</span> <span class="nx">elRow</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">_addTrEl</span><span class="p">(</span><span class="nx">allRecords</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+							<span class="nx">nextSibling</span> <span class="o">=</span> <span class="nx">elTbody</span><span class="p">.</span><span class="nx">childNodes</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">||</span> <span class="kc">null</span><span class="p">;</span>
+							<span class="nx">elTbody</span><span class="p">.</span><span class="nx">insertBefore</span><span class="p">(</span><span class="nx">elRow</span><span class="p">,</span> <span class="nx">nextSibling</span><span class="p">);</span>
+						<span class="p">}</span>
+						<span class="nx">elTbody</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+
+						<span class="c1">// Set up for the next loop</span>
+						<span class="nx">oArg</span><span class="p">.</span><span class="nx">nCurrentRecord</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
+					<span class="p">}</span>
+				<span class="p">},</span>
+				<span class="nx">scope</span><span class="o">:</span> <span class="k">this</span><span class="p">,</span>
+				<span class="nx">iterations</span><span class="o">:</span> <span class="p">(</span><span class="nx">loopN</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">nRecordsLength</span><span class="o">/</span><span class="nx">loopN</span><span class="p">)</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+				<span class="nx">argument</span><span class="o">:</span> <span class="p">{</span>
+					<span class="nx">nCurrentRecord</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span><span class="c1">//nRecordsLength-1,  // Start at first Record</span>
+					<span class="nx">nLoopLength</span><span class="o">:</span> <span class="p">(</span><span class="nx">loopN</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="nx">loopN</span> <span class="o">:</span> <span class="nx">nRecordsLength</span>
+				<span class="p">},</span>
+				<span class="nx">timeout</span><span class="o">:</span> <span class="p">(</span><span class="nx">loopN</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span>
+			<span class="p">});</span>
+
+			<span class="c1">// Post-render tasks</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">_oChainRender</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span>
+				<span class="nx">method</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">oArg</span><span class="p">)</span> <span class="p">{</span>
+					<span class="k">if</span><span class="p">((</span><span class="k">this</span> <span class="k">instanceof</span> <span class="nx">DT</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">_sId</span><span class="p">)</span> <span class="p">{</span>
+						<span class="k">while</span><span class="p">(</span><span class="nx">elTbody</span><span class="p">.</span><span class="nx">rows</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="nx">nRecordsLength</span><span class="p">)</span> <span class="p">{</span>
+							<span class="nx">elTbody</span><span class="p">.</span><span class="nx">removeChild</span><span class="p">(</span><span class="nx">elTbody</span><span class="p">.</span><span class="nx">lastChild</span><span class="p">);</span>
+						<span class="p">}</span>
+						<span class="k">this</span><span class="p">.</span><span class="nx">_setFirstRow</span><span class="p">();</span>
+						<span class="k">this</span><span class="p">.</span><span class="nx">_setLastRow</span><span class="p">();</span>
+						<span class="k">this</span><span class="p">.</span><span class="nx">_setRowStripes</span><span class="p">();</span>
+						<span class="k">this</span><span class="p">.</span><span class="nx">_setSelections</span><span class="p">();</span>
+					<span class="p">}</span>
+				<span class="p">},</span>
+				<span class="nx">scope</span><span class="o">:</span> <span class="k">this</span><span class="p">,</span>
+				<span class="nx">timeout</span><span class="o">:</span> <span class="p">(</span><span class="nx">loopN</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span>
+			<span class="p">});</span>
+
+		<span class="p">}</span>
+		<span class="c1">// Table has no rows</span>
+		<span class="k">else</span> <span class="p">{</span>
+			<span class="c1">// Set up the loop Chain to delete rows</span>
+			<span class="kd">var</span> <span class="nx">nTotal</span> <span class="o">=</span> <span class="nx">elTbody</span><span class="p">.</span><span class="nx">rows</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+			<span class="k">if</span><span class="p">(</span><span class="nx">nTotal</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+				<span class="k">this</span><span class="p">.</span><span class="nx">_oChainRender</span><span class="p">.</span><span class="nx">add</span><span class="p">({</span>
+					<span class="nx">method</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">oArg</span><span class="p">)</span> <span class="p">{</span>
+						<span class="k">if</span><span class="p">((</span><span class="k">this</span> <span class="k">instanceof</span> <span class="nx">DT</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">_sId</span><span class="p">)</span> <span class="p">{</span>
+							<span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">oArg</span><span class="p">.</span><span class="nx">nCurrent</span><span class="p">,</span>
+								<span class="nx">loopN</span> <span class="o">=</span> <span class="nx">oArg</span><span class="p">.</span><span class="nx">nLoopLength</span><span class="p">,</span>
+								<span class="nx">nIterEnd</span> <span class="o">=</span> <span class="p">(</span><span class="nx">i</span> <span class="o">-</span> <span class="nx">loopN</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="o">-</span><span class="mi">1</span> <span class="o">:</span> <span class="nx">i</span> <span class="o">-</span> <span class="nx">loopN</span><span class="p">;</span>
+
+							<span class="nx">elTbody</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span><span class="p">;</span>
+
+							<span class="k">for</span><span class="p">(;</span> <span class="nx">i</span><span class="o">&gt;</span><span class="nx">nIterEnd</span><span class="p">;</span> <span class="nx">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+								<span class="nx">elTbody</span><span class="p">.</span><span class="nx">deleteRow</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+							<span class="p">}</span>
+							<span class="nx">elTbody</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+
+							<span class="c1">// Set up for the next loop</span>
+							<span class="nx">oArg</span><span class="p">.</span><span class="nx">nCurrent</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
+						<span class="p">}</span>
+					<span class="p">},</span>
+					<span class="nx">scope</span><span class="o">:</span> <span class="k">this</span><span class="p">,</span>
+					<span class="nx">iterations</span><span class="o">:</span> <span class="p">(</span><span class="nx">loopN</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">nTotal</span><span class="o">/</span><span class="nx">loopN</span><span class="p">)</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+					<span class="nx">argument</span><span class="o">:</span> <span class="p">{</span>
+						<span class="nx">nCurrent</span><span class="o">:</span> <span class="nx">nTotal</span><span class="p">,</span>
+						<span class="nx">nLoopLength</span><span class="o">:</span> <span class="p">(</span><span class="nx">loopN</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="nx">loopN</span> <span class="o">:</span> <span class="nx">nTotal</span>
+					<span class="p">},</span>
+					<span class="nx">timeout</span><span class="o">:</span> <span class="p">(</span><span class="nx">loopN</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="o">-</span><span class="mi">1</span>
+				<span class="p">});</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">_runRenderChain</span><span class="p">();</span>
+	<span class="p">};</span>
+
+<span class="p">})();</span>
+</pre></div>
+
+                    </div>
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="module_treeble.html" title="Treeble">Treeble</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class=""><a href="YAHOO.util.TreebleDataSource.html" title="YAHOO.util.TreebleDataSource">YAHOO.util.TreebleDataSource</a></li>
+                                <li class=""><a href="YAHOO.widget.DataTable.html" title="YAHOO.widget.DataTable">YAHOO.widget.DataTable</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class=""><a href="classmap.js.html" title="classmap.js">classmap.js</a></li>
+                                <li class="selected"><a href="Treeble-280patch.js.html" title="Treeble-280patch.js">Treeble-280patch.js</a></li>
+                                <li class=""><a href="Treeble.js.html" title="Treeble.js">Treeble.js</a></li>
+                        </ul>
+                    </div>
+
+
+
+
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+        Copyright &copy; 2010 Yahoo! Inc. All rights reserved.
+	</div>
+</div>
+<script type="text/javascript">
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.DataTable.html#event_beforeDisplayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "beforeDisplayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_DataSourceBase.parseDataSource", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "DataSourceBase.parseDataSource"}, {"url": "YAHOO.widget.DataTable.html#method_DataTable.generateTreebleDataSourceRequest", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "DataTable.generateTreebleDataSourceRequest"}, {"url": "YAHOO.widget.DataTable.html#config_displayAllRecords", "access": "", "host": "YAHOO.widget.DataTable", "type": "config", "name": "displayAllRecords"}, {"url": "YAHOO.widget.DataTable.html#event_displayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "displayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_isOpen", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "isOpen"}, {"url": "YAHOO.widget.DataTable.html#method_render", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "render"}, {"url": "YAHOO.widget.DataTable.html#method_rowIsOpen", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "rowIsOpen"}, {"url": "YAHOO.util.TreebleDataSource.html#method_toggle", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "toggle"}, {"url": "YAHOO.widget.DataTable.html#method_toggleRow", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "toggleRow"}];
+    YAHOO.yuidoc.init();
+</script>
+</body>
+</html>

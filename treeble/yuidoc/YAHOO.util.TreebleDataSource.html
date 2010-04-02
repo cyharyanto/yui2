@@ -60,12 +60,12 @@
   
 
                     <div class="summary description" property="yui:description">
-                        TreebleDataSource class converts tree of data into a flat list of
+                        TreebleDataSource converts a tree of DataSources into a flat list of
 visible items.  This list of items can then be paginated by DataTable.
-The merged list must be paginated because the number of child nodes
-might be very large.
-The tree of DataSources must be homogeneous, i.e., all of the same type,
-and they must all use the same schema.
+The merged list must be paginated if the number of child nodes might be
+very large.  To turn on this feature, set paginateChildren:true.
+The total number of items available from each DataSources must remain
+constant.
                     </div>
 
                         <div class="section constructor details" rel="yui:constructor" resource="#constructor">
@@ -368,6 +368,7 @@ passed in as a completion function.
                         <h4>Files</h4>
                         <ul class="content">        
                                 <li class=""><a href="classmap.js.html" title="classmap.js">classmap.js</a></li>
+                                <li class=""><a href="Treeble-280patch.js.html" title="Treeble-280patch.js">Treeble-280patch.js</a></li>
                                 <li class=""><a href="Treeble.js.html" title="Treeble.js">Treeble.js</a></li>
                         </ul>
                     </div>
@@ -393,7 +394,7 @@ passed in as a completion function.
 	</div>
 </div>
 <script type="text/javascript">
-    var ALL_YUI_PROPS = [{"url": "YAHOO.util.TreebleDataSource.html#method_DataSourceBase.parseDataSource", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "DataSourceBase.parseDataSource"}, {"url": "YAHOO.util.TreebleDataSource.html#method_isOpen", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "isOpen"}, {"url": "YAHOO.util.TreebleDataSource.html#method_toggle", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "toggle"}];
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.DataTable.html#event_beforeDisplayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "beforeDisplayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_DataSourceBase.parseDataSource", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "DataSourceBase.parseDataSource"}, {"url": "YAHOO.widget.DataTable.html#method_DataTable.generateTreebleDataSourceRequest", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "DataTable.generateTreebleDataSourceRequest"}, {"url": "YAHOO.widget.DataTable.html#config_displayAllRecords", "access": "", "host": "YAHOO.widget.DataTable", "type": "config", "name": "displayAllRecords"}, {"url": "YAHOO.widget.DataTable.html#event_displayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "displayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_isOpen", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "isOpen"}, {"url": "YAHOO.widget.DataTable.html#method_render", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "render"}, {"url": "YAHOO.widget.DataTable.html#method_rowIsOpen", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "rowIsOpen"}, {"url": "YAHOO.util.TreebleDataSource.html#method_toggle", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "toggle"}, {"url": "YAHOO.widget.DataTable.html#method_toggleRow", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "toggleRow"}];
     YAHOO.yuidoc.init();
 </script>
 </body>

@@ -1,7 +1,14 @@
 (function(){
 
-	// This is only needed for local data sources or when paginating only
-	// top-level nodes, and it will be obsolete when YUI 2.9 is released.
+
+/**
+ * This is only needed for local data sources or when paginating only
+ * top-level nodes, and it will be obsolete when YUI 2.9 is released.
+ *
+ * @module Treeble
+ * @namespace YAHOO.widget
+ * @class YAHOO.widget.DataTable
+ */
 
 	var lang   = YAHOO.lang,
 		util   = YAHOO.util,

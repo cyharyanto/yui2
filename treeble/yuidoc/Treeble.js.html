@@ -73,13 +73,13 @@
 <span class="cm"> */</span>
 
 <span class="cm">/**</span>
-<span class="cm"> * TreebleDataSource class converts tree of data into a flat list of</span>
+<span class="cm"> * TreebleDataSource converts a tree of DataSources into a flat list of</span>
 <span class="cm"> * visible items.  This list of items can then be paginated by DataTable.</span>
-<span class="cm"> * The merged list must be paginated because the number of child nodes</span>
-<span class="cm"> * might be very large.</span>
+<span class="cm"> * The merged list must be paginated if the number of child nodes might be</span>
+<span class="cm"> * very large.  To turn on this feature, set paginateChildren:true.</span>
 <span class="cm"> * </span>
-<span class="cm"> * The tree of DataSources must be homogeneous, i.e., all of the same type,</span>
-<span class="cm"> * and they must all use the same schema.</span>
+<span class="cm"> * The total number of items available from each DataSources must remain</span>
+<span class="cm"> * constant.</span>
 <span class="cm"> *</span>
 <span class="cm"> * @module Treeble</span>
 <span class="cm"> * @namespace YAHOO.util</span>
@@ -158,6 +158,12 @@
 	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oLiveData</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">generateRequest</span><span class="p">)</span>
 	<span class="p">{</span>
 		<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;TreebleDataSource requires treebleConfig.generateRequest configuration to be set on top-level DataSource&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;TreebleDataSource&#39;</span><span class="p">);</span>
+		<span class="k">return</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oLiveData</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsExpr</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">oLiveData</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">totalRecordsReturnExpr</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;TreebleDataSource requires either treebleConfig.totalRecordsExpr or treebleConfig.totalRecordsReturnExpr configuration to be set on top-level DataSource&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;TreebleDataSource&#39;</span><span class="p">);</span>
 		<span class="k">return</span><span class="p">;</span>
 	<span class="p">}</span>
 
@@ -1130,6 +1136,7 @@
                         <h4>Files</h4>
                         <ul class="content">        
                                 <li class=""><a href="classmap.js.html" title="classmap.js">classmap.js</a></li>
+                                <li class=""><a href="Treeble-280patch.js.html" title="Treeble-280patch.js">Treeble-280patch.js</a></li>
                                 <li class="selected"><a href="Treeble.js.html" title="Treeble.js">Treeble.js</a></li>
                         </ul>
                     </div>
@@ -1147,7 +1154,7 @@
 	</div>
 </div>
 <script type="text/javascript">
-    var ALL_YUI_PROPS = [{"url": "YAHOO.util.TreebleDataSource.html#method_DataSourceBase.parseDataSource", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "DataSourceBase.parseDataSource"}, {"url": "YAHOO.widget.DataTable.html#method_DataTable.generateTreebleDataSourceRequest", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "DataTable.generateTreebleDataSourceRequest"}, {"url": "YAHOO.util.TreebleDataSource.html#method_isOpen", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "isOpen"}, {"url": "YAHOO.widget.DataTable.html#method_rowIsOpen", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "rowIsOpen"}, {"url": "YAHOO.util.TreebleDataSource.html#method_toggle", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "toggle"}, {"url": "YAHOO.widget.DataTable.html#method_toggleRow", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "toggleRow"}];
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.DataTable.html#event_beforeDisplayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "beforeDisplayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_DataSourceBase.parseDataSource", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "DataSourceBase.parseDataSource"}, {"url": "YAHOO.widget.DataTable.html#method_DataTable.generateTreebleDataSourceRequest", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "DataTable.generateTreebleDataSourceRequest"}, {"url": "YAHOO.widget.DataTable.html#config_displayAllRecords", "access": "", "host": "YAHOO.widget.DataTable", "type": "config", "name": "displayAllRecords"}, {"url": "YAHOO.widget.DataTable.html#event_displayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "displayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_isOpen", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "isOpen"}, {"url": "YAHOO.widget.DataTable.html#method_render", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "render"}, {"url": "YAHOO.widget.DataTable.html#method_rowIsOpen", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "rowIsOpen"}, {"url": "YAHOO.util.TreebleDataSource.html#method_toggle", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "toggle"}, {"url": "YAHOO.widget.DataTable.html#method_toggleRow", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "toggleRow"}];
     YAHOO.yuidoc.init();
 </script>
 </body>
