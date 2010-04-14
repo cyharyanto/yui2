@@ -299,7 +299,7 @@ function getVisibleSlicesPgTop(
 			{
 				ds:    ds,
 				path:  path.slice(0),
-				start: skip,
+				start: prev + 1,
 				end:   m + delta - 1
 			});
 			send = true;
