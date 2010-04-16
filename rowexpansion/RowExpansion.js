@@ -394,7 +394,7 @@
                 if( state && state.expanded ){
 
                     var next_sibling = Dom.getNextSibling( row ),
-                        hash_index   = indexOf( this.a_rowExpansions, record_id );
+                        hash_index   = indexOf( this.a_rowExpansions, this.getRecord(record_id).getId() );
 
                     if( Dom.hasClass( next_sibling, CLASS_EXPANSION ) ) {
 
