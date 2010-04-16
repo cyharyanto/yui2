@@ -1,0 +1,155 @@
+<!DOCTYPE html public '-//w3c//dtd html 4.01//en' http://www.w3.org/tr/html4/strict.dtd'>
+<html>
+<head>
+	<title>YUI 2 Quick Edit Example</title>
+	<meta http-equiv=content-type content="text/html; charset=utf-8">
+
+	<!-- Combo-handled YUI CSS files: -->
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.8.0r4/build/paginator/assets/skins/sam/paginator.css&2.8.0r4/build/datatable/assets/skins/sam/datatable.css">
+	<!-- Combo-handled YUI JS files: -->
+	<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.8.0r4/build/yahoo-dom-event/yahoo-dom-event.js&2.8.0r4/build/element/element-min.js&2.8.0r4/build/paginator/paginator-min.js&2.8.0r4/build/datasource/datasource-min.js&2.8.0r4/build/datatable/datatable-min.js"></script>
+
+	<script type="text/javascript">
+	(function(){
+		var orig = YAHOO.widget.DataTable._cloneObject;
+		YAHOO.widget.DataTable._cloneObject = function(o)
+		{
+			if (o instanceof RegExp)
+			{
+				return o;
+			}
+			else
+			{
+				return orig(o);
+			}
+		}
+	})();
+	</script>
+	<script type="text/javascript" src="RowExpansion.js"></script>
+
+	<style type="text/css">
+	/* custom styles for this example */
+	#table{width:500px;}
+			
+	/** 
+	*
+	* Style the yui-dt-expandablerow-trigger column 
+	*
+	**/
+	.yui-dt-expandablerow-trigger{
+		width:18px;
+		height:22px;
+		cursor:pointer;
+	}
+	.yui-dt-expanded .yui-dt-expandablerow-trigger{
+		background:url(../datatable/assets/images/arrow_open.png) 4px 4px no-repeat;
+	}
+	.yui-dt-expandablerow-trigger, .yui-dt-collapsed .yui-dt-expandablerow-trigger{
+		background:url(../datatable/assets/images/arrow_closed.png) 4px 4px no-repeat;
+	}
+	.yui-dt-expanded .yui-dt-expandablerow-trigger.spinner{
+		background:url(../datatable/assets/img/spinner.gif) 1px 4px no-repeat;
+	}
+	</style>
+</head>
+<body class="yui-skin-sam">
+
+<script type="text/javascript">
+/* Modify as needed */
+YAHOO.util.Event.onDOMReady( function() {
+    YAHOO.example.Basic = function() {
+
+        /**
+        *
+        * Create a YUI DataSource instance. This will create an XHR datasource and will use YQL 
+        * to query the Flickr web service.
+        *
+        **/
+        var myDataSource = new YAHOO.util.LocalDataSource(
+            {"query":{"count":"20","created":"2010-04-16T06:45:58Z","lang":"en-US","results":{"photo":[{"farm":"3","id":"4523029928","isfamily":"0","isfriend":"0","ispublic":"1","owner":"13492514@N03","secret":"af12013f5c","server":"2746","title":"The Beauty Of Uncertainty"},{"farm":"5","id":"4524345504","isfamily":"0","isfriend":"0","ispublic":"1","owner":"22236508@N03","secret":"f872a856c8","server":"4022","title":""},{"farm":"5","id":"4522485867","isfamily":"0","isfriend":"0","ispublic":"1","owner":"40129241@N08","secret":"0779c539b6","server":"4044","title":"\"Modo Moña\" ON   [Explore]"},{"farm":"5","id":"4523553930","isfamily":"0","isfriend":"0","ispublic":"1","owner":"60144575@N00","secret":"225e547cde","server":"4038","title":"natural diffuser"},{"farm":"3","id":"4524406090","isfamily":"0","isfriend":"0","ispublic":"1","owner":"47582528@N04","secret":"386c94e54e","server":"2752","title":"Fences from Berlin - for you collected on my last wonderful trip !"},{"farm":"5","id":"4523398992","isfamily":"0","isfriend":"0","ispublic":"1","owner":"36925203@N04","secret":"17f1f010c1","server":"4072","title":"Good Morning V.2 (Explore!)"},{"farm":"3","id":"4523465853","isfamily":"0","isfriend":"0","ispublic":"1","owner":"24637969@N00","secret":"7023f82e3f","server":"2734","title":"Breast Cancer Awareness"},{"farm":"5","id":"4523799226","isfamily":"0","isfriend":"0","ispublic":"1","owner":"40028423@N07","secret":"8fbc74ffc1","server":"4070","title":"15.04.10 Breast Cancer Awareness Day"},{"farm":"3","id":"4523756300","isfamily":"0","isfriend":"0","ispublic":"1","owner":"37010090@N04","secret":"eb9fefa8d0","server":"2750","title":"Ghost Motion in Shibuya"},{"farm":"5","id":"4522319727","isfamily":"0","isfriend":"0","ispublic":"1","owner":"30041161@N03","secret":"e110f8b5a9","server":"4055","title":"\u0ba4\u0bbe\u0b95\u0bae\u0bcd.."},{"farm":"5","id":"4524334826","isfamily":"0","isfriend":"0","ispublic":"1","owner":"35906348@N06","secret":"fbb284792b","server":"4061","title":"hey hey little fighter girl, (EXPLORED)"},{"farm":"5","id":"4523776079","isfamily":"0","isfriend":"0","ispublic":"1","owner":"45422121@N05","secret":"35a92529a2","server":"4070","title":"Day 76: oh no"},{"farm":"5","id":"4522955774","isfamily":"0","isfriend":"0","ispublic":"1","owner":"36592963@N03","secret":"23a2821202","server":"4044","title":"Golden Waters"},{"farm":"5","id":"4524248510","isfamily":"0","isfriend":"0","ispublic":"1","owner":"39669415@N05","secret":"27bbe9e994","server":"4020","title":"Sunset with volcanic dust"},{"farm":"3","id":"4524442290","isfamily":"0","isfriend":"0","ispublic":"1","owner":"18971686@N07","secret":"4b1a5f1e2c","server":"2727","title":"104/365x2: Make a wish"},{"farm":"5","id":"4524220205","isfamily":"0","isfriend":"0","ispublic":"1","owner":"8751076@N02","secret":"f8b16048a0","server":"4060","title":"Goodness Gracious"},{"farm":"5","id":"4523722238","isfamily":"0","isfriend":"0","ispublic":"1","owner":"37018142@N08","secret":"84a4337197","server":"4004","title":"It's never too late to have a happy childhood..."},{"farm":"5","id":"4523100227","isfamily":"0","isfriend":"0","ispublic":"1","owner":"73425467@N00","secret":"2cb6210185","server":"4060","title":""},{"farm":"5","id":"4523647741","isfamily":"0","isfriend":"0","ispublic":"1","owner":"39870013@N03","secret":"689fedc190","server":"4063","title":"Volcanic sunset"},{"farm":"5","id":"4524459698","isfamily":"0","isfriend":"0","ispublic":"1","owner":"45811376@N00","secret":"370c7ac0b7","server":"4029","title":"Freshly Squeezed {15/52}"}]}}}
+            );
+            myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+            myDataSource.connXhrMode = "queueRequests";
+            myDataSource.responseSchema = {
+                resultsList: "query.results.photo"
+            };
+
+        /**
+        *
+        * Create a YUI DataTable instance.
+        *
+        **/
+        var myDataTable = new YAHOO.widget.RowExpansionDataTable(
+            "table",
+            [
+                {
+                    label:"",
+                    /**
+                    * This formatter adds a class that will be used to style a 
+                    * trigger in the first column
+                    **/
+                    formatter:function( el, oRecord, oColumn, oData ) {
+
+                        YAHOO.util.Dom.addClass( el.parentNode, "yui-dt-expandablerow-trigger" );
+
+                    }
+                },
+                {
+                    key:"title",
+                    label:"Interestingness",
+                    resizeable: true,
+                    sortable: true,
+                    width : '200px',
+                    /**
+                    * This formatter includes a default string in cells where the record
+                    * is missing a title. This just makes the finsished product look nicer.
+                    **/
+                    formatter: function( el, oRecord, oColumn, oData ){
+                        
+                        el.innerHTML = oData || '--[ No description ]--';
+                        
+                    }
+                }
+            ],
+            myDataSource,
+            { 
+                /**
+                * The "rowExpansionTemplate" property is passed a string. This is passed 
+                * through YAHOO.lang.substitute which can match tokens (represented with brackets), 
+                * which contain keys from the DataTables data.
+                **/
+                rowExpansionTemplate : '<img src="http://farm{farm}.static.flickr.com/{server}/{id}_{secret}_m_d.jpg" /><div><a href="http://flickr.com/photos/{owner}">See more photos from this Flickr User</a></div>',
+
+                paginator: new YAHOO.widget.Paginator({
+                    rowsPerPage:5,
+                    containers:'table-pagination'
+                })
+            }
+        );
+
+        /**
+        *
+        * Subscribe to the "cellClickEvent" which will yui-dt-expandablerow-trigger the expansion 
+        * when the user clicks on the yui-dt-expandablerow-trigger column
+        *
+        **/
+        myDataTable.subscribe( 'cellClickEvent', myDataTable.onEventToggleRowExpansion );
+        
+        return {
+                oDS: myDataSource,
+                oDT: myDataTable
+        };
+    }();
+});
+</script>
+
+
+<h1>YUI 2 Row Expansion Example</h1>
+
+<p>A demonstration of the DataTable's row expansion feature to display a list of "Interestingness" from <a href="http://www.flickr.com">Flickr</a>. When the table first loads, it displays a list of image titles. When a row is expanded the photo is displayed in the expansion area along with a link to the Flickr user's photostream. This example uses a simple string-based template to format the row expansion area.</p>
+
+<div id="table"></div>
+<div id="table-pagination"></div>
+
+</body>
+</html>
