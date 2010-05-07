@@ -51,7 +51,70 @@
                     </h3>
                     <div class="description summary">
                         The QuickEditDataTable class extends the DataTable class to provide
-Quick Edit mode.
+Quick Edit mode.  (It could just as easily extend
+ScrollingDataTable.)  QuickEdit mode allows the user to edit all the
+values that are visible in the table, controlled by the column
+configuration.  Each editable cell contains an input field.  If the
+user decides to save the changes, then you can extract the changes
+by calling <code>getQuickEditChanges()</code>.
+For a column to be editable in QuickEdit mode, the column
+configuration must include <code>quickEdit</code>.  The contents of
+this object define the column's behavior in QuickEdit mode.
+If a column should not be editable, but needs to be formatted
+differently in QuickEdit mode, then you must define qeFormatter in
+the column configuration. This is simply a normal cell formatter
+function that will be used in QuickEdit mode.  The static functions
+<code>readonly*QuickEditFormatter</code> provide examples.
+The following configuration can be provided as part of quickEdit:
+<dl>
+<dt>copyDown</dt><dd>If true, the top cell in the column will have a
+button to copy the value down to the rest of the rows.</dd>
+<dt>formatter</dt><dd>The cell formatter which will render an
+appropriate form field: &lt;input type="text"&gt;, &lt;textarea&gt;,
+or &lt;select&gt;.</dd>
+<dt>validation</dt><dd>Validation configuration for every field in
+the column.</dd>
+</dl>
+The following configuration can be provided as part of
+quickEdit.validation:
+<dl>
+<dt>css</dt><dd>CSS classes encoding basic validation rules.  Note
+that this will only work if you uncomment the call to
+<code>validateFromCSSData()</code> inside
+<code>_validateElements()</code>.</dd>
+<dt>fn</dt><dd>A function that will be called with the DataTable as
+its scope and the cell's form element as the argument. Return true
+if the value is valid. Otherwise, call this.displayMessage(...) to
+display an error and return false.</dd>
+<dt>msg</dt><dd>A map of types to messages that will be displayed
+when a basic or regex validation rule fails. Currently, the only
+valid type is regex.  If you copy the implementation of
+validateFromCSSData(), from FormManager in the YUI 3 Gallery, then
+you will be able to specify more types:  required, min_length,
+max_length, integer, and decimal.</dd>
+<dt>regex</dt><dd>Regular expression that the value must satisfy in
+order to be considered valid.</dd>
+</dl>
+Custom QuickEdit Formatters
+To write a custom cell formatter for QuickEdit mode, you must
+structure the function as follows:
+function myQuickEditFormatter(el, oRecord, oColumn, oData) {
+var markup =
+'&lt;input type="text" class="{yiv} yui-quick-edit yui-quick-edit-key:{key}"/&gt;' +
+YAHOO.widget.QuickEditDataTable.MARKUP_QE_ERROR_DISPLAY;
+el.innerHTML = lang.substitute(markup, {
+key: oColumn.key,
+yiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || '') : ''
+});
+el.firstChild.value = extractMyEditableValue(oData);
+YAHOO.widget.QuickEditDataTable.copyDownFormatter.apply(this, arguments);
+};
+You can use textarea or select instead of input, but you can only
+create a single field.
+<code>extractMyEditableValue</code> does not have to be a separate
+function nor must it be limited to using only oData. The work should
+normally be done inline in the formatter function, but the name of
+the sample function makes the point clear.
                     </div>
 
 
@@ -61,7 +124,7 @@ Quick Edit mode.
 
                             <p>This module contains the following classes:</p>
                             <script>
-                            //var YUI_CLASS_LIST = [{"extends": {"superclass": {}, "events": {}, "configs": {}, "properties": {}, "methods": {}}, "description": "Quick Edit extension to YUI 2 DataTable\nAuthor: lindalj@yahoo-inc.com / John Lindal", "guessedname": "DataTable", "name": "YAHOO.widget.DataTable"}, {"extends": {"superclass": {}, "events": {}, "configs": {}, "properties": {}, "methods": {}}, "description": "The QuickEditDataTable class extends the DataTable class to provide\nQuick Edit mode.", "guessedname": "QuickEditDataTable", "name": "YAHOO.widget.QuickEditDataTable"}];
+                            //var YUI_CLASS_LIST = [{"extends": {"superclass": {}, "events": {}, "configs": {}, "properties": {}, "methods": {}}, "description": "Quick Edit extension to YUI 2 DataTable\nAuthor: lindalj@yahoo-inc.com / John Lindal", "guessedname": "DataTable", "name": "YAHOO.widget.DataTable"}, {"extends": {"superclass": {}, "events": {}, "configs": {}, "properties": {}, "methods": {}}, "description": "The QuickEditDataTable class extends the DataTable class to provide\nQuick Edit mode.  (It could just as easily extend\nScrollingDataTable.)  QuickEdit mode allows the user to edit all the\nvalues that are visible in the table, controlled by the column\nconfiguration.  Each editable cell contains an input field.  If the\nuser decides to save the changes, then you can extract the changes\nby calling <code>getQuickEditChanges()</code>.\nFor a column to be editable in QuickEdit mode, the column\nconfiguration must include <code>quickEdit</code>.  The contents of\nthis object define the column's behavior in QuickEdit mode.\nIf a column should not be editable, but needs to be formatted\ndifferently in QuickEdit mode, then you must define qeFormatter in\nthe column configuration. This is simply a normal cell formatter\nfunction that will be used in QuickEdit mode.  The static functions\n<code>readonly*QuickEditFormatter</code> provide examples.\nThe following configuration can be provided as part of quickEdit:\n<dl>\n<dt>copyDown</dt><dd>If true, the top cell in the column will have a\nbutton to copy the value down to the rest of the rows.</dd>\n<dt>formatter</dt><dd>The cell formatter which will render an\nappropriate form field: &lt;input type=\"text\"&gt;, &lt;textarea&gt;,\nor &lt;select&gt;.</dd>\n<dt>validation</dt><dd>Validation configuration for every field in\nthe column.</dd>\n</dl>\nThe following configuration can be provided as part of\nquickEdit.validation:\n<dl>\n<dt>css</dt><dd>CSS classes encoding basic validation rules.  Note\nthat this will only work if you uncomment the call to\n<code>validateFromCSSData()</code> inside\n<code>_validateElements()</code>.</dd>\n<dt>fn</dt><dd>A function that will be called with the DataTable as\nits scope and the cell's form element as the argument. Return true\nif the value is valid. Otherwise, call this.displayMessage(...) to\ndisplay an error and return false.</dd>\n<dt>msg</dt><dd>A map of types to messages that will be displayed\nwhen a basic or regex validation rule fails. Currently, the only\nvalid type is regex.  If you copy the implementation of\nvalidateFromCSSData(), from FormManager in the YUI 3 Gallery, then\nyou will be able to specify more types:  required, min_length,\nmax_length, integer, and decimal.</dd>\n<dt>regex</dt><dd>Regular expression that the value must satisfy in\norder to be considered valid.</dd>\n</dl>\nCustom QuickEdit Formatters\nTo write a custom cell formatter for QuickEdit mode, you must\nstructure the function as follows:\nfunction myQuickEditFormatter(el, oRecord, oColumn, oData) {\nvar markup =\n'&lt;input type=\"text\" class=\"{yiv} yui-quick-edit yui-quick-edit-key:{key}\"/&gt;' +\nYAHOO.widget.QuickEditDataTable.MARKUP_QE_ERROR_DISPLAY;\nel.innerHTML = lang.substitute(markup, {\nkey: oColumn.key,\nyiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || '') : ''\n});\nel.firstChild.value = extractMyEditableValue(oData);\nYAHOO.widget.QuickEditDataTable.copyDownFormatter.apply(this, arguments);\n};\nYou can use textarea or select instead of input, but you can only\ncreate a single field.\n<code>extractMyEditableValue</code> does not have to be a separate\nfunction nor must it be limited to using only oData. The work should\nnormally be done inline in the formatter function, but the name of\nthe sample function makes the point clear.", "guessedname": "QuickEditDataTable", "name": "YAHOO.widget.QuickEditDataTable"}];
                             </script>
                             <div id="splash_classList">
                                 <ul>
@@ -116,7 +179,7 @@ Quick Edit mode.
 	</div>
 </div>
 <script type="text/javascript">
-    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.QuickEditDataTable.html#method_cancelQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "cancelQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_clearMessages", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "clearMessages"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_copyDownFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "copyDownFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_displayMessage", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "displayMessage"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_getQuickEditChanges", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "getQuickEditChanges"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_readonlyLinkQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "readonlyLinkQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_startQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "startQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_validateQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "validateQuickEdit"}];
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.QuickEditDataTable.html#method_cancelQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "cancelQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_clearMessages", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "clearMessages"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_copyDownFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "copyDownFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_displayMessage", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "displayMessage"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_getQuickEditChanges", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "getQuickEditChanges"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_readonlyLinkQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "readonlyLinkQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_startQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "startQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textareaQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textareaQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_validateQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "validateQuickEdit"}];
     YAHOO.yuidoc.init();
 </script>
 </body>

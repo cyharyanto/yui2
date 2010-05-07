@@ -11,19 +11,105 @@
         Dom = YAHOO.util.Dom;
 
     /**
-    * The QuickEditDataTable class extends the DataTable class to provide
-    * Quick Edit mode.
-    *
-    * @module QuickEdit
-    * @namespace YAHOO.widget
-    * @class QuickEditDataTable
-    * @extends YAHOO.widget.DataTable
-    * @constructor
-    * @param elContainer {HTMLElement} Container element for the TABLE.
-    * @param aColumnDefs {Object[]} Array of object literal Column definitions.
-    * @param oDataSource {YAHOO.util.DataSource} DataSource instance.
-    * @param oConfigs {object} (optional) Object literal of configuration values.
-    */
+     * The QuickEditDataTable class extends the DataTable class to provide
+     * Quick Edit mode.  (It could just as easily extend
+     * ScrollingDataTable.)  QuickEdit mode allows the user to edit all the
+     * values that are visible in the table, controlled by the column
+     * configuration.  Each editable cell contains an input field.  If the
+     * user decides to save the changes, then you can extract the changes
+     * by calling <code>getQuickEditChanges()</code>.
+     * 
+     * For a column to be editable in QuickEdit mode, the column
+     * configuration must include <code>quickEdit</code>.  The contents of
+     * this object define the column's behavior in QuickEdit mode.
+     * 
+     * If a column should not be editable, but needs to be formatted
+     * differently in QuickEdit mode, then you must define qeFormatter in
+     * the column configuration. This is simply a normal cell formatter
+     * function that will be used in QuickEdit mode.  The static functions
+     * <code>readonly*QuickEditFormatter</code> provide examples.
+     * 
+     * The following configuration can be provided as part of quickEdit:
+     * 
+     * <dl>
+     * 
+     * <dt>copyDown</dt><dd>If true, the top cell in the column will have a
+     * button to copy the value down to the rest of the rows.</dd>
+     * 
+     * <dt>formatter</dt><dd>The cell formatter which will render an
+     * appropriate form field: &lt;input type="text"&gt;, &lt;textarea&gt;,
+     * or &lt;select&gt;.</dd>
+     * 
+     * <dt>validation</dt><dd>Validation configuration for every field in
+     * the column.</dd>
+     * 
+     * </dl>
+     * 
+     * The following configuration can be provided as part of
+     * quickEdit.validation:
+     * 
+     * <dl>
+     * 
+     * <dt>css</dt><dd>CSS classes encoding basic validation rules.  Note
+     * that this will only work if you uncomment the call to
+     * <code>validateFromCSSData()</code> inside
+     * <code>_validateElements()</code>.</dd>
+     * 
+     * <dt>fn</dt><dd>A function that will be called with the DataTable as
+     * its scope and the cell's form element as the argument. Return true
+     * if the value is valid. Otherwise, call this.displayMessage(...) to
+     * display an error and return false.</dd>
+     * 
+     * <dt>msg</dt><dd>A map of types to messages that will be displayed
+     * when a basic or regex validation rule fails. Currently, the only
+     * valid type is regex.  If you copy the implementation of
+     * validateFromCSSData(), from FormManager in the YUI 3 Gallery, then
+     * you will be able to specify more types:  required, min_length,
+     * max_length, integer, and decimal.</dd>
+     * 
+     * <dt>regex</dt><dd>Regular expression that the value must satisfy in
+     * order to be considered valid.</dd>
+     * 
+     * </dl>
+     * 
+     * Custom QuickEdit Formatters
+     * 
+     * To write a custom cell formatter for QuickEdit mode, you must
+     * structure the function as follows:
+     * 
+     * function myQuickEditFormatter(el, oRecord, oColumn, oData) {
+     *   var markup =
+     *     '&lt;input type="text" class="{yiv} yui-quick-edit yui-quick-edit-key:{key}"/&gt;' +
+     *     YAHOO.widget.QuickEditDataTable.MARKUP_QE_ERROR_DISPLAY;
+     *     
+     *     el.innerHTML = lang.substitute(markup, {
+     *       key: oColumn.key,
+     *       yiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || '') : ''
+     *     });
+     *     
+     *     el.firstChild.value = extractMyEditableValue(oData);
+     *     
+     *     YAHOO.widget.QuickEditDataTable.copyDownFormatter.apply(this, arguments);
+     * };
+     * 
+     * You can use textarea or select instead of input, but you can only
+     * create a single field.
+     * 
+     * <code>extractMyEditableValue</code> does not have to be a separate
+     * function nor must it be limited to using only oData. The work should
+     * normally be done inline in the formatter function, but the name of
+     * the sample function makes the point clear.
+     *
+     * @module QuickEdit
+     * @namespace YAHOO.widget
+     * @class QuickEditDataTable
+     * @extends YAHOO.widget.DataTable
+     * @constructor
+     * @param elContainer {HTMLElement} Container element for the TABLE.
+     * @param aColumnDefs {Object[]} Array of object literal Column definitions.
+     * @param oDataSource {YAHOO.util.DataSource} DataSource instance.
+     * @param oConfigs {object} (optional) Object literal of configuration values.
+     */
     YAHOO.widget.QuickEditDataTable = function(elContainer,aColumnDefs,oDataSource,oConfigs)
     {
         YAHOO.widget.QuickEditDataTable.superclass.constructor.call(this, elContainer,aColumnDefs,oDataSource,oConfigs); 
@@ -504,7 +590,7 @@
          * Called with exactly the same arguments as any other cell
          * formatter, this function displays a textarea field.
          *
-         * @method textQuickEditFormatter
+         * @method textareaQuickEditFormatter
          * @static
          */
         textareaQuickEditFormatter : function(el, oRecord, oColumn, oData) {

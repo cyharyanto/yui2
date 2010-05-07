@@ -60,19 +60,105 @@
         <span class="nx">Dom</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">Dom</span><span class="p">;</span>
 
     <span class="cm">/**</span>
-<span class="cm">    * The QuickEditDataTable class extends the DataTable class to provide</span>
-<span class="cm">    * Quick Edit mode.</span>
-<span class="cm">    *</span>
-<span class="cm">    * @module QuickEdit</span>
-<span class="cm">    * @namespace YAHOO.widget</span>
-<span class="cm">    * @class QuickEditDataTable</span>
-<span class="cm">    * @extends YAHOO.widget.DataTable</span>
-<span class="cm">    * @constructor</span>
-<span class="cm">    * @param elContainer {HTMLElement} Container element for the TABLE.</span>
-<span class="cm">    * @param aColumnDefs {Object[]} Array of object literal Column definitions.</span>
-<span class="cm">    * @param oDataSource {YAHOO.util.DataSource} DataSource instance.</span>
-<span class="cm">    * @param oConfigs {object} (optional) Object literal of configuration values.</span>
-<span class="cm">    */</span>
+<span class="cm">     * The QuickEditDataTable class extends the DataTable class to provide</span>
+<span class="cm">     * Quick Edit mode.  (It could just as easily extend</span>
+<span class="cm">     * ScrollingDataTable.)  QuickEdit mode allows the user to edit all the</span>
+<span class="cm">     * values that are visible in the table, controlled by the column</span>
+<span class="cm">     * configuration.  Each editable cell contains an input field.  If the</span>
+<span class="cm">     * user decides to save the changes, then you can extract the changes</span>
+<span class="cm">     * by calling &lt;code&gt;getQuickEditChanges()&lt;/code&gt;.</span>
+<span class="cm">     * </span>
+<span class="cm">     * For a column to be editable in QuickEdit mode, the column</span>
+<span class="cm">     * configuration must include &lt;code&gt;quickEdit&lt;/code&gt;.  The contents of</span>
+<span class="cm">     * this object define the column&#39;s behavior in QuickEdit mode.</span>
+<span class="cm">     * </span>
+<span class="cm">     * If a column should not be editable, but needs to be formatted</span>
+<span class="cm">     * differently in QuickEdit mode, then you must define qeFormatter in</span>
+<span class="cm">     * the column configuration. This is simply a normal cell formatter</span>
+<span class="cm">     * function that will be used in QuickEdit mode.  The static functions</span>
+<span class="cm">     * &lt;code&gt;readonly*QuickEditFormatter&lt;/code&gt; provide examples.</span>
+<span class="cm">     * </span>
+<span class="cm">     * The following configuration can be provided as part of quickEdit:</span>
+<span class="cm">     * </span>
+<span class="cm">     * &lt;dl&gt;</span>
+<span class="cm">     * </span>
+<span class="cm">     * &lt;dt&gt;copyDown&lt;/dt&gt;&lt;dd&gt;If true, the top cell in the column will have a</span>
+<span class="cm">     * button to copy the value down to the rest of the rows.&lt;/dd&gt;</span>
+<span class="cm">     * </span>
+<span class="cm">     * &lt;dt&gt;formatter&lt;/dt&gt;&lt;dd&gt;The cell formatter which will render an</span>
+<span class="cm">     * appropriate form field: &amp;lt;input type=&quot;text&quot;&amp;gt;, &amp;lt;textarea&amp;gt;,</span>
+<span class="cm">     * or &amp;lt;select&amp;gt;.&lt;/dd&gt;</span>
+<span class="cm">     * </span>
+<span class="cm">     * &lt;dt&gt;validation&lt;/dt&gt;&lt;dd&gt;Validation configuration for every field in</span>
+<span class="cm">     * the column.&lt;/dd&gt;</span>
+<span class="cm">     * </span>
+<span class="cm">     * &lt;/dl&gt;</span>
+<span class="cm">     * </span>
+<span class="cm">     * The following configuration can be provided as part of</span>
+<span class="cm">     * quickEdit.validation:</span>
+<span class="cm">     * </span>
+<span class="cm">     * &lt;dl&gt;</span>
+<span class="cm">     * </span>
+<span class="cm">     * &lt;dt&gt;css&lt;/dt&gt;&lt;dd&gt;CSS classes encoding basic validation rules.  Note</span>
+<span class="cm">     * that this will only work if you uncomment the call to</span>
+<span class="cm">     * &lt;code&gt;validateFromCSSData()&lt;/code&gt; inside</span>
+<span class="cm">     * &lt;code&gt;_validateElements()&lt;/code&gt;.&lt;/dd&gt;</span>
+<span class="cm">     * </span>
+<span class="cm">     * &lt;dt&gt;fn&lt;/dt&gt;&lt;dd&gt;A function that will be called with the DataTable as</span>
+<span class="cm">     * its scope and the cell&#39;s form element as the argument. Return true</span>
+<span class="cm">     * if the value is valid. Otherwise, call this.displayMessage(...) to</span>
+<span class="cm">     * display an error and return false.&lt;/dd&gt;</span>
+<span class="cm">     * </span>
+<span class="cm">     * &lt;dt&gt;msg&lt;/dt&gt;&lt;dd&gt;A map of types to messages that will be displayed</span>
+<span class="cm">     * when a basic or regex validation rule fails. Currently, the only</span>
+<span class="cm">     * valid type is regex.  If you copy the implementation of</span>
+<span class="cm">     * validateFromCSSData(), from FormManager in the YUI 3 Gallery, then</span>
+<span class="cm">     * you will be able to specify more types:  required, min_length,</span>
+<span class="cm">     * max_length, integer, and decimal.&lt;/dd&gt;</span>
+<span class="cm">     * </span>
+<span class="cm">     * &lt;dt&gt;regex&lt;/dt&gt;&lt;dd&gt;Regular expression that the value must satisfy in</span>
+<span class="cm">     * order to be considered valid.&lt;/dd&gt;</span>
+<span class="cm">     * </span>
+<span class="cm">     * &lt;/dl&gt;</span>
+<span class="cm">     * </span>
+<span class="cm">     * Custom QuickEdit Formatters</span>
+<span class="cm">     * </span>
+<span class="cm">     * To write a custom cell formatter for QuickEdit mode, you must</span>
+<span class="cm">     * structure the function as follows:</span>
+<span class="cm">     * </span>
+<span class="cm">     * function myQuickEditFormatter(el, oRecord, oColumn, oData) {</span>
+<span class="cm">     *   var markup =</span>
+<span class="cm">     *     &#39;&amp;lt;input type=&quot;text&quot; class=&quot;{yiv} yui-quick-edit yui-quick-edit-key:{key}&quot;/&amp;gt;&#39; +</span>
+<span class="cm">     *     YAHOO.widget.QuickEditDataTable.MARKUP_QE_ERROR_DISPLAY;</span>
+<span class="cm">     *     </span>
+<span class="cm">     *     el.innerHTML = lang.substitute(markup, {</span>
+<span class="cm">     *       key: oColumn.key,</span>
+<span class="cm">     *       yiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || &#39;&#39;) : &#39;&#39;</span>
+<span class="cm">     *     });</span>
+<span class="cm">     *     </span>
+<span class="cm">     *     el.firstChild.value = extractMyEditableValue(oData);</span>
+<span class="cm">     *     </span>
+<span class="cm">     *     YAHOO.widget.QuickEditDataTable.copyDownFormatter.apply(this, arguments);</span>
+<span class="cm">     * };</span>
+<span class="cm">     * </span>
+<span class="cm">     * You can use textarea or select instead of input, but you can only</span>
+<span class="cm">     * create a single field.</span>
+<span class="cm">     * </span>
+<span class="cm">     * &lt;code&gt;extractMyEditableValue&lt;/code&gt; does not have to be a separate</span>
+<span class="cm">     * function nor must it be limited to using only oData. The work should</span>
+<span class="cm">     * normally be done inline in the formatter function, but the name of</span>
+<span class="cm">     * the sample function makes the point clear.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @module QuickEdit</span>
+<span class="cm">     * @namespace YAHOO.widget</span>
+<span class="cm">     * @class QuickEditDataTable</span>
+<span class="cm">     * @extends YAHOO.widget.DataTable</span>
+<span class="cm">     * @constructor</span>
+<span class="cm">     * @param elContainer {HTMLElement} Container element for the TABLE.</span>
+<span class="cm">     * @param aColumnDefs {Object[]} Array of object literal Column definitions.</span>
+<span class="cm">     * @param oDataSource {YAHOO.util.DataSource} DataSource instance.</span>
+<span class="cm">     * @param oConfigs {object} (optional) Object literal of configuration values.</span>
+<span class="cm">     */</span>
     <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">QuickEditDataTable</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">elContainer</span><span class="p">,</span><span class="nx">aColumnDefs</span><span class="p">,</span><span class="nx">oDataSource</span><span class="p">,</span><span class="nx">oConfigs</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">QuickEditDataTable</span><span class="p">.</span><span class="nx">superclass</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">elContainer</span><span class="p">,</span><span class="nx">aColumnDefs</span><span class="p">,</span><span class="nx">oDataSource</span><span class="p">,</span><span class="nx">oConfigs</span><span class="p">);</span> 
@@ -553,7 +639,7 @@
 <span class="cm">         * Called with exactly the same arguments as any other cell</span>
 <span class="cm">         * formatter, this function displays a textarea field.</span>
 <span class="cm">         *</span>
-<span class="cm">         * @method textQuickEditFormatter</span>
+<span class="cm">         * @method textareaQuickEditFormatter</span>
 <span class="cm">         * @static</span>
 <span class="cm">         */</span>
         <span class="nx">textareaQuickEditFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span> <span class="p">{</span>
@@ -673,7 +759,7 @@
 	</div>
 </div>
 <script type="text/javascript">
-    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.QuickEditDataTable.html#method_cancelQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "cancelQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_clearMessages", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "clearMessages"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_copyDownFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "copyDownFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_displayMessage", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "displayMessage"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_getQuickEditChanges", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "getQuickEditChanges"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_readonlyLinkQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "readonlyLinkQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_startQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "startQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_validateQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "validateQuickEdit"}];
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.QuickEditDataTable.html#method_cancelQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "cancelQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_clearMessages", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "clearMessages"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_copyDownFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "copyDownFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_displayMessage", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "displayMessage"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_getQuickEditChanges", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "getQuickEditChanges"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_readonlyLinkQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "readonlyLinkQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_startQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "startQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textareaQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textareaQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_validateQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "validateQuickEdit"}];
     YAHOO.yuidoc.init();
 </script>
 </body>
