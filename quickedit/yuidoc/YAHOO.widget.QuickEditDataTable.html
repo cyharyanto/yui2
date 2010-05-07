@@ -61,7 +61,7 @@
 
                     <div class="summary description" property="yui:description">
                         <p>The QuickEditDataTable class extends the DataTable class to
-provide Quick Edit mode.  (It could just as easily extend
+provide QuickEdit mode.  (It could just as easily extend
 ScrollingDataTable.)  QuickEdit mode allows the user to edit all the
 values that are visible in the table, controlled by the column
 configuration.  Each editable cell contains an input field.  If the
@@ -92,11 +92,12 @@ quickEdit.validation:</p>
 <dt>css</dt><dd>CSS classes encoding basic validation rules.  Note
 that this will only work if you uncomment the call to
 <code>validateFromCSSData()</code> inside
-<code>_validateElements()</code>.</dd>
+<code>_validateQuickEditElements()</code>.</dd>
 <dt>fn</dt><dd>A function that will be called with the DataTable as
 its scope and the cell's form element as the argument. Return true
-if the value is valid. Otherwise, call this.displayMessage(...) to
-display an error and return false.</dd>
+if the value is valid. Otherwise, call
+this.displayQuickEditMessage(...) to display an error and return
+false.</dd>
 <dt>msg</dt><dd>A map of types to messages that will be displayed
 when a basic or regex validation rule fails. Currently, the only
 valid type is regex.  If you copy the implementation of
@@ -210,7 +211,7 @@ the sample function makes the point clear.</p>
                                         </code>
                                         
                                         <div class="description" property="yui:description">
-                                            Switch out of Quick Edit mode.  THIS DISCARDS ALL DATA!  If you
+                                            Switch out of QuickEdit mode.  THIS DISCARDS ALL DATA!  If you
 want to save the data, call getQuickEditChanges() BEFORE calling
 this function.
                                         </div>
@@ -227,22 +228,22 @@ this function.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="" rel="yui:method" resource="#method_clearMessages">
+                                    <div class="" rel="yui:method" resource="#method_clearQuickEditMessages">
                                     <h4>
-                                        <a name="method_clearMessages">clearMessages</a></h4>
+                                        <a name="method_clearQuickEditMessages">clearQuickEditMessages</a></h4>
                                     <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         void
-                                            <strong property="yui:name">clearMessages</strong>
+                                            <strong property="yui:name">clearQuickEditMessages</strong>
                                            (
                                             )
                                         </code>
                                         
                                         <div class="description" property="yui:description">
-                                            Clear all validation messages in quick edit mode.
+                                            Clear all validation messages in QuickEdit mode.
                                         </div>
 
                                         <div class="description">
@@ -290,16 +291,16 @@ of your QuickEdit formatter.
                                     </div>
                                     <hr />
                                     </div>
-                                    <div class="" rel="yui:method" resource="#method_displayMessage">
+                                    <div class="" rel="yui:method" resource="#method_displayQuickEditMessage">
                                     <h4>
-                                        <a name="method_displayMessage">displayMessage</a></h4>
+                                        <a name="method_displayQuickEditMessage">displayQuickEditMessage</a></h4>
                                     <div class="detail" >
                                         <code>
                                         
                                         
                                         
                                         void
-                                            <strong property="yui:name">displayMessage</strong>
+                                            <strong property="yui:name">displayQuickEditMessage</strong>
                                            (
                                                 
                                                         
@@ -322,7 +323,7 @@ of your QuickEdit formatter.
                                         </code>
                                         
                                         <div class="description" property="yui:description">
-                                            Display a message for a quick edit field.  If an existing message with
+                                            Display a message for a QuickEdit field.  If an existing message with
 a higher precedence is already visible, it will not be replaced.
                                         </div>
 
@@ -421,7 +422,7 @@ with only the changed values.  The object keys are the column keys.
                                             Called with exactly the same arguments as any other cell
 formatter, this function displays an email address without the
 anchor tag.  Use this as the column's qeFormatter if the column
-should not be editable in Quick Edit mode.
+should not be editable in QuickEdit mode.
                                         </div>
 
                                         <div class="description">
@@ -451,7 +452,7 @@ should not be editable in Quick Edit mode.
                                         </code>
                                         
                                         <div class="description" property="yui:description">
-                                            Switch to Quick Edit mode.  Columns that have quickEdit defined will
+                                            Switch to QuickEdit mode.  Columns that have quickEdit defined will
 be editable.
                                         </div>
 
@@ -544,7 +545,7 @@ formatter, this function displays an input field.
                                         </code>
                                         
                                         <div class="description" property="yui:description">
-                                            Validate the quick edit data.
+                                            Validate the QuickEdit data.
                                         </div>
 
                                         <div class="description">
@@ -613,9 +614,9 @@ formatter, this function displays an input field.
                         <h4>Methods</h4>
                         <ul class="content">        
                                 <li class=""><a href="#method_cancelQuickEdit" title="cancelQuickEdit">cancelQuickEdit</a></li>
-                                <li class=""><a href="#method_clearMessages" title="clearMessages">clearMessages</a></li>
+                                <li class=""><a href="#method_clearQuickEditMessages" title="clearQuickEditMessages">clearQuickEditMessages</a></li>
                                 <li class=""><a href="#method_copyDownFormatter" title="copyDownFormatter">copyDownFormatter</a></li>
-                                <li class=""><a href="#method_displayMessage" title="displayMessage">displayMessage</a></li>
+                                <li class=""><a href="#method_displayQuickEditMessage" title="displayQuickEditMessage">displayQuickEditMessage</a></li>
                                 <li class=""><a href="#method_getQuickEditChanges" title="getQuickEditChanges">getQuickEditChanges</a></li>
                                 <li class=""><a href="#method_readonlyLinkQuickEditFormatter" title="readonlyLinkQuickEditFormatter">readonlyLinkQuickEditFormatter</a></li>
                                 <li class=""><a href="#method_startQuickEdit" title="startQuickEdit">startQuickEdit</a></li>
@@ -636,7 +637,7 @@ formatter, this function displays an input field.
 	</div>
 </div>
 <script type="text/javascript">
-    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.QuickEditDataTable.html#method_cancelQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "cancelQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_clearMessages", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "clearMessages"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_copyDownFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "copyDownFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_displayMessage", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "displayMessage"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_getQuickEditChanges", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "getQuickEditChanges"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_readonlyLinkQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "readonlyLinkQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_startQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "startQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textareaQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textareaQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_validateQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "validateQuickEdit"}];
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.QuickEditDataTable.html#method_cancelQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "cancelQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_clearQuickEditMessages", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "clearQuickEditMessages"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_copyDownFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "copyDownFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_displayQuickEditMessage", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "displayQuickEditMessage"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_getQuickEditChanges", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "getQuickEditChanges"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_readonlyLinkQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "readonlyLinkQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_startQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "startQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textareaQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textareaQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_validateQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "validateQuickEdit"}];
     YAHOO.yuidoc.init();
 </script>
 </body>

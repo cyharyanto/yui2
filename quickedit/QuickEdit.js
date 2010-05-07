@@ -1,8 +1,8 @@
 /**********
 *
-* Quick Edit extension to YUI 2 DataTable
+* QuickEdit extension to YUI 2 DataTable
 * Author: lindalj@yahoo-inc.com / John Lindal
-* @submodule Quick Edit
+* @submodule QuickEdit
 * @class YAHOO.widget.DataTable
 ***********/
 (function(){
@@ -12,7 +12,7 @@
 
     /**
      * <p>The QuickEditDataTable class extends the DataTable class to
-     * provide Quick Edit mode.  (It could just as easily extend
+     * provide QuickEdit mode.  (It could just as easily extend
      * ScrollingDataTable.)  QuickEdit mode allows the user to edit all the
      * values that are visible in the table, controlled by the column
      * configuration.  Each editable cell contains an input field.  If the
@@ -54,12 +54,13 @@
      * <dt>css</dt><dd>CSS classes encoding basic validation rules.  Note
      * that this will only work if you uncomment the call to
      * <code>validateFromCSSData()</code> inside
-     * <code>_validateElements()</code>.</dd>
+     * <code>_validateQuickEditElements()</code>.</dd>
      * 
      * <dt>fn</dt><dd>A function that will be called with the DataTable as
      * its scope and the cell's form element as the argument. Return true
-     * if the value is valid. Otherwise, call this.displayMessage(...) to
-     * display an error and return false.</dd>
+     * if the value is valid. Otherwise, call
+     * this.displayQuickEditMessage(...) to display an error and return
+     * false.</dd>
      * 
      * <dt>msg</dt><dd>A map of types to messages that will be displayed
      * when a basic or regex validation rule fails. Currently, the only
@@ -165,7 +166,7 @@
         YAHOO.widget.DataTable, 
     {
         /**
-         * Switch to Quick Edit mode.  Columns that have quickEdit defined will
+         * Switch to QuickEdit mode.  Columns that have quickEdit defined will
          * be editable.
          *
          * @method startQuickEdit
@@ -205,7 +206,7 @@
                     }
 
                     if (fn) {
-                        var fmt                 = this._wrapFormatter(fn, col.formatter);
+                        var fmt                 = this._wrapQuickEditFormatter(fn, col.formatter);
                         this.qeSaveFmt[col.key] = col.formatter;
                         col.formatter           = fmt;
                     }
@@ -213,7 +214,7 @@
             }
 
             Dom.addClass(this.getContainerEl(), 'yui-dt-quick-edit');
-            this.subscribe('tbodyKeyEvent', this._moveFocus, null, this);
+            this.subscribe('tbodyKeyEvent', this._moveQuickEditFocus, null, this);
 
             var pg = this.get('paginator');
             if (pg) {
@@ -232,7 +233,7 @@
             this.render();
         },
 
-        _wrapFormatter : function(editFmt, origFmt) {
+        _wrapQuickEditFormatter : function(editFmt, origFmt) {
 
             return function(el, oRecord, oColumn, oData) {
                 if (oRecord) {
@@ -245,7 +246,7 @@
         },
 
         /**
-         * Switch out of Quick Edit mode.  THIS DISCARDS ALL DATA!  If you
+         * Switch out of QuickEdit mode.  THIS DISCARDS ALL DATA!  If you
          * want to save the data, call getQuickEditChanges() BEFORE calling
          * this function.
          *
@@ -275,7 +276,7 @@
             delete this.qeSaveFmt;
 
             Dom.removeClass(this.getContainerEl(), 'yui-dt-quick-edit');
-            this.unsubscribe('tbodyKeyEvent', this._moveFocus);
+            this.unsubscribe('tbodyKeyEvent', this._moveQuickEditFocus);
 
             var pg = this.get('paginator');
             if (pg) {
@@ -372,21 +373,23 @@
         },
 
         /**
-         * Validate the quick edit data.
+         * Validate the QuickEdit data.
          *
          * @method validateQuickEdit
          * @return {boolean} true if all validation checks pass
          */
         validateQuickEdit : function() {
 
-            this.clearMessages();
+            this.clearQuickEditMessages();
             var status = true;
 
             var e1 = this.getTbodyEl().getElementsByTagName('input');
             var e2 = this.getTbodyEl().getElementsByTagName('textarea');
+            var e3 = this.getTbodyEl().getElementsByTagName('select');
 
-            status = this._validateElements(e1) && status;	// status last to guarantee call
-            status = this._validateElements(e2) && status;
+            status = this._validateQuickEditElements(e1) && status;	// status last to guarantee call
+            status = this._validateQuickEditElements(e2) && status;
+            status = this._validateQuickEditElements(e3) && status;
 
             if (!status) {
                 this.fireEvent('notifyErrors');
@@ -398,12 +401,12 @@
         /**
          * Validate the given form fields.
          *
-         * @method _validateElements
+         * @method _validateQuickEditElements
          * @param e {Array} Array of form fields.
          * @return {boolean} true if all validation checks pass
          * @private
          */
-        _validateElements : function(
+        _validateQuickEditElements : function(
             /* array */ e) {
 
             var status = true;
@@ -418,7 +421,7 @@
 
                 var info = validateFromCSSData(e[i], msg_list);
                 if (info.error) {
-                    this.displayMessage(e[i], info.error, 'error');
+                    this.displayQuickEditMessage(e[i], info.error, 'error');
                     status = false;
                 }
                 if (!info.keepGoing) {
@@ -428,7 +431,7 @@
                 if (col.quickEdit.validation
                         && col.quickEdit.validation.regex instanceof RegExp
                         && !col.quickEdit.validation.regex.test(e[i].value)) {
-                    this.displayMessage(e[i], msg_list ? msg_list.regex : null, 'error');
+                    this.displayQuickEditMessage(e[i], msg_list ? msg_list.regex : null, 'error');
                     status = false;
                     continue;
                 }
@@ -445,11 +448,11 @@
         },
 
         /**
-         * Clear all validation messages in quick edit mode.
+         * Clear all validation messages in QuickEdit mode.
          *
-         * @method clearMessages
+         * @method clearQuickEditMessages
          */
-        clearMessages : function() {
+        clearQuickEditMessages : function() {
 
             this.hasQEMessages = false;
 
@@ -470,16 +473,16 @@
         },
 
         /**
-         * Display a message for a quick edit field.  If an existing message with
+         * Display a message for a QuickEdit field.  If an existing message with
          * a higher precedence is already visible, it will not be replaced.
          *
-         * @method displayMessage
+         * @method displayQuickEditMessage
          * @param e {Element} form field
          * @param msg {String} message to display
          * @param type {String} message type: error, warn, success, info
          * @param scroll {boolean} If false, does not scroll, even if this is the first message to display.
          */
-        displayMessage : function(
+        displayQuickEditMessage : function(
             /* element */   e,
             /* string */    msg,
             /* string */    type,
@@ -490,7 +493,7 @@
             }
 
             var row = this.getTrEl(e);
-            if (statusTakesPrecendence(this._getElementStatus(row, qe_row_status_re), type)) {
+            if (statusTakesPrecendence(this._getQuickEditElementStatus(row, qe_row_status_re), type)) {
                 if (!this.hasQEMessages && scroll) {
                     this.getFirstTdEl(row).scrollIntoView();
                 }
@@ -505,7 +508,7 @@
             }
 
             var cell = this.getTdEl(e);
-            if (statusTakesPrecendence(this._getElementStatus(cell, qe_cell_status_re), type)) {
+            if (statusTakesPrecendence(this._getQuickEditElementStatus(cell, qe_cell_status_re), type)) {
                 if (msg) {
                     var m = Dom.getElementsByClassName(QEDT.CLASS_QE_ERROR_TEXT, null, cell);
                     if (m && m.length > 0) {
@@ -521,12 +524,12 @@
         /**
          * Return the status of the field.
          *
-         * @method _getElementStatus
+         * @method _getQuickEditElementStatus
          * @param e {Element} form field
          * @param r {RegExp} regex to match against className
          * @private
          */
-        _getElementStatus : function(
+        _getQuickEditElementStatus : function(
             /* string/object */ e,
             /* regex */         r) {
 
@@ -537,12 +540,12 @@
         /**
          * Shift the focus up/down within a column.
          *
-         * @method _moveFocus
+         * @method _moveQuickEditFocus
          * @param cssClass {String} Extra class to apply to the row.
          * @return {Element} reference to the new row
          * @private
          */
-        _moveFocus : function(data) {
+        _moveQuickEditFocus : function(data) {
             var e   = data.event;
             var key = YAHOO.util.Event.getCharCode(e);
             if (e.ctrlKey && (key == 38 || key == 40)) {    // Ctrl-up/down
@@ -617,7 +620,7 @@
          * Called with exactly the same arguments as any other cell
          * formatter, this function displays an email address without the
          * anchor tag.  Use this as the column's qeFormatter if the column
-         * should not be editable in Quick Edit mode.
+         * should not be editable in QuickEdit mode.
          *
          * @method readonlyLinkQuickEditFormatter
          * @static
@@ -631,7 +634,7 @@
          * Called with exactly the same arguments as any other cell
          * formatter, this function displays a link without the anchor tag.
          * Use this as the column's qeFormatter if the column should not be
-         * editable in Quick Edit mode.
+         * editable in QuickEdit mode.
          *
          * @method readonlyLinkQuickEditFormatter
          * @static

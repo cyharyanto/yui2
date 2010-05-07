@@ -49,9 +49,9 @@
                         </style>
                         <div class="highlight"><pre><span class="cm">/**********</span>
 <span class="cm">*</span>
-<span class="cm">* Quick Edit extension to YUI 2 DataTable</span>
+<span class="cm">* QuickEdit extension to YUI 2 DataTable</span>
 <span class="cm">* Author: lindalj@yahoo-inc.com / John Lindal</span>
-<span class="cm">* @submodule Quick Edit</span>
+<span class="cm">* @submodule QuickEdit</span>
 <span class="cm">* @class YAHOO.widget.DataTable</span>
 <span class="cm">***********/</span>
 <span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
@@ -61,7 +61,7 @@
 
     <span class="cm">/**</span>
 <span class="cm">     * &lt;p&gt;The QuickEditDataTable class extends the DataTable class to</span>
-<span class="cm">     * provide Quick Edit mode.  (It could just as easily extend</span>
+<span class="cm">     * provide QuickEdit mode.  (It could just as easily extend</span>
 <span class="cm">     * ScrollingDataTable.)  QuickEdit mode allows the user to edit all the</span>
 <span class="cm">     * values that are visible in the table, controlled by the column</span>
 <span class="cm">     * configuration.  Each editable cell contains an input field.  If the</span>
@@ -103,12 +103,13 @@
 <span class="cm">     * &lt;dt&gt;css&lt;/dt&gt;&lt;dd&gt;CSS classes encoding basic validation rules.  Note</span>
 <span class="cm">     * that this will only work if you uncomment the call to</span>
 <span class="cm">     * &lt;code&gt;validateFromCSSData()&lt;/code&gt; inside</span>
-<span class="cm">     * &lt;code&gt;_validateElements()&lt;/code&gt;.&lt;/dd&gt;</span>
+<span class="cm">     * &lt;code&gt;_validateQuickEditElements()&lt;/code&gt;.&lt;/dd&gt;</span>
 <span class="cm">     * </span>
 <span class="cm">     * &lt;dt&gt;fn&lt;/dt&gt;&lt;dd&gt;A function that will be called with the DataTable as</span>
 <span class="cm">     * its scope and the cell&#39;s form element as the argument. Return true</span>
-<span class="cm">     * if the value is valid. Otherwise, call this.displayMessage(...) to</span>
-<span class="cm">     * display an error and return false.&lt;/dd&gt;</span>
+<span class="cm">     * if the value is valid. Otherwise, call</span>
+<span class="cm">     * this.displayQuickEditMessage(...) to display an error and return</span>
+<span class="cm">     * false.&lt;/dd&gt;</span>
 <span class="cm">     * </span>
 <span class="cm">     * &lt;dt&gt;msg&lt;/dt&gt;&lt;dd&gt;A map of types to messages that will be displayed</span>
 <span class="cm">     * when a basic or regex validation rule fails. Currently, the only</span>
@@ -214,7 +215,7 @@
         <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">DataTable</span><span class="p">,</span> 
     <span class="p">{</span>
         <span class="cm">/**</span>
-<span class="cm">         * Switch to Quick Edit mode.  Columns that have quickEdit defined will</span>
+<span class="cm">         * Switch to QuickEdit mode.  Columns that have quickEdit defined will</span>
 <span class="cm">         * be editable.</span>
 <span class="cm">         *</span>
 <span class="cm">         * @method startQuickEdit</span>
@@ -254,7 +255,7 @@
                     <span class="p">}</span>
 
                     <span class="k">if</span> <span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="kd">var</span> <span class="nx">fmt</span>                 <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_wrapFormatter</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">col</span><span class="p">.</span><span class="nx">formatter</span><span class="p">);</span>
+                        <span class="kd">var</span> <span class="nx">fmt</span>                 <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_wrapQuickEditFormatter</span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">col</span><span class="p">.</span><span class="nx">formatter</span><span class="p">);</span>
                         <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveFmt</span><span class="p">[</span><span class="nx">col</span><span class="p">.</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">col</span><span class="p">.</span><span class="nx">formatter</span><span class="p">;</span>
                         <span class="nx">col</span><span class="p">.</span><span class="nx">formatter</span>           <span class="o">=</span> <span class="nx">fmt</span><span class="p">;</span>
                     <span class="p">}</span>
@@ -262,7 +263,7 @@
             <span class="p">}</span>
 
             <span class="nx">Dom</span><span class="p">.</span><span class="nx">addClass</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">getContainerEl</span><span class="p">(),</span> <span class="s1">&#39;yui-dt-quick-edit&#39;</span><span class="p">);</span>
-            <span class="k">this</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;tbodyKeyEvent&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_moveFocus</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">&#39;tbodyKeyEvent&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_moveQuickEditFocus</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
 
             <span class="kd">var</span> <span class="nx">pg</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;paginator&#39;</span><span class="p">);</span>
             <span class="k">if</span> <span class="p">(</span><span class="nx">pg</span><span class="p">)</span> <span class="p">{</span>
@@ -281,7 +282,7 @@
             <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
         <span class="p">},</span>
 
-        <span class="nx">_wrapFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">editFmt</span><span class="p">,</span> <span class="nx">origFmt</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">_wrapQuickEditFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">editFmt</span><span class="p">,</span> <span class="nx">origFmt</span><span class="p">)</span> <span class="p">{</span>
 
             <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span> <span class="p">{</span>
                 <span class="k">if</span> <span class="p">(</span><span class="nx">oRecord</span><span class="p">)</span> <span class="p">{</span>
@@ -294,7 +295,7 @@
         <span class="p">},</span>
 
         <span class="cm">/**</span>
-<span class="cm">         * Switch out of Quick Edit mode.  THIS DISCARDS ALL DATA!  If you</span>
+<span class="cm">         * Switch out of QuickEdit mode.  THIS DISCARDS ALL DATA!  If you</span>
 <span class="cm">         * want to save the data, call getQuickEditChanges() BEFORE calling</span>
 <span class="cm">         * this function.</span>
 <span class="cm">         *</span>
@@ -324,7 +325,7 @@
             <span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">qeSaveFmt</span><span class="p">;</span>
 
             <span class="nx">Dom</span><span class="p">.</span><span class="nx">removeClass</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">getContainerEl</span><span class="p">(),</span> <span class="s1">&#39;yui-dt-quick-edit&#39;</span><span class="p">);</span>
-            <span class="k">this</span><span class="p">.</span><span class="nx">unsubscribe</span><span class="p">(</span><span class="s1">&#39;tbodyKeyEvent&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_moveFocus</span><span class="p">);</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">unsubscribe</span><span class="p">(</span><span class="s1">&#39;tbodyKeyEvent&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_moveQuickEditFocus</span><span class="p">);</span>
 
             <span class="kd">var</span> <span class="nx">pg</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;paginator&#39;</span><span class="p">);</span>
             <span class="k">if</span> <span class="p">(</span><span class="nx">pg</span><span class="p">)</span> <span class="p">{</span>
@@ -421,21 +422,23 @@
         <span class="p">},</span>
 
         <span class="cm">/**</span>
-<span class="cm">         * Validate the quick edit data.</span>
+<span class="cm">         * Validate the QuickEdit data.</span>
 <span class="cm">         *</span>
 <span class="cm">         * @method validateQuickEdit</span>
 <span class="cm">         * @return {boolean} true if all validation checks pass</span>
 <span class="cm">         */</span>
         <span class="nx">validateQuickEdit</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
 
-            <span class="k">this</span><span class="p">.</span><span class="nx">clearMessages</span><span class="p">();</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">clearQuickEditMessages</span><span class="p">();</span>
             <span class="kd">var</span> <span class="nx">status</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
 
             <span class="kd">var</span> <span class="nx">e1</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getTbodyEl</span><span class="p">().</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">);</span>
             <span class="kd">var</span> <span class="nx">e2</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getTbodyEl</span><span class="p">().</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;textarea&#39;</span><span class="p">);</span>
+            <span class="kd">var</span> <span class="nx">e3</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getTbodyEl</span><span class="p">().</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">);</span>
 
-            <span class="nx">status</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_validateElements</span><span class="p">(</span><span class="nx">e1</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">status</span><span class="p">;</span>	<span class="c1">// status last to guarantee call</span>
-            <span class="nx">status</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_validateElements</span><span class="p">(</span><span class="nx">e2</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">status</span><span class="p">;</span>
+            <span class="nx">status</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_validateQuickEditElements</span><span class="p">(</span><span class="nx">e1</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">status</span><span class="p">;</span>	<span class="c1">// status last to guarantee call</span>
+            <span class="nx">status</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_validateQuickEditElements</span><span class="p">(</span><span class="nx">e2</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">status</span><span class="p">;</span>
+            <span class="nx">status</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_validateQuickEditElements</span><span class="p">(</span><span class="nx">e3</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">status</span><span class="p">;</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">status</span><span class="p">)</span> <span class="p">{</span>
                 <span class="k">this</span><span class="p">.</span><span class="nx">fireEvent</span><span class="p">(</span><span class="s1">&#39;notifyErrors&#39;</span><span class="p">);</span>
@@ -447,12 +450,12 @@
         <span class="cm">/**</span>
 <span class="cm">         * Validate the given form fields.</span>
 <span class="cm">         *</span>
-<span class="cm">         * @method _validateElements</span>
+<span class="cm">         * @method _validateQuickEditElements</span>
 <span class="cm">         * @param e {Array} Array of form fields.</span>
 <span class="cm">         * @return {boolean} true if all validation checks pass</span>
 <span class="cm">         * @private</span>
 <span class="cm">         */</span>
-        <span class="nx">_validateElements</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span>
+        <span class="nx">_validateQuickEditElements</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span>
             <span class="cm">/* array */</span> <span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
 
             <span class="kd">var</span> <span class="nx">status</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
@@ -467,7 +470,7 @@
 
 <span class="cm">                var info = validateFromCSSData(e[i], msg_list);</span>
 <span class="cm">                if (info.error) {</span>
-<span class="cm">                    this.displayMessage(e[i], info.error, &#39;error&#39;);</span>
+<span class="cm">                    this.displayQuickEditMessage(e[i], info.error, &#39;error&#39;);</span>
 <span class="cm">                    status = false;</span>
 <span class="cm">                }</span>
 <span class="cm">                if (!info.keepGoing) {</span>
@@ -477,7 +480,7 @@
                 <span class="k">if</span> <span class="p">(</span><span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span>
                         <span class="o">&amp;&amp;</span> <span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span><span class="p">.</span><span class="nx">regex</span> <span class="k">instanceof</span> <span class="nb">RegExp</span>
                         <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">col</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span><span class="p">.</span><span class="nx">regex</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">e</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">value</span><span class="p">))</span> <span class="p">{</span>
-                    <span class="k">this</span><span class="p">.</span><span class="nx">displayMessage</span><span class="p">(</span><span class="nx">e</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">msg_list</span> <span class="o">?</span> <span class="nx">msg_list</span><span class="p">.</span><span class="nx">regex</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">);</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">displayQuickEditMessage</span><span class="p">(</span><span class="nx">e</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">msg_list</span> <span class="o">?</span> <span class="nx">msg_list</span><span class="p">.</span><span class="nx">regex</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">);</span>
                     <span class="nx">status</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
                     <span class="k">continue</span><span class="p">;</span>
                 <span class="p">}</span>
@@ -494,11 +497,11 @@
         <span class="p">},</span>
 
         <span class="cm">/**</span>
-<span class="cm">         * Clear all validation messages in quick edit mode.</span>
+<span class="cm">         * Clear all validation messages in QuickEdit mode.</span>
 <span class="cm">         *</span>
-<span class="cm">         * @method clearMessages</span>
+<span class="cm">         * @method clearQuickEditMessages</span>
 <span class="cm">         */</span>
-        <span class="nx">clearMessages</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">clearQuickEditMessages</span> <span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
 
             <span class="k">this</span><span class="p">.</span><span class="nx">hasQEMessages</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
 
@@ -519,16 +522,16 @@
         <span class="p">},</span>
 
         <span class="cm">/**</span>
-<span class="cm">         * Display a message for a quick edit field.  If an existing message with</span>
+<span class="cm">         * Display a message for a QuickEdit field.  If an existing message with</span>
 <span class="cm">         * a higher precedence is already visible, it will not be replaced.</span>
 <span class="cm">         *</span>
-<span class="cm">         * @method displayMessage</span>
+<span class="cm">         * @method displayQuickEditMessage</span>
 <span class="cm">         * @param e {Element} form field</span>
 <span class="cm">         * @param msg {String} message to display</span>
 <span class="cm">         * @param type {String} message type: error, warn, success, info</span>
 <span class="cm">         * @param scroll {boolean} If false, does not scroll, even if this is the first message to display.</span>
 <span class="cm">         */</span>
-        <span class="nx">displayMessage</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span>
+        <span class="nx">displayQuickEditMessage</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span>
             <span class="cm">/* element */</span>   <span class="nx">e</span><span class="p">,</span>
             <span class="cm">/* string */</span>    <span class="nx">msg</span><span class="p">,</span>
             <span class="cm">/* string */</span>    <span class="nx">type</span><span class="p">,</span>
@@ -539,7 +542,7 @@
             <span class="p">}</span>
 
             <span class="kd">var</span> <span class="nx">row</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getTrEl</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">statusTakesPrecendence</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_getElementStatus</span><span class="p">(</span><span class="nx">row</span><span class="p">,</span> <span class="nx">qe_row_status_re</span><span class="p">),</span> <span class="nx">type</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">statusTakesPrecendence</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_getQuickEditElementStatus</span><span class="p">(</span><span class="nx">row</span><span class="p">,</span> <span class="nx">qe_row_status_re</span><span class="p">),</span> <span class="nx">type</span><span class="p">))</span> <span class="p">{</span>
                 <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">hasQEMessages</span> <span class="o">&amp;&amp;</span> <span class="nx">scroll</span><span class="p">)</span> <span class="p">{</span>
                     <span class="k">this</span><span class="p">.</span><span class="nx">getFirstTdEl</span><span class="p">(</span><span class="nx">row</span><span class="p">).</span><span class="nx">scrollIntoView</span><span class="p">();</span>
                 <span class="p">}</span>
@@ -554,7 +557,7 @@
             <span class="p">}</span>
 
             <span class="kd">var</span> <span class="nx">cell</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getTdEl</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">statusTakesPrecendence</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_getElementStatus</span><span class="p">(</span><span class="nx">cell</span><span class="p">,</span> <span class="nx">qe_cell_status_re</span><span class="p">),</span> <span class="nx">type</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">statusTakesPrecendence</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_getQuickEditElementStatus</span><span class="p">(</span><span class="nx">cell</span><span class="p">,</span> <span class="nx">qe_cell_status_re</span><span class="p">),</span> <span class="nx">type</span><span class="p">))</span> <span class="p">{</span>
                 <span class="k">if</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
                     <span class="kd">var</span> <span class="nx">m</span> <span class="o">=</span> <span class="nx">Dom</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="nx">QEDT</span><span class="p">.</span><span class="nx">CLASS_QE_ERROR_TEXT</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">cell</span><span class="p">);</span>
                     <span class="k">if</span> <span class="p">(</span><span class="nx">m</span> <span class="o">&amp;&amp;</span> <span class="nx">m</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
@@ -570,12 +573,12 @@
         <span class="cm">/**</span>
 <span class="cm">         * Return the status of the field.</span>
 <span class="cm">         *</span>
-<span class="cm">         * @method _getElementStatus</span>
+<span class="cm">         * @method _getQuickEditElementStatus</span>
 <span class="cm">         * @param e {Element} form field</span>
 <span class="cm">         * @param r {RegExp} regex to match against className</span>
 <span class="cm">         * @private</span>
 <span class="cm">         */</span>
-        <span class="nx">_getElementStatus</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span>
+        <span class="nx">_getQuickEditElementStatus</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span>
             <span class="cm">/* string/object */</span> <span class="nx">e</span><span class="p">,</span>
             <span class="cm">/* regex */</span>         <span class="nx">r</span><span class="p">)</span> <span class="p">{</span>
 
@@ -586,12 +589,12 @@
         <span class="cm">/**</span>
 <span class="cm">         * Shift the focus up/down within a column.</span>
 <span class="cm">         *</span>
-<span class="cm">         * @method _moveFocus</span>
+<span class="cm">         * @method _moveQuickEditFocus</span>
 <span class="cm">         * @param cssClass {String} Extra class to apply to the row.</span>
 <span class="cm">         * @return {Element} reference to the new row</span>
 <span class="cm">         * @private</span>
 <span class="cm">         */</span>
-        <span class="nx">_moveFocus</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">_moveQuickEditFocus</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
             <span class="kd">var</span> <span class="nx">e</span>   <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">event</span><span class="p">;</span>
             <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">Event</span><span class="p">.</span><span class="nx">getCharCode</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
             <span class="k">if</span> <span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">ctrlKey</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">key</span> <span class="o">==</span> <span class="mi">38</span> <span class="o">||</span> <span class="nx">key</span> <span class="o">==</span> <span class="mi">40</span><span class="p">))</span> <span class="p">{</span>    <span class="c1">// Ctrl-up/down</span>
@@ -666,7 +669,7 @@
 <span class="cm">         * Called with exactly the same arguments as any other cell</span>
 <span class="cm">         * formatter, this function displays an email address without the</span>
 <span class="cm">         * anchor tag.  Use this as the column&#39;s qeFormatter if the column</span>
-<span class="cm">         * should not be editable in Quick Edit mode.</span>
+<span class="cm">         * should not be editable in QuickEdit mode.</span>
 <span class="cm">         *</span>
 <span class="cm">         * @method readonlyLinkQuickEditFormatter</span>
 <span class="cm">         * @static</span>
@@ -680,7 +683,7 @@
 <span class="cm">         * Called with exactly the same arguments as any other cell</span>
 <span class="cm">         * formatter, this function displays a link without the anchor tag.</span>
 <span class="cm">         * Use this as the column&#39;s qeFormatter if the column should not be</span>
-<span class="cm">         * editable in Quick Edit mode.</span>
+<span class="cm">         * editable in QuickEdit mode.</span>
 <span class="cm">         *</span>
 <span class="cm">         * @method readonlyLinkQuickEditFormatter</span>
 <span class="cm">         * @static</span>
@@ -762,7 +765,7 @@
 	</div>
 </div>
 <script type="text/javascript">
-    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.QuickEditDataTable.html#method_cancelQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "cancelQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_clearMessages", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "clearMessages"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_copyDownFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "copyDownFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_displayMessage", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "displayMessage"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_getQuickEditChanges", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "getQuickEditChanges"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_readonlyLinkQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "readonlyLinkQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_startQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "startQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textareaQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textareaQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_validateQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "validateQuickEdit"}];
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.QuickEditDataTable.html#method_cancelQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "cancelQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_clearQuickEditMessages", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "clearQuickEditMessages"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_copyDownFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "copyDownFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_displayQuickEditMessage", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "displayQuickEditMessage"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_getQuickEditChanges", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "getQuickEditChanges"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_readonlyLinkQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "readonlyLinkQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_startQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "startQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textareaQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textareaQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_validateQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "validateQuickEdit"}];
     YAHOO.yuidoc.init();
 </script>
 </body>
