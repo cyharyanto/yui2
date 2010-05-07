@@ -11,25 +11,26 @@
         Dom = YAHOO.util.Dom;
 
     /**
-     * The QuickEditDataTable class extends the DataTable class to provide
-     * Quick Edit mode.  (It could just as easily extend
+     * <p>The QuickEditDataTable class extends the DataTable class to
+     * provide Quick Edit mode.  (It could just as easily extend
      * ScrollingDataTable.)  QuickEdit mode allows the user to edit all the
      * values that are visible in the table, controlled by the column
      * configuration.  Each editable cell contains an input field.  If the
      * user decides to save the changes, then you can extract the changes
-     * by calling <code>getQuickEditChanges()</code>.
+     * by calling <code>getQuickEditChanges()</code>.</p>
      * 
-     * For a column to be editable in QuickEdit mode, the column
+     * <p>For a column to be editable in QuickEdit mode, the column
      * configuration must include <code>quickEdit</code>.  The contents of
-     * this object define the column's behavior in QuickEdit mode.
+     * this object define the column's behavior in QuickEdit mode.</p>
      * 
-     * If a column should not be editable, but needs to be formatted
+     * <p>If a column should not be editable, but needs to be formatted
      * differently in QuickEdit mode, then you must define qeFormatter in
      * the column configuration. This is simply a normal cell formatter
      * function that will be used in QuickEdit mode.  The static functions
-     * <code>readonly*QuickEditFormatter</code> provide examples.
+     * <code>readonly*QuickEditFormatter</code> provide examples.</p>
      * 
-     * The following configuration can be provided as part of quickEdit:
+     * <p>The following configuration can be provided as part of
+     * quickEdit:</p>
      * 
      * <dl>
      * 
@@ -45,8 +46,8 @@
      * 
      * </dl>
      * 
-     * The following configuration can be provided as part of
-     * quickEdit.validation:
+     * <p>The following configuration can be provided as part of
+     * quickEdit.validation:</p>
      * 
      * <dl>
      * 
@@ -72,33 +73,35 @@
      * 
      * </dl>
      * 
-     * Custom QuickEdit Formatters
+     * <p>Custom QuickEdit Formatters</p>
      * 
-     * To write a custom cell formatter for QuickEdit mode, you must
-     * structure the function as follows:
+     * <p>To write a custom cell formatter for QuickEdit mode, you must
+     * structure the function as follows:</p>
      * 
+     * <pre>
      * function myQuickEditFormatter(el, oRecord, oColumn, oData) {
-     *   var markup =
-     *     '&lt;input type="text" class="{yiv} yui-quick-edit yui-quick-edit-key:{key}"/&gt;' +
-     *     YAHOO.widget.QuickEditDataTable.MARKUP_QE_ERROR_DISPLAY;
-     *     
-     *     el.innerHTML = lang.substitute(markup, {
-     *       key: oColumn.key,
-     *       yiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || '') : ''
-     *     });
-     *     
-     *     el.firstChild.value = extractMyEditableValue(oData);
-     *     
-     *     YAHOO.widget.QuickEditDataTable.copyDownFormatter.apply(this, arguments);
+     * &nbsp;&nbsp;var markup =
+     * &nbsp;&nbsp;&nbsp;&nbsp;'&lt;input type="text" class="{yiv} yui-quick-edit yui-quick-edit-key:{key}"/&gt;' +
+     * &nbsp;&nbsp;&nbsp;&nbsp;YAHOO.widget.QuickEditDataTable.MARKUP_QE_ERROR_DISPLAY;
+     * 
+     * &nbsp;&nbsp;&nbsp;&nbsp;el.innerHTML = lang.substitute(markup, {
+     * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;key: oColumn.key,
+     * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;yiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || '') : ''
+     * &nbsp;&nbsp;&nbsp;&nbsp;});
+     * 
+     * &nbsp;&nbsp;&nbsp;&nbsp;el.firstChild.value = extractMyEditableValue(oData);
+     * 
+     * &nbsp;&nbsp;&nbsp;&nbsp;YAHOO.widget.QuickEditDataTable.copyDownFormatter.apply(this, arguments);
      * };
+     * </pre>
      * 
-     * You can use textarea or select instead of input, but you can only
-     * create a single field.
+     * <p>You can use textarea or select instead of input, but you can only
+     * create a single field.</p>
      * 
-     * <code>extractMyEditableValue</code> does not have to be a separate
+     * <p><code>extractMyEditableValue</code> does not have to be a separate
      * function nor must it be limited to using only oData. The work should
      * normally be done inline in the formatter function, but the name of
-     * the sample function makes the point clear.
+     * the sample function makes the point clear.</p>
      *
      * @module QuickEdit
      * @namespace YAHOO.widget

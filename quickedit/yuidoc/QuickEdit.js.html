@@ -60,25 +60,26 @@
         <span class="nx">Dom</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">Dom</span><span class="p">;</span>
 
     <span class="cm">/**</span>
-<span class="cm">     * The QuickEditDataTable class extends the DataTable class to provide</span>
-<span class="cm">     * Quick Edit mode.  (It could just as easily extend</span>
+<span class="cm">     * &lt;p&gt;The QuickEditDataTable class extends the DataTable class to</span>
+<span class="cm">     * provide Quick Edit mode.  (It could just as easily extend</span>
 <span class="cm">     * ScrollingDataTable.)  QuickEdit mode allows the user to edit all the</span>
 <span class="cm">     * values that are visible in the table, controlled by the column</span>
 <span class="cm">     * configuration.  Each editable cell contains an input field.  If the</span>
 <span class="cm">     * user decides to save the changes, then you can extract the changes</span>
-<span class="cm">     * by calling &lt;code&gt;getQuickEditChanges()&lt;/code&gt;.</span>
+<span class="cm">     * by calling &lt;code&gt;getQuickEditChanges()&lt;/code&gt;.&lt;/p&gt;</span>
 <span class="cm">     * </span>
-<span class="cm">     * For a column to be editable in QuickEdit mode, the column</span>
+<span class="cm">     * &lt;p&gt;For a column to be editable in QuickEdit mode, the column</span>
 <span class="cm">     * configuration must include &lt;code&gt;quickEdit&lt;/code&gt;.  The contents of</span>
-<span class="cm">     * this object define the column&#39;s behavior in QuickEdit mode.</span>
+<span class="cm">     * this object define the column&#39;s behavior in QuickEdit mode.&lt;/p&gt;</span>
 <span class="cm">     * </span>
-<span class="cm">     * If a column should not be editable, but needs to be formatted</span>
+<span class="cm">     * &lt;p&gt;If a column should not be editable, but needs to be formatted</span>
 <span class="cm">     * differently in QuickEdit mode, then you must define qeFormatter in</span>
 <span class="cm">     * the column configuration. This is simply a normal cell formatter</span>
 <span class="cm">     * function that will be used in QuickEdit mode.  The static functions</span>
-<span class="cm">     * &lt;code&gt;readonly*QuickEditFormatter&lt;/code&gt; provide examples.</span>
+<span class="cm">     * &lt;code&gt;readonly*QuickEditFormatter&lt;/code&gt; provide examples.&lt;/p&gt;</span>
 <span class="cm">     * </span>
-<span class="cm">     * The following configuration can be provided as part of quickEdit:</span>
+<span class="cm">     * &lt;p&gt;The following configuration can be provided as part of</span>
+<span class="cm">     * quickEdit:&lt;/p&gt;</span>
 <span class="cm">     * </span>
 <span class="cm">     * &lt;dl&gt;</span>
 <span class="cm">     * </span>
@@ -94,8 +95,8 @@
 <span class="cm">     * </span>
 <span class="cm">     * &lt;/dl&gt;</span>
 <span class="cm">     * </span>
-<span class="cm">     * The following configuration can be provided as part of</span>
-<span class="cm">     * quickEdit.validation:</span>
+<span class="cm">     * &lt;p&gt;The following configuration can be provided as part of</span>
+<span class="cm">     * quickEdit.validation:&lt;/p&gt;</span>
 <span class="cm">     * </span>
 <span class="cm">     * &lt;dl&gt;</span>
 <span class="cm">     * </span>
@@ -121,33 +122,35 @@
 <span class="cm">     * </span>
 <span class="cm">     * &lt;/dl&gt;</span>
 <span class="cm">     * </span>
-<span class="cm">     * Custom QuickEdit Formatters</span>
+<span class="cm">     * &lt;p&gt;Custom QuickEdit Formatters&lt;/p&gt;</span>
 <span class="cm">     * </span>
-<span class="cm">     * To write a custom cell formatter for QuickEdit mode, you must</span>
-<span class="cm">     * structure the function as follows:</span>
+<span class="cm">     * &lt;p&gt;To write a custom cell formatter for QuickEdit mode, you must</span>
+<span class="cm">     * structure the function as follows:&lt;/p&gt;</span>
 <span class="cm">     * </span>
+<span class="cm">     * &lt;pre&gt;</span>
 <span class="cm">     * function myQuickEditFormatter(el, oRecord, oColumn, oData) {</span>
-<span class="cm">     *   var markup =</span>
-<span class="cm">     *     &#39;&amp;lt;input type=&quot;text&quot; class=&quot;{yiv} yui-quick-edit yui-quick-edit-key:{key}&quot;/&amp;gt;&#39; +</span>
-<span class="cm">     *     YAHOO.widget.QuickEditDataTable.MARKUP_QE_ERROR_DISPLAY;</span>
-<span class="cm">     *     </span>
-<span class="cm">     *     el.innerHTML = lang.substitute(markup, {</span>
-<span class="cm">     *       key: oColumn.key,</span>
-<span class="cm">     *       yiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || &#39;&#39;) : &#39;&#39;</span>
-<span class="cm">     *     });</span>
-<span class="cm">     *     </span>
-<span class="cm">     *     el.firstChild.value = extractMyEditableValue(oData);</span>
-<span class="cm">     *     </span>
-<span class="cm">     *     YAHOO.widget.QuickEditDataTable.copyDownFormatter.apply(this, arguments);</span>
+<span class="cm">     * &amp;nbsp;&amp;nbsp;var markup =</span>
+<span class="cm">     * &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&#39;&amp;lt;input type=&quot;text&quot; class=&quot;{yiv} yui-quick-edit yui-quick-edit-key:{key}&quot;/&amp;gt;&#39; +</span>
+<span class="cm">     * &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;YAHOO.widget.QuickEditDataTable.MARKUP_QE_ERROR_DISPLAY;</span>
+<span class="cm">     * </span>
+<span class="cm">     * &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;el.innerHTML = lang.substitute(markup, {</span>
+<span class="cm">     * &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;key: oColumn.key,</span>
+<span class="cm">     * &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;yiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || &#39;&#39;) : &#39;&#39;</span>
+<span class="cm">     * &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;});</span>
+<span class="cm">     * </span>
+<span class="cm">     * &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;el.firstChild.value = extractMyEditableValue(oData);</span>
+<span class="cm">     * </span>
+<span class="cm">     * &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;YAHOO.widget.QuickEditDataTable.copyDownFormatter.apply(this, arguments);</span>
 <span class="cm">     * };</span>
+<span class="cm">     * &lt;/pre&gt;</span>
 <span class="cm">     * </span>
-<span class="cm">     * You can use textarea or select instead of input, but you can only</span>
-<span class="cm">     * create a single field.</span>
+<span class="cm">     * &lt;p&gt;You can use textarea or select instead of input, but you can only</span>
+<span class="cm">     * create a single field.&lt;/p&gt;</span>
 <span class="cm">     * </span>
-<span class="cm">     * &lt;code&gt;extractMyEditableValue&lt;/code&gt; does not have to be a separate</span>
+<span class="cm">     * &lt;p&gt;&lt;code&gt;extractMyEditableValue&lt;/code&gt; does not have to be a separate</span>
 <span class="cm">     * function nor must it be limited to using only oData. The work should</span>
 <span class="cm">     * normally be done inline in the formatter function, but the name of</span>
-<span class="cm">     * the sample function makes the point clear.</span>
+<span class="cm">     * the sample function makes the point clear.&lt;/p&gt;</span>
 <span class="cm">     *</span>
 <span class="cm">     * @module QuickEdit</span>
 <span class="cm">     * @namespace YAHOO.widget</span>
