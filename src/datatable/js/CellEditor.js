@@ -658,78 +658,59 @@ show : function() {
     elContainer.style.display = "";
 
     // constrain to viewport
-    var cell = this.getTdEl();
-    var cxy  = Dom.getXY(cell);
-    var cx   = cxy[0];
-    var cy   = cxy[1];
-    var xy   = Dom.getXY(elContainer);
-    var x    = xy[0];
-    var y    = xy[1];
-    var w    = elContainer.offsetWidth;
-    var h    = elContainer.offsetHeight;
     var vw   = Dom.getViewportWidth();
     var vh   = Dom.getViewportHeight();
+    var e    = this.getContainerEl();
+    var xy   = Dom.getXY(e);
+    var x    = xy[0];
+    var y    = xy[1];
+    var cell = this.getTdEl();
+    var cw   = cell.offsetWidth;
+    var ch   = cell.offsetHeight;
 
-    var anyMoved = false;
-    do {
-        var moved = false;
-        if (x + w > vw) {
-            x -= w;
+    // we don't store e's width & height
+    // because YUI calendar expands when shifted inside viewport
 
-            e.style.left = x + "px";
-            if (w < e.offsetWidth) {  // YUI calendar expands when shifted inside viewport
-                x -= (e.offsetWidth - w);
-                w  = e.offsetWidth;
-            }
-
-            if (x < 0) {
-                var t = this.getDataTable().getContainerEl();
-                x += Math.min(cell.offsetWidth, Dom.getX(t) + t.clientWidth - Dom.getX(cell));
-                if (x < 0) x = 0;
-                if (y === xy[1]) {
-                    y += cell.offsetHeight;
-                    if (y + h > vh) {
-                        y -= cell.offsetHeight + h;
-                        if (y < 0) y = 0;
-                    }
-                }
-            }
-
-            e.style.left = x + "px";
-            e.style.top  = y + "px";
-            moved        = true;
-        }
-        else if (y + (y > cy || !anyMoved ? cell.offsetHeight : 0) + h > vh) {
-
-            if (anyMoved && y + cell.offsetHeight < vh) {
-                y -= (h - cell.offsetHeight);
-            }
-            else {
-                y -= h;
-            }
-
-            if (y < 0) {
-                y = 0;
-                if (x === xy[0]) {
-                    x += cell.offsetWidth;
-                    if (x + w > vw) {
-                        x -= cell.offsetWidth + w;
-                        if (x < 0) x = 0;
-                    }
-                }
-            }
-
-            e.style.left = x + "px";
-            e.style.top  = y + "px";
-            moved        = true;
-        }
-        else if (!anyMoved && !this.disableBtns) {
-            y          += cell.offsetHeight;
-            e.style.top = y + "px";
-        }
-        anyMoved = anyMoved || moved;
+    if (e.offsetWidth > vw) {
+        e.style.width = (vw-25)+'px';   // ought to use margins+borders, not 25
     }
-        while (moved);
+
+    if (e.offsetHeight > vh) {
+        e.style.height = (vh-25)+'px';   // ought to use margins+borders, not 25
+    }
+
+    var pos =
+    [
+        [ 0, ch ],
+        [ '- e.offsetWidth + cw', ch ],
+        [ 0, '- e.offsetHeight' ],
+        [ '- e.offsetWidth + cw', '- e.offsetHeight' ],
+        [ cw, 0 ],
+        [ '- e.offsetWidth', 0 ],
+        [ cw, '- e.offsetHeight + ch' ],
+        [ '- e.offsetWidth', '- e.offsetHeight + ch' ],
+    ];
+
+    if (!this.disableBtns ||
+        x < 0 || x + e.offsetWidth > vw ||
+        y < 0 || y + e.offsetHeight > vh) {
+
+        for (var i=0; i<pos.length; i++) {
+
+            e.style.left = (x + eval(pos[i][0])) + "px";
+            e.style.top  = (y + eval(pos[i][1])) + "px";
+
+            vw = Dom.getViewportWidth();  // scrollbar may disappear
+            vh = Dom.getViewportHeight();
+
+            xy = Dom.getXY(e);
+            if (0 <= xy[0] && xy[0] + e.offsetWidth <= vw &&
+                0 <= xy[1] && xy[1] + e.offsetHeight <= vh) {
+
+                break;
+            }
+        }
+    }
 
     Dom.addClass(cell, 'yui-dt-target');
 
@@ -787,39 +768,43 @@ save : function() {
             return;
         }
     }
-        
+
     var oSelf = this;
     var finishSave = function(bSuccess, oNewValue) {
-        var oOrigValue = oSelf.value;
-        if(bSuccess) {
-            // Update new value
-            oSelf.value = oNewValue;
-            oSelf.getDataTable().updateCell(oSelf.getRecord(), oSelf.getColumn(), oNewValue);
-            
-            // Hide CellEditor
-            oSelf._hide();
-            
-            oSelf.fireEvent("saveEvent",
-                    {editor:oSelf, oldData:oOrigValue, newData:oSelf.value});
-            YAHOO.log("Cell Editor input saved", "info", this.toString());
-        }
-        else {
-            oSelf.resetForm();
-            oSelf.fireEvent("revertEvent",
-                    {editor:oSelf, oldData:oOrigValue, newData:oNewValue});
-            YAHOO.log("Could not save Cell Editor input " +
-                    lang.dump(oNewValue), "warn", oSelf.toString());
-        }
-        oSelf.unblock();
-    };
-    
+        oSelf.finishSave(bSuccess, oNewValue);
+    }
+
     this.block();
     if(lang.isFunction(this.asyncSubmitter)) {
         this.asyncSubmitter.call(this, finishSave, validValue);
     } 
     else {   
-        finishSave(true, validValue);
+        this.finishSave(true, validValue);
     }
+},
+
+finishSave : function(bSuccess, oNewValue) {
+    var oOrigValue = this.value;
+    if(bSuccess) {
+        // Update new value
+        this.value = oNewValue;
+        this.getDataTable().updateCell(this.getRecord(), this.getColumn(), oNewValue);
+        
+        // Hide CellEditor
+        this._hide();
+        
+        this.fireEvent("saveEvent",
+                {editor:this, oldData:oOrigValue, newData:this.value});
+        YAHOO.log("Cell Editor input saved", "info", this.toString());
+    }
+    else {
+        this.resetForm();
+        this.fireEvent("revertEvent",
+                {editor:this, oldData:oOrigValue, newData:oNewValue});
+        YAHOO.log("Could not save Cell Editor input " +
+                lang.dump(oNewValue), "warn", this.toString());
+    }
+    this.unblock();
 },
 
 /**
@@ -1742,7 +1727,17 @@ handleDisabledBtns : function() {
  * @method move
  */
 move : function() {
-    this.textarea.style.width = this.getTdEl().offsetWidth + "px";
+    var tdEl = this.getTdEl(),
+        x = Dom.getX(tdEl),
+        dtContainer = this.getDataTable().getContainerEl(),
+        tdWidth = this.getTdEl().offsetWidth,
+        w = dtContainer.clientWidth || dtContainer.offsetWidth;
+
+    if (tdWidth >= w) {
+        tdWidth = Dom.getX(dtContainer) + w - x - 40;
+    }
+
+    this.textarea.style.width = tdWidth + "px";
     this.textarea.style.height = "3em";
     YAHOO.widget.TextareaCellEditor.superclass.move.call(this);
 },
@@ -1869,7 +1864,17 @@ renderForm : function() {
  * @method move
  */
 move : function() {
-    this.textbox.style.width = this.getTdEl().offsetWidth + "px";
+    var tdEl = this.getTdEl(),
+        x = Dom.getX(tdEl),
+        dtContainer = this.getDataTable().getContainerEl(),
+        tdWidth = this.getTdEl().offsetWidth,
+        w = dtContainer.clientWidth || dtContainer.offsetWidth;
+
+    if (tdWidth >= w) {
+        tdWidth = Dom.getX(dtContainer) + w - x - 40;
+    }
+
+    this.textbox.style.width = tdWidth + "px";
     widget.TextboxCellEditor.superclass.move.call(this);
 },
 
