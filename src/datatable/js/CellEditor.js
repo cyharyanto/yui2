@@ -688,7 +688,7 @@ show : function() {
         [ cw, 0 ],
         [ '- e.offsetWidth', 0 ],
         [ cw, '- e.offsetHeight + ch' ],
-        [ '- e.offsetWidth', '- e.offsetHeight + ch' ],
+        [ '- e.offsetWidth', '- e.offsetHeight + ch' ]
     ];
 
     if (!this.disableBtns ||
