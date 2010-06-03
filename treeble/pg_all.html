@@ -13,12 +13,12 @@
 	<script type="text/javascript" src="Treeble.js"></script>
 
 	<style type="text/css">
-	.yui-dt td.satg-treeble-nub
+	.yui-dt td.treeble-nub
 	{
 		border-right-color: transparent;
 	}
 
-	.yui-dt .satg-row-toggle a.satg-treeble-collapse-nub
+	.yui-dt .row-toggle a.treeble-collapse-nub
 	{
 		padding:0 8px;
 		height:14px;
@@ -26,24 +26,24 @@
 		*display:inline-block;
 	}
 
-	.yui-dt .satg-row-closed a.satg-treeble-collapse-nub
+	.yui-dt .row-closed a.treeble-collapse-nub
 	{
 		background:url(closed.png) no-repeat;
 	}
-	.yui-dt .satg-row-open a.satg-treeble-collapse-nub
+	.yui-dt .row-open a.treeble-collapse-nub
 	{
 		background:url(open.png) no-repeat;
 	}
 
-	.yui-dt td .satg-treeble-depth-1
+	.yui-dt td .treeble-depth-1
 	{
 		padding-left: 15px;
 	}
-	.yui-dt td .satg-treeble-depth-2
+	.yui-dt td .treeble-depth-2
 	{
 		padding-left: 30px;
 	}
-	.yui-dt td .satg-treeble-depth-3
+	.yui-dt td .treeble-depth-3
 	{
 		padding-left: 45px;
 	}
@@ -156,16 +156,16 @@ YAHOO.util.Event.onDOMReady(function(){
 			{key:"toggle_column", label:"", formatter:
 				function(elCell, oRecord, oColumn, oData)
 				{
-					Dom.addClass(elCell.parentNode, 'satg-treeble-nub');
+					Dom.addClass(elCell.parentNode, 'treeble-nub');
 					if (oRecord.getData('kiddies'))
 					{
 						var path  = oRecord.getData('_yui_node_path');
 						var open  = this.rowIsOpen(path);
-						var clazz = open ? 'satg-row-open' : 'satg-row-closed';
+						var clazz = open ? 'row-open' : 'row-closed';
 
-						Dom.addClass(elCell, 'satg-row-toggle');
-						Dom.replaceClass(elCell, /satg-row-(open|closed)/, clazz);
-						elCell.innerHTML = '<a class="satg-treeble-collapse-nub" href="javascript:void(0);"></a>';
+						Dom.addClass(elCell, 'row-toggle');
+						Dom.replaceClass(elCell, /row-(open|closed)/, clazz);
+						elCell.innerHTML = '<a class="treeble-collapse-nub" href="javascript:void(0);"></a>';
 
 						Event.on(elCell, 'click', function(e, path)
 						{
@@ -178,7 +178,7 @@ YAHOO.util.Event.onDOMReady(function(){
 			{key:"title", label:"Title", resizeable:true,
 				formatter: function(elCell, oRecord, oColumn, oData)
 				{
-					var depth_class  = 'satg-treeble-depth-'+oRecord.getData('_yui_node_depth');
+					var depth_class  = 'treeble-depth-'+oRecord.getData('_yui_node_depth');
 					elCell.innerHTML = '<span class="'+depth_class+'">'+oData+'</span>';
 				}},
 			{key:"year", label:"Year", resizeable:true},

@@ -424,7 +424,7 @@ function getVisibleSlicesPgAll(
 	{
 		count: n,
 		send:  send
-	}
+	};
 	return info;
 }
 
