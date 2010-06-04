@@ -541,8 +541,6 @@
          * Shift the focus up/down within a column.
          *
          * @method _moveQuickEditFocus
-         * @param cssClass {String} Extra class to apply to the row.
-         * @return {Element} reference to the new row
          * @private
          */
         _moveQuickEditFocus : function(data) {
