@@ -497,10 +497,11 @@ destroy : function() {
         oColumn.editor = null;
     }
     
-    var elContainer = this.getContainerEl();
-    if (elContainer) {
-        Ev.purgeElement(elContainer, true);
-        elContainer.parentNode.removeChild(elContainer);
+    if (this._elContainer) {
+        Ev.purgeElement(this._elContainer, true);
+        elContainer.parentNode.removeChild(this._elContainer);
+        this._elContainer = null;
+        this._needsRender = true;
     }
 },
 
@@ -662,8 +663,8 @@ show : function() {
     var vh   = Dom.getViewportHeight();
     var e    = this.getContainerEl();
     var xy   = Dom.getXY(e);
-    var x    = xy[0];
-    var y    = xy[1];
+    var x    = Math.max(0, xy[0]);
+    var y    = Math.max(0, xy[1]);
     var cell = this.getTdEl();
     var cw   = cell.offsetWidth;
     var ch   = cell.offsetHeight;
@@ -671,12 +672,32 @@ show : function() {
     // we don't store e's width & height
     // because YUI calendar expands when shifted inside viewport
 
+    if (this.adjustedWidth) {
+        e.style.width = 'auto';
+        this.adjustedWidth = false;
+	    var tmp = e.offsetWidth;  // IE7: access DOM so it will recalculate
+    }
     if (e.offsetWidth > vw) {
         e.style.width = (vw-25)+'px';   // ought to use margins+borders, not 25
+        this.adjustedWidth = true;
     }
 
+    if (this.adjustedHeight) {
+        e.style.height = 'auto';
+        this.adjustedHeight = false;
+	    tmp = e.offsetWidth;  // IE7: access DOM so it will recalculate
+    }
     if (e.offsetHeight > vh) {
         e.style.height = (vh-25)+'px';   // ought to use margins+borders, not 25
+        this.adjustedHeight = true;
+    }
+
+    if (x + cw > vw) {
+        cw = vw - x;
+    }
+
+    if (y + ch > vh) {
+        ch = vh - y;
     }
 
     var pos =
