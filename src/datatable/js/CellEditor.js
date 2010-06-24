@@ -1749,7 +1749,7 @@ handleDisabledBtns : function() {
  */
 move : function() {
     var tdEl = this.getTdEl(),
-        x = Dom.getX(tdEl),
+        x = Math.max(0, Dom.getX(tdEl)),
         dtContainer = this.getDataTable().getContainerEl(),
         tdWidth = this.getTdEl().offsetWidth,
         w = dtContainer.clientWidth || dtContainer.offsetWidth;
@@ -1886,7 +1886,7 @@ renderForm : function() {
  */
 move : function() {
     var tdEl = this.getTdEl(),
-        x = Dom.getX(tdEl),
+        x = Math.max(0, Dom.getX(tdEl)),
         dtContainer = this.getDataTable().getContainerEl(),
         tdWidth = this.getTdEl().offsetWidth,
         w = dtContainer.clientWidth || dtContainer.offsetWidth;
