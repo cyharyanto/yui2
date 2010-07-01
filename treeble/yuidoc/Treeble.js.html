@@ -94,7 +94,7 @@
 <span class="cm"> *		&lt;dd&gt;(required) The function to convert the output from</span>
 <span class="cm"> *			&lt;code&gt;DataTable.generateTreebleDataSourceRequest()&lt;/code&gt; into</span>
 <span class="cm"> *			a request usable by one of the actual DataSources.  This function</span>
-<span class="cm"> *			takes two arguments: state {sort,dir,startIndex,results} and path</span>
+<span class="cm"> *			takes two arguments: state (sort,dir,startIndex,results) and path</span>
 <span class="cm"> *			(an array of node indices telling how to reach the node).</span>
 <span class="cm"> *			&lt;/dd&gt;</span>
 <span class="cm"> *		&lt;dt&gt;childNodesKey&lt;/dt&gt;</span>
@@ -348,7 +348,7 @@
 			<span class="p">{</span>
 				<span class="nx">ds</span><span class="o">:</span>    <span class="nx">ds</span><span class="p">,</span>
 				<span class="nx">path</span><span class="o">:</span>  <span class="nx">path</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
-				<span class="nx">start</span><span class="o">:</span> <span class="nx">skip</span><span class="p">,</span>
+				<span class="nx">start</span><span class="o">:</span> <span class="nx">send</span> <span class="o">?</span> <span class="nx">prev</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">:</span> <span class="nx">skip</span><span class="p">,</span>
 				<span class="nx">end</span><span class="o">:</span>   <span class="nx">m</span> <span class="o">+</span> <span class="nx">delta</span> <span class="o">-</span> <span class="mi">1</span>
 			<span class="p">});</span>
 			<span class="nx">send</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
@@ -473,7 +473,7 @@
 	<span class="p">{</span>
 		<span class="nx">count</span><span class="o">:</span> <span class="nx">n</span><span class="p">,</span>
 		<span class="nx">send</span><span class="o">:</span>  <span class="nx">send</span>
-	<span class="p">}</span>
+	<span class="p">};</span>
 	<span class="k">return</span> <span class="nx">info</span><span class="p">;</span>
 <span class="p">}</span>
 

@@ -89,7 +89,9 @@ constant.
                                             <dt>Parameters:</dt>
                                                 <dd rel="yui:parameter">
                                                     <code><span property="yui:name">oLiveData</span>
-                                                    &lt;<span property="yui:type">DataSource}  The top-level DataSource.
+                                                    &lt;<span property="yui:type">DataSource</span>&gt;
+                                                    </code>
+                                                    <span property="yui:description">   The top-level DataSource.
 You must pass a treebleConfig object as part of this object's configuration.
 This object can contain the following configuration:
 <dl>
@@ -97,9 +99,7 @@ This object can contain the following configuration:
 <dd>(required) The function to convert the output from
 <code>DataTable.generateTreebleDataSourceRequest()</code> into
 a request usable by one of the actual DataSources.  This function
-takes two arguments: state {sort,dir,startIndex,results</span>&gt;
-                                                    </code>
-                                                    <span property="yui:description">  and path
+takes two arguments: state (sort,dir,startIndex,results) and path
 (an array of node indices telling how to reach the node).
 </dd>
 <dt>childNodesKey</dt>

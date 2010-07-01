@@ -45,7 +45,7 @@ DS.TYPE_TREELIST = 9;
  *		<dd>(required) The function to convert the output from
  *			<code>DataTable.generateTreebleDataSourceRequest()</code> into
  *			a request usable by one of the actual DataSources.  This function
- *			takes two arguments: state {sort,dir,startIndex,results} and path
+ *			takes two arguments: state (sort,dir,startIndex,results) and path
  *			(an array of node indices telling how to reach the node).
  *			</dd>
  *		<dt>childNodesKey</dt>
