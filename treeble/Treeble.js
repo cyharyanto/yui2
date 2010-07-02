@@ -840,6 +840,15 @@ lang.extend(util.TreebleDataSource, DS,
 
 		this._cancelAllRequests();
 
+		if (this._callback)
+		{
+			var r = this._callback.request;
+			if (r.sort !== oRequest.sort || r.dir !== oRequest.dir)
+			{
+				this._open = [];
+			}
+		}
+
 		this._callback =
 		{
 			request:  oRequest,

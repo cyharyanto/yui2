@@ -52,7 +52,68 @@
 <body class="yui-skin-sam">
 
 <script type="text/javascript">
-YAHOO.util.Event.onDOMReady(function(){
+YAHOO.util.Event.onDOMReady(function()
+{
+	function bind(f)
+	{
+		var args = Array.prototype.slice.call(arguments, 1);
+		return function()
+		{
+			return f.apply(window, args.concat(Array.prototype.slice.call(arguments, 0)));
+		};
+	}
+
+	function compareStrings(key, dir, a, b)
+	{
+		var s1 = a[key].toLowerCase(),
+			s2 = b[key].toLowerCase();
+
+		return (s1 < s2 ? -1*dir : (s1 > s2 ? +1*dir : 0));
+	}
+
+	function compareInts(key, dir, a, b)
+	{
+		var i1 = (a[key] && parseInt(a[key], 10)) || 0,
+			i2 = (b[key] && parseInt(b[key], 10)) || 0;
+
+		return (i1 - i2)*dir;
+	}
+
+	var sort_map =
+	{
+		title:
+		{
+			asc:  bind(compareStrings, 'title', +1),
+			desc: bind(compareStrings, 'title', -1)
+		},
+		year:
+		{
+			asc:  bind(compareInts, 'year', +1),
+			desc: bind(compareInts, 'year', -1)
+		},
+		quantity:
+		{
+			asc:  bind(compareInts, 'quantity', +1),
+			desc: bind(compareInts, 'quantity', -1)
+		}
+	};
+
+	var makeConnection = YAHOO.util.LocalDataSource.prototype.makeConnection;
+	YAHOO.util.LocalDataSource.prototype.makeConnection = function(oRequest, oCallback, oCaller)
+	{
+		if (!this.origLiveData)
+		{
+			this.origLiveData = this.liveData;
+		}
+		this.liveData = this.origLiveData.slice(0);
+
+		if (oRequest.sort && sort_map[ oRequest.sort ])
+		{
+			this.liveData.sort(sort_map[ oRequest.sort ][ oRequest.dir ]);
+		}
+
+		return makeConnection.apply(this, arguments);
+	};
 
 	YAHOO.namespace('example');
 
@@ -208,14 +269,14 @@ YAHOO.util.Event.onDOMReady(function(){
 					}
 				}
 			},
-			{key:"title", label:"Title", resizeable:true,
+			{key:"title", label:"Title", resizeable:true, sortable:true,
 				formatter: function(elCell, oRecord, oColumn, oData)
 				{
 					var depth_class  = 'treeble-depth-'+oRecord.getData('_yui_node_depth');
 					elCell.innerHTML = '<span class="'+depth_class+'">'+oData+'</span>';
 				}},
-			{key:"year", label:"Year", resizeable:true},
-			{key:"quantity", label:"Quantity", resizeable:true, editor:new YAHOO.widget.TextboxCellEditor({validator:DT.validateNumber})}
+			{key:"year", label:"Year", resizeable:true, sortable:true},
+			{key:"quantity", label:"Quantity", resizeable:true, sortable:true, editor:new YAHOO.widget.TextboxCellEditor({validator:DT.validateNumber})}
 		],
 
 		//Data Source 
