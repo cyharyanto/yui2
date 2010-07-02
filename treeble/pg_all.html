@@ -76,7 +76,12 @@ YAHOO.util.Event.onDOMReady(function()
 		var i1 = (a[key] && parseInt(a[key], 10)) || 0,
 			i2 = (b[key] && parseInt(b[key], 10)) || 0;
 
-		return (i1 - i2)*dir;
+		var result = (i1 - i2)*dir;
+		if (result === 0)
+		{
+			result = compareStrings('title', +1, a, b);
+		}
+		return result;
 	}
 
 	var sort_map =
