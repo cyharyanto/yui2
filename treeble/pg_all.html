@@ -319,7 +319,7 @@ YAHOO.util.Event.onDOMReady(function()
 				template:'{FirstPageLink}{PreviousPageLink}{PageLinks}{NextPageLink}{LastPageLink}{RowsPerPageDropdown}'
 			}),
 			initialLoad: false,
-			initialRequest: {startIndex:0,results:5},
+			initialRequest: {startIndex:0,results:5,sort:'toggle_column',dir:'asc'},
 			dynamicData: true,
 			displayAllRecords: false,
 			generateRequest: DT.generateTreebleDataSourceRequest
