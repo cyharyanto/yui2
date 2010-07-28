@@ -733,6 +733,14 @@ show : function() {
         }
     }
 
+    if (xy[0] < 0) {
+        e.style.left = 0;
+    }
+
+    if (xy[1] < 0) {
+        e.style.top = 0;
+    }
+
     Dom.addClass(cell, 'yui-dt-target');
 
     if(elIFrame) {
