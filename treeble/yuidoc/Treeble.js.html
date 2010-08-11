@@ -66,6 +66,7 @@
 <span class="cm">		ds:         {DataSource} source for child nodes</span>
 <span class="cm">		childTotal: {Number} total number of child nodes</span>
 <span class="cm">		children:   {Array} (recursive) child nodes which are or have been opened</span>
+<span class="cm">		parent:     {Object} parent item</span>
 
 <span class="cm">	Each level is sorted by index to allow simple traversal in display</span>
 <span class="cm">	order.</span>
@@ -73,13 +74,13 @@
 <span class="cm"> */</span>
 
 <span class="cm">/**</span>
-<span class="cm"> * TreebleDataSource converts a tree of DataSources into a flat list of</span>
+<span class="cm"> * &lt;p&gt;TreebleDataSource converts a tree of DataSources into a flat list of</span>
 <span class="cm"> * visible items.  This list of items can then be paginated by DataTable.</span>
 <span class="cm"> * The merged list must be paginated if the number of child nodes might be</span>
-<span class="cm"> * very large.  To turn on this feature, set paginateChildren:true.</span>
+<span class="cm"> * very large.  To turn on this feature, set paginateChildren:true.&lt;/p&gt;</span>
 <span class="cm"> * </span>
-<span class="cm"> * The total number of items available from each DataSources must remain</span>
-<span class="cm"> * constant.</span>
+<span class="cm"> * &lt;p&gt;The tree must be immutable.  The total number of items available from</span>
+<span class="cm"> * each DataSource must remain constant.&lt;/p&gt;</span>
 <span class="cm"> *</span>
 <span class="cm"> * @module Treeble</span>
 <span class="cm"> * @namespace YAHOO.util</span>
@@ -124,12 +125,14 @@
 <span class="cm"> *		&lt;dd&gt;(optional) Pass &lt;code&gt;true&lt;/code&gt; to paginate the result after merging</span>
 <span class="cm"> *			child nodes into the list.  The default (&lt;code&gt;false&lt;/code&gt;) is to</span>
 <span class="cm"> *			paginate only top-level nodes, so all children are visible.&lt;/dd&gt;</span>
+<span class="cm"> *		&lt;dt&gt;uniqueIdKey&lt;/dt&gt;</span>
+<span class="cm"> *		&lt;dd&gt;(optional) The key in each record that stores an identifier which is</span>
+<span class="cm"> *			unique across the entire tree.  If this is not specified, then</span>
+<span class="cm"> *			all nodes will close when the data is sorted.&lt;/dd&gt;</span>
 <span class="cm"> *		&lt;/dl&gt;</span>
 <span class="cm"> */</span>
 <span class="nx">util</span><span class="p">.</span><span class="nx">TreebleDataSource</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">oLiveData</span><span class="p">,</span> <span class="nx">oConfigs</span><span class="p">)</span>
 <span class="p">{</span>
-	<span class="nx">oConfigs</span> <span class="o">=</span> <span class="nx">oConfigs</span> <span class="o">||</span> <span class="p">{};</span>
-
 	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">oLiveData</span> <span class="k">instanceof</span> <span class="nx">util</span><span class="p">.</span><span class="nx">DataSourceBase</span><span class="p">)</span>
 	<span class="p">{</span>
 		<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;TreebleDataSource requires DataSource&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;TreebleDataSource&#39;</span><span class="p">);</span>
@@ -167,9 +170,10 @@
 		<span class="k">return</span><span class="p">;</span>
 	<span class="p">}</span>
 
-	<span class="k">this</span><span class="p">.</span><span class="nx">dataType</span> <span class="o">=</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">TYPE_TREELIST</span><span class="p">;</span>
-	<span class="k">this</span><span class="p">.</span><span class="nx">_open</span>    <span class="o">=</span> <span class="p">[];</span>
-	<span class="k">this</span><span class="p">.</span><span class="nx">_req</span>     <span class="o">=</span> <span class="p">[];</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">dataType</span>    <span class="o">=</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">TYPE_TREELIST</span><span class="p">;</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">_open</span>       <span class="o">=</span> <span class="p">[];</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">_open_cache</span> <span class="o">=</span> <span class="p">{};</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">_req</span>        <span class="o">=</span> <span class="p">[];</span>
 	<span class="nx">util</span><span class="p">.</span><span class="nx">TreebleDataSource</span><span class="p">.</span><span class="nx">superclass</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">oLiveData</span><span class="p">,</span> <span class="nx">oConfigs</span><span class="p">);</span>
 <span class="p">};</span>
 
@@ -191,7 +195,7 @@
 	<span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
 	<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">k</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">k</span><span class="o">&lt;</span><span class="nx">data</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">k</span><span class="o">++</span><span class="p">)</span>
 	<span class="p">{</span>
-		<span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">startIndex</span> <span class="o">+</span> <span class="nx">k</span><span class="p">;</span>
+		<span class="kd">var</span> <span class="nx">i</span>  <span class="o">=</span> <span class="nx">startIndex</span> <span class="o">+</span> <span class="nx">k</span><span class="p">;</span>
 		<span class="kd">var</span> <span class="nx">ds</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="nx">k</span><span class="p">][</span> <span class="nx">childNodesKey</span> <span class="p">];</span>
 		<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">ds</span><span class="p">)</span>
 		<span class="p">{</span>
@@ -202,18 +206,38 @@
 		<span class="p">{</span>
 			<span class="nx">open</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">j</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 			<span class="nx">result</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+			<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">uniqueIdKey</span><span class="p">)</span>
+			<span class="p">{</span>
+				<span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">_open_cache</span><span class="p">[</span> <span class="nx">data</span><span class="p">[</span><span class="nx">k</span><span class="p">][</span> <span class="k">this</span><span class="p">.</span><span class="nx">uniqueIdKey</span> <span class="p">]</span> <span class="p">];</span>
+			<span class="p">}</span>
 		<span class="p">}</span>
 
 		<span class="k">if</span> <span class="p">(</span><span class="nx">j</span> <span class="o">&gt;=</span> <span class="nx">open</span><span class="p">.</span><span class="nx">length</span> <span class="o">||</span> <span class="nx">open</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">index</span> <span class="o">&gt;</span> <span class="nx">i</span><span class="p">)</span>
 		<span class="p">{</span>
-			<span class="nx">open</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+			<span class="kd">var</span> <span class="nx">item</span> <span class="o">=</span>
 			<span class="p">{</span>
-				<span class="nx">index</span><span class="o">:</span>    <span class="nx">i</span><span class="p">,</span>
-				<span class="nx">open</span><span class="o">:</span>     <span class="kc">null</span><span class="p">,</span>
-				<span class="nx">ds</span><span class="o">:</span>       <span class="nx">ds</span><span class="p">,</span>
-				<span class="nx">children</span><span class="o">:</span> <span class="p">[],</span>
-				<span class="nx">parent</span><span class="o">:</span>   <span class="nx">parent</span>
-			<span class="p">});</span>
+				<span class="nx">index</span><span class="o">:</span>      <span class="nx">i</span><span class="p">,</span>
+				<span class="nx">open</span><span class="o">:</span>       <span class="kc">null</span><span class="p">,</span>
+				<span class="nx">ds</span><span class="o">:</span>         <span class="nx">ds</span><span class="p">,</span>
+				<span class="nx">children</span><span class="o">:</span>   <span class="p">[],</span>
+				<span class="nx">childTotal</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+				<span class="nx">parent</span><span class="o">:</span>     <span class="nx">parent</span>
+			<span class="p">};</span>
+
+			<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">uniqueIdKey</span><span class="p">)</span>
+			<span class="p">{</span>
+				<span class="kd">var</span> <span class="nx">cached_item</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_open_cache</span><span class="p">[</span> <span class="nx">data</span><span class="p">[</span><span class="nx">k</span><span class="p">][</span> <span class="k">this</span><span class="p">.</span><span class="nx">uniqueIdKey</span> <span class="p">]</span> <span class="p">];</span>
+				<span class="k">if</span> <span class="p">(</span><span class="nx">cached_item</span><span class="p">)</span>
+				<span class="p">{</span>
+					<span class="nx">item</span><span class="p">.</span><span class="nx">open</span>       <span class="o">=</span> <span class="nx">cached_item</span><span class="p">.</span><span class="nx">open</span><span class="p">;</span>
+					<span class="nx">item</span><span class="p">.</span><span class="nx">childTotal</span> <span class="o">=</span> <span class="nx">cached_item</span><span class="p">.</span><span class="nx">childTotal</span><span class="p">;</span>
+					<span class="k">this</span><span class="p">.</span><span class="nx">_redo</span>      <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_redo</span> <span class="o">||</span> <span class="nx">item</span><span class="p">.</span><span class="nx">open</span><span class="p">;</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+
+			<span class="nx">open</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">j</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">item</span><span class="p">);</span>
+			<span class="k">this</span><span class="p">.</span><span class="nx">_open_cache</span><span class="p">[</span> <span class="nx">data</span><span class="p">[</span><span class="nx">k</span><span class="p">][</span> <span class="k">this</span><span class="p">.</span><span class="nx">uniqueIdKey</span> <span class="p">]</span> <span class="p">]</span> <span class="o">=</span> <span class="nx">item</span><span class="p">;</span>
 		<span class="p">}</span>
 
 		<span class="nx">j</span><span class="o">++</span><span class="p">;</span>
@@ -279,6 +303,31 @@
 	<span class="p">}</span>
 
 	<span class="k">return</span> <span class="nx">total</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">requestTree</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">_cancelAllRequests</span><span class="p">();</span>
+
+	<span class="k">this</span><span class="p">.</span><span class="nx">_redo</span>                <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">_generating_requests</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+	<span class="kd">var</span> <span class="nx">req</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_callback</span><span class="p">.</span><span class="nx">request</span><span class="p">;</span>
+	<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">paginateChildren</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">_slices</span> <span class="o">=</span> <span class="nx">getVisibleSlicesPgAll</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">startIndex</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">results</span><span class="p">,</span>
+											 <span class="k">this</span><span class="p">.</span><span class="nx">liveData</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_open</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">else</span>
+	<span class="p">{</span>
+		<span class="k">this</span><span class="p">.</span><span class="nx">_slices</span> <span class="o">=</span> <span class="nx">getVisibleSlicesPgTop</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">startIndex</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">results</span><span class="p">,</span>
+											 <span class="k">this</span><span class="p">.</span><span class="nx">liveData</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_open</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="nx">requestSlices</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">req</span><span class="p">);</span>
+
+	<span class="k">this</span><span class="p">.</span><span class="nx">_generating_requests</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+	<span class="nx">checkFinished</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
 <span class="p">}</span>
 
 <span class="kd">function</span> <span class="nx">getVisibleSlicesPgTop</span><span class="p">(</span>
@@ -525,6 +574,7 @@
 		<span class="p">}</span>
 	<span class="p">}</span>
 
+	<span class="nx">request</span> <span class="o">=</span> <span class="nx">cloneObject</span><span class="p">(</span><span class="nx">request</span><span class="p">);</span>
 	<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="k">this</span><span class="p">.</span><span class="nx">_req</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span>
 	<span class="p">{</span>
 		<span class="kd">var</span> <span class="nx">req</span>            <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_req</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
@@ -592,7 +642,7 @@
 
 	<span class="kd">var</span> <span class="nx">parent</span> <span class="o">=</span> <span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">path</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">?</span> <span class="nx">getNode</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">path</span><span class="p">)</span> <span class="o">:</span> <span class="kc">null</span><span class="p">);</span>
 	<span class="kd">var</span> <span class="nx">open</span>   <span class="o">=</span> <span class="p">(</span><span class="nx">parent</span> <span class="o">!==</span> <span class="kc">null</span> <span class="o">?</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">children</span> <span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_open</span><span class="p">);</span>
-	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">populateOpen</span><span class="p">(</span><span class="nx">parent</span><span class="p">,</span> <span class="nx">open</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">data</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">start</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">childNodesKey</span><span class="p">))</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">populateOpen</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">parent</span><span class="p">,</span> <span class="nx">open</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">data</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">start</span><span class="p">,</span> <span class="nx">req</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">childNodesKey</span><span class="p">))</span>
 	<span class="p">{</span>
 		<span class="nx">treeFailure</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
 		<span class="k">return</span><span class="p">;</span>
@@ -675,6 +725,12 @@
 		<span class="p">{</span>
 			<span class="k">return</span><span class="p">;</span>
 		<span class="p">}</span>
+	<span class="p">}</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_redo</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">lang</span><span class="p">.</span><span class="nx">later</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="nx">requestTree</span><span class="p">);</span>
+		<span class="k">return</span><span class="p">;</span>
 	<span class="p">}</span>
 
 	<span class="kd">var</span> <span class="nx">response</span> <span class="o">=</span> <span class="p">{};</span>
@@ -845,30 +901,26 @@
 			<span class="p">{</span>
 				<span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
 			<span class="p">}</span>
-			<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">open</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span>
-			<span class="p">{</span>
-				<span class="nx">request</span><span class="p">.</span><span class="nx">startIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-				<span class="nx">request</span><span class="p">.</span><span class="nx">results</span>    <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-				<span class="nx">node</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">sendRequest</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">generateRequest</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">path</span><span class="p">),</span>
-				<span class="p">{</span>
-					<span class="nx">success</span><span class="o">:</span>  <span class="nx">toggleSuccess</span><span class="p">,</span>
-					<span class="nx">failure</span><span class="o">:</span>  <span class="nx">toggleFailure</span><span class="p">,</span>
-					<span class="nx">scope</span><span class="o">:</span>    <span class="k">this</span><span class="p">,</span>
-					<span class="nx">argument</span><span class="o">:</span> <span class="p">[</span><span class="nx">node</span><span class="p">,</span> <span class="nx">completion</span><span class="p">]</span>
-				<span class="p">});</span>
-				<span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-			<span class="p">}</span>
-			<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">node</span><span class="p">.</span><span class="nx">open</span><span class="p">)</span>
-			<span class="p">{</span>
-				<span class="nx">node</span><span class="p">.</span><span class="nx">open</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-				<span class="nx">complete</span><span class="p">(</span><span class="nx">completion</span><span class="p">);</span>
-				<span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-			<span class="p">}</span>
 			<span class="nx">list</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">children</span><span class="p">;</span>
 		<span class="p">}</span>
 
-		<span class="nx">node</span><span class="p">.</span><span class="nx">open</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-		<span class="nx">complete</span><span class="p">(</span><span class="nx">completion</span><span class="p">);</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">open</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span>
+		<span class="p">{</span>
+			<span class="nx">request</span><span class="p">.</span><span class="nx">startIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+			<span class="nx">request</span><span class="p">.</span><span class="nx">results</span>    <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+			<span class="nx">node</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">sendRequest</span><span class="p">(</span><span class="nx">node</span><span class="p">.</span><span class="nx">ds</span><span class="p">.</span><span class="nx">treebleConfig</span><span class="p">.</span><span class="nx">generateRequest</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">path</span><span class="p">),</span>
+			<span class="p">{</span>
+				<span class="nx">success</span><span class="o">:</span>  <span class="nx">toggleSuccess</span><span class="p">,</span>
+				<span class="nx">failure</span><span class="o">:</span>  <span class="nx">toggleFailure</span><span class="p">,</span>
+				<span class="nx">scope</span><span class="o">:</span>    <span class="k">this</span><span class="p">,</span>
+				<span class="nx">argument</span><span class="o">:</span> <span class="p">[</span><span class="nx">node</span><span class="p">,</span> <span class="nx">completion</span><span class="p">]</span>
+			<span class="p">});</span>
+		<span class="p">}</span>
+		<span class="k">else</span>
+		<span class="p">{</span>
+			<span class="nx">node</span><span class="p">.</span><span class="nx">open</span> <span class="o">=</span> <span class="o">!</span><span class="nx">node</span><span class="p">.</span><span class="nx">open</span><span class="p">;</span>
+			<span class="nx">complete</span><span class="p">(</span><span class="nx">completion</span><span class="p">);</span>
+		<span class="p">}</span>
 		<span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
 	<span class="p">},</span>
 
@@ -887,7 +939,22 @@
 		<span class="kd">var</span> <span class="nx">tId</span> <span class="o">=</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">_nTransactionId</span><span class="o">++</span><span class="p">;</span>
 		<span class="k">this</span><span class="p">.</span><span class="nx">fireEvent</span><span class="p">(</span><span class="s2">&quot;requestEvent&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">tId</span><span class="o">:</span><span class="nx">tId</span><span class="p">,</span> <span class="nx">request</span><span class="o">:</span><span class="nx">oRequest</span><span class="p">,</span><span class="nx">callback</span><span class="o">:</span><span class="nx">oCallback</span><span class="p">,</span><span class="nx">caller</span><span class="o">:</span><span class="nx">oCaller</span><span class="p">});</span>
 
-		<span class="k">this</span><span class="p">.</span><span class="nx">_cancelAllRequests</span><span class="p">();</span>
+		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_callback</span><span class="p">)</span>
+		<span class="p">{</span>
+			<span class="kd">var</span> <span class="nx">r</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_callback</span><span class="p">.</span><span class="nx">request</span><span class="p">;</span>
+			<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">r</span><span class="p">)</span>
+			<span class="p">{</span>
+				<span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">==</span> <span class="s1">&#39;startIndex&#39;</span> <span class="o">||</span> <span class="nx">key</span> <span class="o">==</span> <span class="s1">&#39;results&#39;</span><span class="p">)</span>
+				<span class="p">{</span>
+					<span class="k">continue</span><span class="p">;</span>
+				<span class="p">}</span>
+
+				<span class="k">if</span> <span class="p">(</span><span class="nx">r</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">!==</span> <span class="nx">oRequest</span><span class="p">[</span><span class="nx">key</span><span class="p">])</span>
+				<span class="p">{</span>
+					<span class="k">this</span><span class="p">.</span><span class="nx">_open</span> <span class="o">=</span> <span class="p">[];</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
 
 		<span class="k">this</span><span class="p">.</span><span class="nx">_callback</span> <span class="o">=</span>
 		<span class="p">{</span>
@@ -896,23 +963,7 @@
 			<span class="nx">caller</span><span class="o">:</span>   <span class="nx">oCaller</span>
 		<span class="p">};</span>
 
-		<span class="k">this</span><span class="p">.</span><span class="nx">_generating_requests</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-
-		<span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">paginateChildren</span><span class="p">)</span>
-		<span class="p">{</span>
-			<span class="k">this</span><span class="p">.</span><span class="nx">_slices</span> <span class="o">=</span> <span class="nx">getVisibleSlicesPgAll</span><span class="p">(</span><span class="nx">oRequest</span><span class="p">.</span><span class="nx">startIndex</span><span class="p">,</span> <span class="nx">oRequest</span><span class="p">.</span><span class="nx">results</span><span class="p">,</span>
-												 <span class="k">this</span><span class="p">.</span><span class="nx">liveData</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_open</span><span class="p">);</span>
-		<span class="p">}</span>
-		<span class="k">else</span>
-		<span class="p">{</span>
-			<span class="k">this</span><span class="p">.</span><span class="nx">_slices</span> <span class="o">=</span> <span class="nx">getVisibleSlicesPgTop</span><span class="p">(</span><span class="nx">oRequest</span><span class="p">.</span><span class="nx">startIndex</span><span class="p">,</span> <span class="nx">oRequest</span><span class="p">.</span><span class="nx">results</span><span class="p">,</span>
-												 <span class="k">this</span><span class="p">.</span><span class="nx">liveData</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">_open</span><span class="p">);</span>
-		<span class="p">}</span>
-
-		<span class="nx">requestSlices</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">oRequest</span><span class="p">);</span>
-
-		<span class="k">this</span><span class="p">.</span><span class="nx">_generating_requests</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-		<span class="nx">checkFinished</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+		<span class="nx">requestTree</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
 	<span class="p">},</span>
 
 	<span class="nx">_cancelAllRequests</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span>

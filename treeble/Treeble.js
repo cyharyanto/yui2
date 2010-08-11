@@ -17,6 +17,7 @@ DS.TYPE_TREELIST = 9;
 		ds:         {DataSource} source for child nodes
 		childTotal: {Number} total number of child nodes
 		children:   {Array} (recursive) child nodes which are or have been opened
+		parent:     {Object} parent item
 
 	Each level is sorted by index to allow simple traversal in display
 	order.
@@ -24,13 +25,13 @@ DS.TYPE_TREELIST = 9;
  */
 
 /**
- * TreebleDataSource converts a tree of DataSources into a flat list of
+ * <p>TreebleDataSource converts a tree of DataSources into a flat list of
  * visible items.  This list of items can then be paginated by DataTable.
  * The merged list must be paginated if the number of child nodes might be
- * very large.  To turn on this feature, set paginateChildren:true.
+ * very large.  To turn on this feature, set paginateChildren:true.</p>
  * 
- * The total number of items available from each DataSources must remain
- * constant.
+ * <p>The tree must be immutable.  The total number of items available from
+ * each DataSource must remain constant.</p>
  *
  * @module Treeble
  * @namespace YAHOO.util
@@ -75,12 +76,14 @@ DS.TYPE_TREELIST = 9;
  *		<dd>(optional) Pass <code>true</code> to paginate the result after merging
  *			child nodes into the list.  The default (<code>false</code>) is to
  *			paginate only top-level nodes, so all children are visible.</dd>
+ *		<dt>uniqueIdKey</dt>
+ *		<dd>(optional) The key in each record that stores an identifier which is
+ *			unique across the entire tree.  If this is not specified, then
+ *			all nodes will close when the data is sorted.</dd>
  *		</dl>
  */
 util.TreebleDataSource = function(oLiveData, oConfigs)
 {
-	oConfigs = oConfigs || {};
-
 	if (!oLiveData instanceof util.DataSourceBase)
 	{
 		YAHOO.log('TreebleDataSource requires DataSource', 'error', 'TreebleDataSource');
@@ -118,9 +121,10 @@ util.TreebleDataSource = function(oLiveData, oConfigs)
 		return;
 	}
 
-	this.dataType = DS.TYPE_TREELIST;
-	this._open    = [];
-	this._req     = [];
+	this.dataType    = DS.TYPE_TREELIST;
+	this._open       = [];
+	this._open_cache = {};
+	this._req        = [];
 	util.TreebleDataSource.superclass.constructor.call(this, oLiveData, oConfigs);
 };
 
@@ -142,7 +146,7 @@ function populateOpen(
 	var result = true;
 	for (var k=0; k<data.length; k++)
 	{
-		var i = startIndex + k;
+		var i  = startIndex + k;
 		var ds = data[k][ childNodesKey ];
 		if (!ds)
 		{
@@ -153,18 +157,38 @@ function populateOpen(
 		{
 			open.splice(j, 1);
 			result = false;
+
+			if (this.uniqueIdKey)
+			{
+				delete this._open_cache[ data[k][ this.uniqueIdKey ] ];
+			}
 		}
 
 		if (j >= open.length || open[j].index > i)
 		{
-			open.splice(j, 0,
+			var item =
 			{
-				index:    i,
-				open:     null,
-				ds:       ds,
-				children: [],
-				parent:   parent
-			});
+				index:      i,
+				open:       null,
+				ds:         ds,
+				children:   [],
+				childTotal: 0,
+				parent:     parent
+			};
+
+			if (this.uniqueIdKey)
+			{
+				var cached_item = this._open_cache[ data[k][ this.uniqueIdKey ] ];
+				if (cached_item)
+				{
+					item.open       = cached_item.open;
+					item.childTotal = cached_item.childTotal;
+					this._redo      = this._redo || item.open;
+				}
+			}
+
+			open.splice(j, 0, item);
+			this._open_cache[ data[k][ this.uniqueIdKey ] ] = item;
 		}
 
 		j++;
@@ -230,6 +254,31 @@ function countVisibleNodes(
 	}
 
 	return total;
+}
+
+function requestTree()
+{
+	this._cancelAllRequests();
+
+	this._redo                = false;
+	this._generating_requests = true;
+
+	var req = this._callback.request;
+	if (this.paginateChildren)
+	{
+		this._slices = getVisibleSlicesPgAll(req.startIndex, req.results,
+											 this.liveData, this._open);
+	}
+	else
+	{
+		this._slices = getVisibleSlicesPgTop(req.startIndex, req.results,
+											 this.liveData, this._open);
+	}
+
+	requestSlices.call(this, req);
+
+	this._generating_requests = false;
+	checkFinished.call(this);
 }
 
 function getVisibleSlicesPgTop(
@@ -476,6 +525,7 @@ function requestSlices(
 		}
 	}
 
+	request = cloneObject(request);
 	for (var i=0; i<this._req.length; i++)
 	{
 		var req            = this._req[i];
@@ -543,7 +593,7 @@ function treeSuccess(oRequest, oParsedResponse, reqIndex)
 
 	var parent = (req.path.length > 0 ? getNode.call(this, req.path) : null);
 	var open   = (parent !== null ? parent.children : this._open);
-	if (!populateOpen(parent, open, req.data, req.start, req.ds.treebleConfig.childNodesKey))
+	if (!populateOpen.call(this, parent, open, req.data, req.start, req.ds.treebleConfig.childNodesKey))
 	{
 		treeFailure.apply(this, arguments);
 		return;
@@ -626,6 +676,12 @@ function checkFinished()
 		{
 			return;
 		}
+	}
+
+	if (this._redo)
+	{
+		YAHOO.lang.later(0, this, requestTree);
+		return;
 	}
 
 	var response = {};
@@ -796,30 +852,26 @@ lang.extend(util.TreebleDataSource, DS,
 			{
 				return false;
 			}
-			else if (node.open === null)
-			{
-				request.startIndex = 0;
-				request.results    = 0;
-				node.ds.sendRequest(node.ds.treebleConfig.generateRequest(request, path),
-				{
-					success:  toggleSuccess,
-					failure:  toggleFailure,
-					scope:    this,
-					argument: [node, completion]
-				});
-				return true;
-			}
-			else if (!node.open)
-			{
-				node.open = true;
-				complete(completion);
-				return true;
-			}
 			list = node.children;
 		}
 
-		node.open = false;
-		complete(completion);
+		if (node.open === null)
+		{
+			request.startIndex = 0;
+			request.results    = 0;
+			node.ds.sendRequest(node.ds.treebleConfig.generateRequest(request, path),
+			{
+				success:  toggleSuccess,
+				failure:  toggleFailure,
+				scope:    this,
+				argument: [node, completion]
+			});
+		}
+		else
+		{
+			node.open = !node.open;
+			complete(completion);
+		}
 		return true;
 	},
 
@@ -838,14 +890,22 @@ lang.extend(util.TreebleDataSource, DS,
 		var tId = DS._nTransactionId++;
 		this.fireEvent("requestEvent", {tId:tId, request:oRequest,callback:oCallback,caller:oCaller});
 
-		this._cancelAllRequests();
-
 		if (this._callback)
 		{
 			var r = this._callback.request;
-			if (r.sort !== oRequest.sort || r.dir !== oRequest.dir)
+			for (var key in r)
 			{
-				this._open = [];
+				if (!YAHOO.lang.hasOwnProperty(r, key) ||
+					key == 'startIndex' || key == 'results')
+				{
+					continue;
+				}
+
+				if (r[key] !== oRequest[key])
+				{
+					this._open = [];
+					break;
+				}
 			}
 		}
 
@@ -856,23 +916,7 @@ lang.extend(util.TreebleDataSource, DS,
 			caller:   oCaller
 		};
 
-		this._generating_requests = true;
-
-		if (this.paginateChildren)
-		{
-			this._slices = getVisibleSlicesPgAll(oRequest.startIndex, oRequest.results,
-												 this.liveData, this._open);
-		}
-		else
-		{
-			this._slices = getVisibleSlicesPgTop(oRequest.startIndex, oRequest.results,
-												 this.liveData, this._open);
-		}
-
-		requestSlices.call(this, oRequest);
-
-		this._generating_requests = false;
-		checkFinished.call(this);
+		requestTree.call(this);
 	},
 
 	_cancelAllRequests: function()

@@ -60,12 +60,12 @@
   
 
                     <div class="summary description" property="yui:description">
-                        TreebleDataSource converts a tree of DataSources into a flat list of
+                        <p>TreebleDataSource converts a tree of DataSources into a flat list of
 visible items.  This list of items can then be paginated by DataTable.
 The merged list must be paginated if the number of child nodes might be
-very large.  To turn on this feature, set paginateChildren:true.
-The total number of items available from each DataSources must remain
-constant.
+very large.  To turn on this feature, set paginateChildren:true.</p>
+<p>The tree must be immutable.  The total number of items available from
+each DataSource must remain constant.</p>
                     </div>
 
                         <div class="section constructor details" rel="yui:constructor" resource="#constructor">
@@ -134,6 +134,10 @@ entire data set.  If this is not provided,
 <dd>(optional) Pass <code>true</code> to paginate the result after merging
 child nodes into the list.  The default (<code>false</code>) is to
 paginate only top-level nodes, so all children are visible.</dd>
+<dt>uniqueIdKey</dt>
+<dd>(optional) The key in each record that stores an identifier which is
+unique across the entire tree.  If this is not specified, then
+all nodes will close when the data is sorted.</dd>
 </dl></span>
                                                 </dd>
                                         </dl>
