@@ -2,8 +2,8 @@
 *
 * Row Expansion DataTable for YUI 2
 * Author: gelinase@yahoo-inc.com / Eric Gelinas
+* @module DataTable
 * @submodule Row Expansion
-* @class YAHOO.widget.DataTable
 ***********/
 (function(){
 
