@@ -51,10 +51,24 @@
      * 
      * <dl>
      * 
-     * <dt>css</dt><dd>CSS classes encoding basic validation rules.  Note
-     * that this will only work if you uncomment the call to
-     * <code>validateFromCSSData()</code> inside
-     * <code>_validateQuickEditElements()</code>.</dd>
+     * <dt>css</dt><dd>CSS classes encoding basic validation rules:
+     *  <dl>
+     *  <dt><code>yiv-required</code></dt>
+     *      <dd>Value must not be empty.</dd>
+     *
+     *  <dt><code>yiv-length:[x,y]</code></dt>
+     *      <dd>String must be at least x characters and at most y characters.
+     *      At least one of x and y must be specified.</dd>
+     *
+     *  <dt><code>yiv-integer:[x,y]</code></dt>
+     *      <dd>The integer value must be at least x and at most y.
+     *      x and y are both optional.</dd>
+     *
+     *  <dt><code>yiv-decimal:[x,y]</code></dt>
+     *      <dd>The decimal value must be at least x and at most y.  Exponents are
+     *      not allowed.  x and y are both optional.</dd>
+     *  </dl>
+     * </dd>
      * 
      * <dt>fn</dt><dd>A function that will be called with the DataTable as
      * its scope and the cell's form element as the argument. Return true
@@ -63,11 +77,8 @@
      * false.</dd>
      * 
      * <dt>msg</dt><dd>A map of types to messages that will be displayed
-     * when a basic or regex validation rule fails. Currently, the only
-     * valid type is regex.  If you copy the implementation of
-     * validateFromCSSData() from FormManager in the YUI 3 Gallery, then
-     * you will be able to specify more types:  required, min_length,
-     * max_length, integer, and decimal.</dd>
+     * when a basic or regex validation rule fails. The valid types are
+     * required, min_length, max_length, integer, decimal, and regex.</dd>
      * 
      * <dt>regex</dt><dd>Regular expression that the value must satisfy in
      * order to be considered valid.</dd>
@@ -131,6 +142,17 @@
         qe_cell_status_pattern    = '(?:^|\\s)(?:' + qe_cell_status_prefix + '([a-z]+))(?= |$)',
         qe_cell_status_re         = new RegExp(qe_cell_status_pattern);
 
+    /**
+     * <p>Names of supported status values, highest precedence first.  Default:
+     * <code>[ 'error', 'warn', 'success', 'info' ]</code></p>
+     * 
+     * <p>This is static because it links to CSS rules that define the
+     * appearance of each status type:  .formmgr-has{status}</p>
+     * 
+     * @config YAHOO.widget.QuickEditDataTable.status_order
+     * @type {Array}
+     * @static
+     */
     QEDT.status_order =
     [
         'error',
@@ -139,7 +161,7 @@
         'info'
     ];
 
-    getStatusPrecedence = function(
+    function getStatusPrecedence(
         /* string */    status)
     {
         for (var i=0; i<QEDT.status_order.length; i++)
@@ -151,13 +173,237 @@
         }
 
         return QEDT.status_order.length;
-    };
+    }
 
-    statusTakesPrecendence = function(
+    function statusTakesPrecendence(
         /* string */    orig_status,
         /* string */    new_status)
     {
         return (!orig_status || getStatusPrecedence(new_status) < getStatusPrecedence(orig_status));
+    }
+
+    var required_class    = 'yiv-required';
+    var length_class_re   = /(?:^|\s+)yiv-length:\[([0-9]+)?,([1-9][0-9]*)?\](?:\s+|$)/;
+    var integer_class_re  = /(?:^|\s+)yiv-integer(?::\[([-+]?[0-9]+)?,([-+]?[0-9]+)?\])?(?:\s+|$)/;
+    var decimal_class_re  = /(?:^|\s+)yiv-decimal(?::\[([-+]?(?:[0-9]+\.?|[0-9]+\.[0-9]+|\.[0-9]+))?,([-+]?(?:[0-9]+\.?|[0-9]+\.[0-9]+|\.[0-9]+))?\])?(?:\s+|$)/;
+    var integer_re        = /^[-+]?[0-9]+$/;
+    var decimal_re        = /^[-+]?(?:[0-9]+\.?|[0-9]*\.[0-9]+)$/;
+
+    function hasLimit(
+        /* string */	s)
+    {
+        return (!lang.isUndefined(s) && s.length > 0);
+    }
+
+    /**
+    * <p>Map of localizable strings used by pre-validation.</p>
+    *
+    * <dl>
+    * <dt>required_string</dt>
+    * <dd>Displayed when <code>yiv-required</code> fails on an input field.</dd>
+    * <dt>required_menu</dt>
+    * <dd>Displayed when <code>yiv-required</code> fails on a select element.</dd>
+    * <dt>length_too_short, length_too_long, length_out_of_range</dt>
+    * <dd>Displayed when <code>yiv-length</code> fails on an input field.</dd>
+    * <dt>integer, integer_too_small, integer_too_large, integer_out_of_range</dt>
+    * <dd>Displayed when <code>yiv-integer</code> fails on an input field.</dd>
+    * <dt>decimal, decimal_too_small, decimal_too_large, decimal_out_of_range</dt>
+    * <dd>Displayed when <code>yiv-decimal</code> fails on an input field.</dd>
+    * </dl>
+    *
+    * @config YAHOO.widget.QuickEditDataTable.Strings
+    * @type {Object}
+    * @static
+    */
+    QEDT.Strings =
+    {
+        required_string:      'This field requires a value.',
+        required_menu:        'This field is required. Choose a value from the pull-down list.',
+
+        length_too_short:     'Enter text that is at least {min} characters or longer.',
+        length_too_long:      'Enter text that is up to {max} characters long.',
+        length_out_of_range:  'Enter text that is {min} to {max} characters long.',
+
+        integer:              'Enter a whole number (no decimal point).',
+        integer_too_small:    'Enter a number that is {min} or higher (no decimal point).',
+        integer_too_large:    'Enter a number that is {max} or lower (no decimal point).',
+        integer_out_of_range: 'Enter a number between or including {min} and {max} (no decimal point).',
+
+        decimal:              'Enter a number.',
+        decimal_too_small:    'Enter a number that is {min} or higher.',
+        decimal_too_large:    'Enter a number that is {max} or lower.',
+        decimal_out_of_range: 'Enter a number between or including {min} and {max}.'
+    };
+
+    QEDT.validateFromCSSData = function(
+        /* input */	e,
+        /* map */	msg_list)
+    {
+        var required = Dom.hasClass(e, required_class);
+        if (required && e.value === '')
+        {
+            var msg = null;
+            if (msg_list && msg_list.required)
+            {
+                msg = msg_list.required;
+            }
+            else if (e.tagName.toLowerCase() == 'select')
+            {
+                msg = QEDT.Strings.required_menu;
+            }
+            else
+            {
+                msg = QEDT.Strings.required_string;
+            }
+            return { keepGoing: false, error: msg };
+        }
+        else if (!required && e.value === '')
+        {
+            return { keepGoing: false };
+        }
+
+        if (e.className)
+        {
+            var m = e.className.match(length_class_re);
+            if (m && m.length)
+            {
+                if (hasLimit(m[1]) && hasLimit(m[2]) &&
+                    parseInt(m[1], 10) > parseInt(m[2], 10))
+                {
+                    alert(e.name+' has min_length > max_length');
+                }
+                else if (!hasLimit(m[1]) && !hasLimit(m[2]))
+                {
+                    alert(e.name+' has yiv_length with no limits');
+                }
+
+                var msg     = null;
+                var has_min = (hasLimit(m[1]) && m[1] !== '0');
+                var has_max = hasLimit(m[2]);
+
+                if (has_min && has_max)
+                {
+                    msg = QEDT.Strings.length_out_of_range;
+                }
+                else if (has_min)
+                {
+                    msg = QEDT.Strings.length_too_short;
+                }
+                else if (has_max)
+                {
+                    msg = QEDT.Strings.length_too_long;
+                }
+
+                if (e.value && hasLimit(m[1]) &&
+                    e.value.length < parseInt(m[1], 10))
+                {
+                    if (msg_list && msg_list.min_length)
+                    {
+                        msg = msg_list.min_length;
+                    }
+                    msg = lang.substitute(msg, {min: parseInt(m[1], 10), max: parseInt(m[2], 10)});
+                    return { keepGoing: false, error: msg };
+                }
+                if (e.value && hasLimit(m[2]) &&
+                    e.value.length > parseInt(m[2], 10))
+                {
+                    if (msg_list && msg_list.max_length)
+                    {
+                        msg = msg_list.max_length;
+                    }
+                    msg = lang.substitute(msg, {min: parseInt(m[1], 10), max: parseInt(m[2], 10)});
+                    return { keepGoing: false, error: msg };
+                }
+            }
+
+            var m = e.className.match(integer_class_re);
+            if (m && m.length)
+            {
+                if (hasLimit(m[1]) && hasLimit(m[2]) &&
+                    parseInt(m[1], 10) > parseInt(m[2], 10))
+                {
+                    alert(e.name+' has min_value > max_value');
+                }
+
+                var value   = parseInt(e.value, 10);
+                var has_min = hasLimit(m[1]);
+                var has_max = hasLimit(m[2]);
+                if (e.value &&
+                    (!integer_re.test(e.value) ||
+                    (has_min && value < parseInt(m[1], 10)) ||
+                    (has_max && value > parseInt(m[2], 10))))
+                {
+                    var msg = null;
+                    if (msg_list && msg_list.integer)
+                    {
+                        msg = msg_list.integer;
+                    }
+                    else if (has_min && has_max)
+                    {
+                        msg = QEDT.Strings.integer_out_of_range;
+                    }
+                    else if (has_min)
+                    {
+                        msg = QEDT.Strings.integer_too_small;
+                    }
+                    else if (has_max)
+                    {
+                        msg = QEDT.Strings.integer_too_large;
+                    }
+                    else
+                    {
+                        msg = QEDT.Strings.integer;
+                    }
+                    msg = lang.substitute(msg, {min: parseInt(m[1], 10), max: parseInt(m[2], 10)});
+                    return { keepGoing: false, error: msg };
+                }
+            }
+
+            var m = e.className.match(decimal_class_re);
+            if (m && m.length)
+            {
+                if (hasLimit(m[1]) && hasLimit(m[2]) &&
+                    parseFloat(m[1]) > parseFloat(m[2]))
+                {
+                    alert(e.name+' has min_value > max_value');
+                }
+
+                var value   = parseFloat(e.value);
+                var has_min = hasLimit(m[1]);
+                var has_max = hasLimit(m[2]);
+                if (e.value &&
+                    (!decimal_re.test(e.value) ||
+                    (has_min && value < parseFloat(m[1])) ||
+                    (has_max && value > parseFloat(m[2]))))
+                {
+                    var msg = null;
+                    if (msg_list && msg_list.decimal)
+                    {
+                        msg = msg_list.decimal;
+                    }
+                    else if (has_min && has_max)
+                    {
+                        msg = QEDT.Strings.decimal_out_of_range;
+                    }
+                    else if (has_min)
+                    {
+                        msg = QEDT.Strings.decimal_too_small;
+                    }
+                    else if (has_max)
+                    {
+                        msg = QEDT.Strings.decimal_too_large;
+                    }
+                    else
+                    {
+                        msg = QEDT.Strings.decimal;
+                    }
+                    msg = lang.substitute(msg, {min: parseFloat(m[1], 10), max: parseFloat(m[2], 10)});
+                    return { keepGoing: false, error: msg };
+                }
+            }
+        }
+
+        return { keepGoing: true };
     };
 
     YAHOO.lang.extend( 
@@ -415,24 +661,22 @@
                     continue;
                 }
                 var msg_list = col.quickEdit.validation ? col.quickEdit.validation.msg : null;
-/*
-                // see yui3-gallery:gallery-formmgr for an example of validateFromCSSData()
 
-                var info = validateFromCSSData(e[i], msg_list);
+                var info = QEDT.validateFromCSSData(e[i], msg_list);
                 if (info.error) {
                     this.displayQuickEditMessage(e[i], info.error, 'error');
                     status = false;
-                }
-                if (!info.keepGoing) {
                     continue;
                 }
-*/
-                if (col.quickEdit.validation
-                        && col.quickEdit.validation.regex instanceof RegExp
-                        && !col.quickEdit.validation.regex.test(e[i].value)) {
-                    this.displayQuickEditMessage(e[i], msg_list ? msg_list.regex : null, 'error');
-                    status = false;
-                    continue;
+
+                if (info.keepGoing) {
+                    if (col.quickEdit.validation
+                            && col.quickEdit.validation.regex instanceof RegExp
+                            && !col.quickEdit.validation.regex.test(e[i].value)) {
+                        this.displayQuickEditMessage(e[i], msg_list ? msg_list.regex : null, 'error');
+                        status = false;
+                        continue;
+                    }
                 }
 
                 if (col.quickEdit.validation
