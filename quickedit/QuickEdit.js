@@ -77,8 +77,10 @@
      * false.</dd>
      * 
      * <dt>msg</dt><dd>A map of types to messages that will be displayed
-     * when a basic or regex validation rule fails. The valid types are
-     * required, min_length, max_length, integer, decimal, and regex.</dd>
+     * when a basic or regex validation rule fails. The valid types are:
+     * required, min_length, max_length, integer, decimal, and regex.
+     * There is no default for type regex, so you must specify a message if
+     * you configure a regex validation.</dd>
      * 
      * <dt>regex</dt><dd>Regular expression that the value must satisfy in
      * order to be considered valid.</dd>
