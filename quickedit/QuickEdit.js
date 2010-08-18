@@ -65,7 +65,7 @@
      * <dt>msg</dt><dd>A map of types to messages that will be displayed
      * when a basic or regex validation rule fails. Currently, the only
      * valid type is regex.  If you copy the implementation of
-     * validateFromCSSData(), from FormManager in the YUI 3 Gallery, then
+     * validateFromCSSData() from FormManager in the YUI 3 Gallery, then
      * you will be able to specify more types:  required, min_length,
      * max_length, integer, and decimal.</dd>
      * 
