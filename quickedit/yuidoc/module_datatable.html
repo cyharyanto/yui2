@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:yui="http://yuilibrary.com/rdf/1.0/yui.rdf#">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<title>API: DataTable   (YUI Library)</title>
+
+	<link rel="stylesheet" type="text/css" href="assets/reset-fonts-grids-min.css" />
+	<link rel="stylesheet" type="text/css" href="assets/api.css" />
+
+    <script type="text/javascript" src="assets/api-js"></script>
+    <script type="text/javascript" src="assets/ac-js"></script>
+</head>
+
+<body id="yahoo-com">
+
+<div id="doc3" class="yui-t2">
+	<div id="hd">
+        <h1><a href="http://developer.yahoo.com/yui/" title="Yahoo! UI Library">Yahoo! UI Library</a></h1>
+        <h3>DataTable&nbsp; <span class="subtitle">1.0.0</span></h3>
+        <a href="./index.html" title="Yahoo! UI Library">Yahoo! UI Library</a> 
+            &gt; <a href="./module_datatable.html" title="DataTable">DataTable</a>
+                
+                
+        <form onsubmit="return false">
+            <div id="propertysearch">
+                Search: <input autocomplete="off" id="searchinput" />
+                <div id="searchresults">
+                    &nbsp;
+                </div>
+            </div>
+        </form>
+	</div>
+
+	<div id="bd">
+		<div id="yui-main">
+			<div class="yui-b">
+            <form action="#" name="yui-classopts-form" method="get" id="yui-classopts-form">
+                <fieldset>
+                    <legend>Filters</legend>
+                <span class="classopts"><input type="checkbox" name="show_private" id="show_private" /> <label for="show_private">Show Private</label></span>
+                <span class="classopts"><input type="checkbox" name="show_protected" id="show_protected" /> <label for="show_protected">Show Protected</label></span>
+                <span class="classopts"><input type="checkbox" name="show_deprecated" id="show_deprecated" /> <label for="show_deprecated">Show Deprecated</label></span>
+                </fieldset>
+            </form>
+
+                   
+                    <h3>Module: DataTable
+                    
+
+
+                    </h3>
+                    <div class="description summary">
+                        QuickEdit extension to YUI 2 DataTable
+Author: lindalj@yahoo-inc.com / John Lindal
+                    </div>
+
+
+
+                <div class="yui-gc">
+                    <div class="yui-u first">
+
+                            <p>This module contains the following classes:</p>
+                            <script>
+                            //var YUI_CLASS_LIST = [{"extends": {"superclass": {}, "events": {}, "configs": {}, "properties": {}, "methods": {}}, "description": "<p>The QuickEditDataTable class extends the DataTable class to\nprovide QuickEdit mode.  (It could just as easily extend\nScrollingDataTable.)  QuickEdit mode allows the user to edit all the\nvalues that are visible in the table, controlled by the column\nconfiguration.  Each editable cell contains an input field.  If the\nuser decides to save the changes, then you can extract the changes\nby calling <code>getQuickEditChanges()</code>.</p>\n<p>For a column to be editable in QuickEdit mode, the column\nconfiguration must include <code>quickEdit</code>.  The contents of\nthis object define the column's behavior in QuickEdit mode.</p>\n<p>If a column should not be editable, but needs to be formatted\ndifferently in QuickEdit mode, then you must define qeFormatter in\nthe column configuration. This is simply a normal cell formatter\nfunction that will be used in QuickEdit mode.  The static functions\n<code>readonly*QuickEditFormatter</code> provide examples.</p>\n<p>The following configuration can be provided as part of\nquickEdit:</p>\n<dl>\n<dt>copyDown</dt><dd>If true, the top cell in the column will have a\nbutton to copy the value down to the rest of the rows.</dd>\n<dt>formatter</dt><dd>The cell formatter which will render an\nappropriate form field: &lt;input type=\"text\"&gt;, &lt;textarea&gt;,\nor &lt;select&gt;.</dd>\n<dt>validation</dt><dd>Validation configuration for every field in\nthe column.</dd>\n</dl>\n<p>The following configuration can be provided as part of\nquickEdit.validation:</p>\n<dl>\n<dt>css</dt><dd>CSS classes encoding basic validation rules.  Note\nthat this will only work if you uncomment the call to\n<code>validateFromCSSData()</code> inside\n<code>_validateQuickEditElements()</code>.</dd>\n<dt>fn</dt><dd>A function that will be called with the DataTable as\nits scope and the cell's form element as the argument. Return true\nif the value is valid. Otherwise, call\nthis.displayQuickEditMessage(...) to display an error and return\nfalse.</dd>\n<dt>msg</dt><dd>A map of types to messages that will be displayed\nwhen a basic or regex validation rule fails. Currently, the only\nvalid type is regex.  If you copy the implementation of\nvalidateFromCSSData(), from FormManager in the YUI 3 Gallery, then\nyou will be able to specify more types:  required, min_length,\nmax_length, integer, and decimal.</dd>\n<dt>regex</dt><dd>Regular expression that the value must satisfy in\norder to be considered valid.</dd>\n</dl>\n<p>Custom QuickEdit Formatters</p>\n<p>To write a custom cell formatter for QuickEdit mode, you must\nstructure the function as follows:</p>\n<pre>\nfunction myQuickEditFormatter(el, oRecord, oColumn, oData) {\n&nbsp;&nbsp;var markup =\n&nbsp;&nbsp;&nbsp;&nbsp;'&lt;input type=\"text\" class=\"{yiv} yui-quick-edit yui-quick-edit-key:{key}\"/&gt;' +\n&nbsp;&nbsp;&nbsp;&nbsp;YAHOO.widget.QuickEditDataTable.MARKUP_QE_ERROR_DISPLAY;\n&nbsp;&nbsp;&nbsp;&nbsp;el.innerHTML = lang.substitute(markup, {\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;key: oColumn.key,\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;yiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || '') : ''\n&nbsp;&nbsp;&nbsp;&nbsp;});\n&nbsp;&nbsp;&nbsp;&nbsp;el.firstChild.value = extractMyEditableValue(oData);\n&nbsp;&nbsp;&nbsp;&nbsp;YAHOO.widget.QuickEditDataTable.copyDownFormatter.apply(this, arguments);\n};\n</pre>\n<p>You can use textarea or select instead of input, but you can only\ncreate a single field.</p>\n<p><code>extractMyEditableValue</code> does not have to be a separate\nfunction nor must it be limited to using only oData. The work should\nnormally be done inline in the formatter function, but the name of\nthe sample function makes the point clear.</p>", "guessedname": "QuickEditDataTable", "name": "YAHOO.widget.QuickEditDataTable"}];
+                            </script>
+                            <div id="splash_classList">
+                                <ul>
+                                    <li><a href="YAHOO.widget.QuickEditDataTable.html" title="YAHOO.widget.QuickEditDataTable" id="class_0">QuickEditDataTable</a></li>
+                                </ul>
+                            </div>
+                    </div>
+                    <div class="yui-u">
+                                    <div class="submodules">
+                                        <h4>Submodules:</h4> 
+                                        <dl>
+                                            <dt><code>Quick Edit</code></dt>
+                                            <dd>QuickEdit extension to YUI 2 DataTable
+Author: lindalj@yahoo-inc.com / John Lindal</dd>
+                                        </dl>
+                                    </div>
+
+                        </div>
+                </div>
+
+			</div>
+		</div>
+		<div class="yui-b">
+            <div class="nav">
+
+                    <div id="moduleList" class="module">
+                        <h4>Modules</h4>
+                        <ul class="content">
+                                <li class="selected"><a href="module_datatable.html" title="DataTable">DataTable</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="classList" class="module">
+                        <h4>Classes</h4>
+                        <ul class="content">
+                                <li class=""><a href="YAHOO.widget.QuickEditDataTable.html" title="YAHOO.widget.QuickEditDataTable">YAHOO.widget.QuickEditDataTable</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="fileList" class="module">
+                        <h4>Files</h4>
+                        <ul class="content">        
+                                <li class=""><a href="classmap.js.html" title="classmap.js">classmap.js</a></li>
+                                <li class=""><a href="QuickEdit.js.html" title="QuickEdit.js">QuickEdit.js</a></li>
+                        </ul>
+                    </div>
+
+
+
+
+
+            </div>
+		</div>
+	</div>
+	<div id="ft">
+        <hr />
+        Copyright &copy; 2010 Yahoo! Inc. All rights reserved.
+	</div>
+</div>
+<script type="text/javascript">
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.QuickEditDataTable.html#method_cancelQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "cancelQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_clearQuickEditMessages", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "clearQuickEditMessages"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_copyDownFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "copyDownFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_displayQuickEditMessage", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "displayQuickEditMessage"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_getQuickEditChanges", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "getQuickEditChanges"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_readonlyLinkQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "readonlyLinkQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_startQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "startQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textareaQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textareaQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_validateQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "validateQuickEdit"}];
+    YAHOO.yuidoc.init();
+</script>
+</body>
+</html>

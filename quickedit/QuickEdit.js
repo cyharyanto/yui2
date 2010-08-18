@@ -2,8 +2,8 @@
 *
 * QuickEdit extension to YUI 2 DataTable
 * Author: lindalj@yahoo-inc.com / John Lindal
-* @submodule QuickEdit
-* @class YAHOO.widget.DataTable
+* @module DataTable
+* @submodule Quick Edit
 ***********/
 (function(){
 
@@ -104,7 +104,6 @@
      * normally be done inline in the formatter function, but the name of
      * the sample function makes the point clear.</p>
      *
-     * @module QuickEdit
      * @namespace YAHOO.widget
      * @class QuickEditDataTable
      * @extends YAHOO.widget.DataTable

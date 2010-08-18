@@ -1,4 +1,4 @@
-YAHOO.env.classMap = {"YAHOO.widget.QuickEditDataTable": "QuickEdit", "YAHOO.widget.DataTable": "QuickEdit"};
+YAHOO.env.classMap = {"YAHOO.widget.QuickEditDataTable": "DataTable"};
 
 YAHOO.env.resolveClass = function(className) {
     var a=className.split('.'), ns=YAHOO.env.classMap;
