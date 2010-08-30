@@ -1,10 +1,14 @@
 /**********
-*
-* Row Expansion DataTable for YUI 2
-* Author: gelinase@yahoo-inc.com / Eric Gelinas
-* @module DataTable
-* @submodule Row Expansion
-***********/
+ * Row Expansion DataTable for YUI 2
+ * Author: gelinase@yahoo-inc.com / Eric Gelinas
+ * Author: lindalj@yahoo-inc.com / John Lindal
+ * @module DataTable
+ * @submodule Row Expansion
+ * 
+ * Copyright (c) 2009, Yahoo! Inc. All rights reserved.
+ * Code licensed under the BSD License:
+ * http://developer.yahoo.net/yui/license.txt
+ ***********/
 (function(){
 
     var Dom = YAHOO.util.Dom,

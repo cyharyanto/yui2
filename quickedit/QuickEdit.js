@@ -1,10 +1,13 @@
 /**********
-*
-* QuickEdit extension to YUI 2 DataTable
-* Author: lindalj@yahoo-inc.com / John Lindal
-* @module DataTable
-* @submodule Quick Edit
-***********/
+ * QuickEdit extension to YUI 2 DataTable
+ * Author: lindalj@yahoo-inc.com / John Lindal
+ * @module DataTable
+ * @submodule Quick Edit
+ * 
+ * Copyright (c) 2009, Yahoo! Inc. All rights reserved.
+ * Code licensed under the BSD License:
+ * http://developer.yahoo.net/yui/license.txt
+ ***********/
 (function(){
 
     var lang = YAHOO.lang,
