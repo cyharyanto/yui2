@@ -608,7 +608,11 @@
                 return;
             }
 
-            var value = list[0].value;
+            var value = YAHOO.lang.trim(list[0].value);
+            if (!value && value !== 0) {
+                return;
+            }
+
             while (1) {
                 cell = this.getBelowTdEl(cell);
                 if (!cell) {
