@@ -922,6 +922,7 @@ lang.extend(util.TreebleDataSource, DS,
 		};
 
 		requestTree.call(this);
+		return tId;
 	},
 
 	_cancelAllRequests: function()
