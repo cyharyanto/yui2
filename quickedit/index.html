@@ -109,7 +109,7 @@ YAHOO.util.Event.onDOMReady(function(){
 					validation: {
 						fn: function(e) {
 							if (e.value == "John Lindal") {
-								this.displayMessage(e, 'He has never been published!', 'error');
+								this.displayQuickEditMessage(e, 'He has never been published!', 'error');
 								return false;
 							}
 							else {
