@@ -138,14 +138,13 @@
     };
 
     var QEDT = YAHOO.widget.QuickEditDataTable,
-        quick_edit_re             = /yui-quick-edit-key:([^\s]+)/,
-        qe_row_status_even_prefix = 'yui-quick-edit-even-has',
-        qe_row_status_odd_prefix  = 'yui-quick-edit-odd-has',
-        qe_row_status_pattern     = '(?:^|\\s)(?:yui-quick-edit-(even|odd)-has([a-z]+))(?= |$)',
-        qe_row_status_re          = new RegExp(qe_row_status_pattern),
-        qe_cell_status_prefix     = 'yui-quick-edit-has',
-        qe_cell_status_pattern    = '(?:^|\\s)(?:' + qe_cell_status_prefix + '([a-z]+))(?= |$)',
-        qe_cell_status_re         = new RegExp(qe_cell_status_pattern);
+        quick_edit_re          = /yui-quick-edit-key:([^\s]+)/,
+        qe_row_status_prefix   = 'yui-quick-edit-has',
+        qe_row_status_pattern  = '(?:^|\\s)(?:' + qe_row_status_prefix + '([a-z]+))(?= |$)',
+        qe_row_status_re       = new RegExp(qe_row_status_pattern),
+        qe_cell_status_prefix  = 'yui-quick-edit-has',
+        qe_cell_status_pattern = '(?:^|\\s)(?:' + qe_cell_status_prefix + '([a-z]+))(?= |$)',
+        qe_cell_status_re      = new RegExp(qe_cell_status_pattern);
 
     /**
      * <p>Names of supported status values, highest precedence first.  Default:
@@ -750,12 +749,7 @@
                     this.getFirstTdEl(row).scrollIntoView();
                 }
 
-                if (Dom.hasClass(row, 'yui-dt-even')) {
-                    Dom.replaceClass(row, qe_row_status_re, qe_row_status_even_prefix + type);
-                }
-                else {
-                    Dom.replaceClass(row, qe_row_status_re, qe_row_status_odd_prefix + type);
-                }
+                Dom.replaceClass(row, qe_row_status_re, qe_row_status_prefix + type);
                 this.hasQEMessages = true;
             }
 
