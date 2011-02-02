@@ -736,6 +736,10 @@ function cloneObject(o)
 	{
 		copy = o;
 	}
+	else if (o instanceof Date)
+	{
+		copy = new Date(o);
+	}
 	else if (lang.isArray(o))
 	{
 		var array = [];
