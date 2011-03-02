@@ -414,6 +414,25 @@
         YAHOO.widget.QuickEditDataTable,
         YAHOO.widget.DataTable, 
     {
+        initAttributes : function(oConfigs) {
+
+            QEDT.superclass.initAttributes.call(this, oConfigs);
+
+            /**
+             * @attribute quickEditChangesAlwaysInclude
+             * @description Record keys to always include in result from getQuickEditChanges().
+             * @type {Array}
+             * @default []
+             **/
+            this.setAttributeConfig("quickEditChangesAlwaysInclude", {
+                value: [],
+                validator: function(value) {
+                    return lang.isArray(value);
+                }
+            });
+
+        },
+
         /**
          * Switch to QuickEdit mode.  Columns that have quickEdit defined will
          * be editable.
@@ -546,7 +565,11 @@
 
         /**
          * Return the changed values.  For each row, an object is created
-         * with only the changed values.  The object keys are the column keys.
+         * with only the changed values.  The object keys are the column
+         * keys.  If you need values from particular columns to be included
+         * always, even if the value did not change, include the key
+         * "quickEditChangesAlwaysInclude" in the DataTable configuration
+         * and pass an array of column keys.
          *
          * @method getQuickEditChanges
          * @return {mixed} array if all validation passed, false otherwise
@@ -557,7 +580,8 @@
                 return false;
             }
 
-            var changes = [];
+            var changes       = [];
+            var alwaysInclude = this.get('quickEditChangesAlwaysInclude');
 
             var tr = this.getFirstTrEl();
             while (tr) {
@@ -582,6 +606,11 @@
                             val !== (prev ? prev.toString() : '')) {
                         change[key] = val;
                     }
+                }
+
+                for (var i=0; i<alwaysInclude.length; i++) {
+                    var key = alwaysInclude[i];
+                    change[key] = rec.getData(key);
                 }
 
                 tr = this.getNextTrEl(tr);
