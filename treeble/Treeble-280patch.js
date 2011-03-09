@@ -1,13 +1,11 @@
 (function(){
 
-
 /**
- * This is only needed for local data sources or when paginating only
- * top-level nodes, and it will be obsolete when YUI 2.9 is released.
+ * This will hopefully be obsolete when YUI 2.9 is released.
  *
  * @module Treeble
  * @namespace YAHOO.widget
- * @class YAHOO.widget.DataTable
+ * @class YAHOO.widget.DataSource,YAHOO.widget.DataTable
  */
 
 	var lang   = YAHOO.lang,
@@ -20,7 +18,170 @@
 		DS     = util.DataSourceBase,
 		DT     = widget.DataTable;
 
-	YAHOO.widget.DataTable.prototype.load = function(oConfig) {
+	/*
+	 * Fix scope when calling parsers.
+	 */
+	DS.prototype.parseJSONData = function(oRequest, oFullResponse) {
+		var oParsedResponse = {results:[],meta:{}};
+
+		if(lang.isObject(oFullResponse) && this.responseSchema.resultsList) {
+			var schema = this.responseSchema,
+				fields          = schema.fields,
+				resultsList     = oFullResponse,
+				results         = [],
+				metaFields      = schema.metaFields || {},
+				fieldParsers    = [],
+				fieldPaths      = [],
+				simpleFields    = [],
+				bError          = false,
+				i,len,j,v,key,parser,path;
+
+			// Function to convert the schema's fields into walk paths
+			var buildPath = function (needle) {
+				var path = null, keys = [], i = 0;
+				if (needle) {
+					// Strip the ["string keys"] and [1] array indexes
+					needle = needle.
+						replace(/\[(['"])(.*?)\1\]/g,
+						function (x,$1,$2) {keys[i]=$2;return '.@'+(i++);}).
+						replace(/\[(\d+)\]/g,
+						function (x,$1) {keys[i]=parseInt($1,10)|0;return '.@'+(i++);}).
+						replace(/^\./,''); // remove leading dot
+
+					// If the cleaned needle contains invalid characters, the
+					// path is invalid
+					if (!/[^\w\.\$@]/.test(needle)) {
+						path = needle.split('.');
+						for (i=path.length-1; i >= 0; --i) {
+							if (path[i].charAt(0) === '@') {
+								path[i] = keys[parseInt(path[i].substr(1),10)];
+							}
+						}
+					}
+					else {
+					}
+				}
+				return path;
+			};
+
+
+			// Function to walk a path and return the pot of gold
+			var walkPath = function (path, origin) {
+				var v=origin,i=0,len=path.length;
+				for (;i<len && v;++i) {
+					v = v[path[i]];
+				}
+				return v;
+			};
+
+			// Parse the response
+			// Step 1. Pull the resultsList from oFullResponse (default assumes
+			// oFullResponse IS the resultsList)
+			path = buildPath(schema.resultsList);
+			if (path) {
+				resultsList = walkPath(path, oFullResponse);
+				if (resultsList === undefined) {
+					bError = true;
+				}
+			} else {
+				bError = true;
+			}
+
+			if (!resultsList) {
+				resultsList = [];
+			}
+
+			if (!lang.isArray(resultsList)) {
+				resultsList = [resultsList];
+			}
+
+			if (!bError) {
+				// Step 2. Parse out field data if identified
+				if(schema.fields) {
+					var field;
+					// Build the field parser map and location paths
+					for (i=0, len=fields.length; i<len; i++) {
+						field = fields[i];
+						key    = field.key || field;
+						parser = ((typeof field.parser === 'function') ?
+							field.parser :
+							DS.Parser[field.parser+'']) || field.converter;
+						path   = buildPath(key);
+
+						if (parser) {
+							fieldParsers[fieldParsers.length] = {key:key,parser:parser};
+						}
+
+						if (path) {
+							if (path.length > 1) {
+								fieldPaths[fieldPaths.length] = {key:key,path:path};
+							} else {
+								simpleFields[simpleFields.length] = {key:key,path:path[0]};
+							}
+						} else {
+						}
+					}
+
+					// Process the results, flattening the records and/or applying parsers if needed
+					for (i = resultsList.length - 1; i >= 0; --i) {
+						var r = resultsList[i], rec = {};
+						if(r) {
+							for (j = simpleFields.length - 1; j >= 0; --j) {
+								// Bug 1777850: data might be held in an array
+								rec[simpleFields[j].key] =
+										(r[simpleFields[j].path] !== undefined) ?
+										r[simpleFields[j].path] : r[j];
+							}
+
+							for (j = fieldPaths.length - 1; j >= 0; --j) {
+								rec[fieldPaths[j].key] = walkPath(fieldPaths[j].path,r);
+							}
+
+							for (j = fieldParsers.length - 1; j >= 0; --j) {
+								var p = fieldParsers[j].key;
+								rec[p] = fieldParsers[j].parser.call(this, rec[p]);
+								if (rec[p] === undefined) {
+									rec[p] = null;
+								}
+							}
+						}
+						results[i] = rec;
+					}
+				}
+				else {
+					results = resultsList;
+				}
+
+				for (key in metaFields) {
+					if (lang.hasOwnProperty(metaFields,key)) {
+						path = buildPath(metaFields[key]);
+						if (path) {
+							v = walkPath(path, oFullResponse);
+							oParsedResponse.meta[key] = v;
+						}
+					}
+				}
+
+			} else {
+
+				oParsedResponse.error = true;
+			}
+
+			oParsedResponse.results = results;
+		}
+		else {
+			oParsedResponse.error = true;
+		}
+
+		return oParsedResponse;
+	};
+
+	/*
+	 * DT overrides are only needed for local data sources or when
+	 * paginating only top-level nodes.
+	 */
+
+	DT.prototype.load = function(oConfig) {
 		oConfig = oConfig || {};
 
 		(oConfig.datasource || this._oDataSource).sendRequest(
@@ -34,8 +195,8 @@
 		);
 	};
 
-	var origInitAttributes = YAHOO.widget.DataTable.prototype.initAttributes;
-	YAHOO.widget.DataTable.prototype.initAttributes = function()
+	var origInitAttributes = DT.prototype.initAttributes;
+	DT.prototype.initAttributes = function()
 	{
 		origInitAttributes.apply(this, arguments);
 
@@ -52,13 +213,11 @@
 		});
 	};
 
-	/**
+	/*
 	 * Override to provide option to display all returned records, even if
 	 * that is more than what paginator says is visible.
-	 *
-	 * @method render
 	 */
-	YAHOO.widget.DataTable.prototype. render = function() {
+	DT.prototype.render = function() {
 
 		this._oChainRender.stop();
 
