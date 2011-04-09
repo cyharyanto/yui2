@@ -90,7 +90,7 @@ YAHOO.util.Event.onDOMReady(function(){
 	YAHOO.example.quickEditDataTable = new YAHOO.widget.QuickEditDataTable(
 
 		//Root element id
-		"table", 
+		"table",
 
 		//Column configuration
 		[
@@ -141,13 +141,13 @@ YAHOO.util.Event.onDOMReady(function(){
 				quickEdit: {
 					copyDown: true,
 					validation: {
-                        css: "yiv-integer:[0,]"
+						css: "yiv-integer:[0,]"
 					}
 				}
 			}
 		],
 
-		//Data Source 
+		//Data Source
 		new YAHOO.util.DataSource(
 			YAHOO.example.Data.bookorders,
 			{
@@ -230,11 +230,11 @@ YAHOO.util.Event.onDOMReady(function(){
 <p>To test validation, try entering <q>John Lindal</q> as the author, anything other than 4 digits for the date, and anything other than a positive integer for the quantity.</p>
 
 <div>
-    <button id="start-quick-edit">Quick Edit</button>
-    <span id="quick-edit-controls">
-        <button id="save-quick-edit">Save</button>
-        <button id="cancel-quick-edit">Cancel</button>
-    </span>
+	<button id="start-quick-edit">Quick Edit</button>
+	<span id="quick-edit-controls">
+		<button id="save-quick-edit">Save</button>
+		<button id="cancel-quick-edit">Cancel</button>
+	</span>
 </div>
 <div id="table"></div>
 <div id="table-pagination"></div>

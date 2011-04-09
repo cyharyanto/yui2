@@ -860,7 +860,7 @@
                 yiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || '') : ''
             });
 
-            el.firstChild.value = oData;
+            el.firstChild.value = (oData || '');
 
             QEDT.copyDownFormatter.apply(this, arguments);
         },
@@ -872,8 +872,8 @@
          * @method textareaQuickEditFormatter
          * @static
          */
-        textareaQuickEditFormatter : function(el, oRecord, oColumn, oData) {
-
+        textareaQuickEditFormatter : function(el, oRecord, oColumn, oData)
+        {
             var markup =
                 '<textarea class="{yiv} yui-quick-edit yui-quick-edit-key:{key}"/>' +
                 QEDT.MARKUP_QE_ERROR_DISPLAY;
@@ -884,7 +884,7 @@
                 yiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || '') : ''
             });
 
-            el.firstChild.value = oData;
+            el.firstChild.value = (oData || '');
 
             QEDT.copyDownFormatter.apply(this, arguments);
         },
@@ -900,7 +900,7 @@
          */
         readonlyEmailQuickEditFormatter : function(el, oRecord, oColumn, oData)
         {
-            el.innerHTML = (oData ? oData : '');
+            el.innerHTML = (oData || '');
         },
 
         /**
@@ -912,9 +912,9 @@
          * @method readonlyLinkQuickEditFormatter
          * @static
          */
-         readonlyLinkQuickEditFormatter : function(el, oRecord, oColumn, oData)
-         {
-            el.innerHTML = oData;
+        readonlyLinkQuickEditFormatter : function(el, oRecord, oColumn, oData)
+        {
+            el.innerHTML = (oData || '');
         },
 
         /**
@@ -934,7 +934,7 @@
             {
                 var button       = document.createElement('button');
                 button.title     = 'Copy down';
-                button.innerHTML = '&darr;'
+                button.innerHTML = '&darr;';
 
                 var msg = Dom.getElementsByClassName(QEDT.CLASS_QE_ERROR_TEXT, null, el)[0];
                 el.insertBefore(button, msg);
