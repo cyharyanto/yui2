@@ -860,7 +860,7 @@
                 yiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || '') : ''
             });
 
-            el.firstChild.value = (oData || '');
+            el.firstChild.value = oData;
 
             QEDT.copyDownFormatter.apply(this, arguments);
         },
@@ -884,7 +884,7 @@
                 yiv: oColumn.quickEdit.validation ? (oColumn.quickEdit.validation.css || '') : ''
             });
 
-            el.firstChild.value = (oData || '');
+            el.firstChild.value = oData;
 
             QEDT.copyDownFormatter.apply(this, arguments);
         },
@@ -900,7 +900,7 @@
          */
         readonlyEmailQuickEditFormatter : function(el, oRecord, oColumn, oData)
         {
-            el.innerHTML = (oData || '');
+            el.innerHTML = (oData || '');		// don't need to check for zero
         },
 
         /**
@@ -914,7 +914,7 @@
          */
         readonlyLinkQuickEditFormatter : function(el, oRecord, oColumn, oData)
         {
-            el.innerHTML = (oData || '');
+            el.innerHTML = (oData || '');		// don't need to check for zero
         },
 
         /**
