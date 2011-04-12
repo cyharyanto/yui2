@@ -1,4 +1,4 @@
-YAHOO.env.classMap = {"YAHOO.util.TreebleDataSource": "Treeble", "YAHOO.widget.DataTable": "Treeble"};
+YAHOO.env.classMap = {"YAHOO.util.TreebleDataSource": "Treeble", "YAHOO.widget.DataTable": "Treeble", "YAHOO.widget.DataSource,DataTable": "Treeble"};
 
 YAHOO.env.resolveClass = function(className) {
     var a=className.split('.'), ns=YAHOO.env.classMap;

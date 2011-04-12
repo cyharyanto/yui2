@@ -49,14 +49,12 @@
                         </style>
                         <div class="highlight"><pre><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
 
-
 <span class="cm">/**</span>
-<span class="cm"> * This is only needed for local data sources or when paginating only</span>
-<span class="cm"> * top-level nodes, and it will be obsolete when YUI 2.9 is released.</span>
+<span class="cm"> * This will hopefully be obsolete when YUI 2.9 is released.</span>
 <span class="cm"> *</span>
 <span class="cm"> * @module Treeble</span>
 <span class="cm"> * @namespace YAHOO.widget</span>
-<span class="cm"> * @class YAHOO.widget.DataTable</span>
+<span class="cm"> * @class YAHOO.widget.DataSource,YAHOO.widget.DataTable</span>
 <span class="cm"> */</span>
 
 	<span class="kd">var</span> <span class="nx">lang</span>   <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">lang</span><span class="p">,</span>
@@ -69,7 +67,170 @@
 		<span class="nx">DS</span>     <span class="o">=</span> <span class="nx">util</span><span class="p">.</span><span class="nx">DataSourceBase</span><span class="p">,</span>
 		<span class="nx">DT</span>     <span class="o">=</span> <span class="nx">widget</span><span class="p">.</span><span class="nx">DataTable</span><span class="p">;</span>
 
-	<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">DataTable</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">load</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">oConfig</span><span class="p">)</span> <span class="p">{</span>
+	<span class="cm">/*</span>
+<span class="cm">	 * Fix scope when calling parsers.</span>
+<span class="cm">	 */</span>
+	<span class="nx">DS</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">parseJSONData</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">oRequest</span><span class="p">,</span> <span class="nx">oFullResponse</span><span class="p">)</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">oParsedResponse</span> <span class="o">=</span> <span class="p">{</span><span class="nx">results</span><span class="o">:</span><span class="p">[],</span><span class="nx">meta</span><span class="o">:</span><span class="p">{}};</span>
+
+		<span class="k">if</span><span class="p">(</span><span class="nx">lang</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">oFullResponse</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">responseSchema</span><span class="p">.</span><span class="nx">resultsList</span><span class="p">)</span> <span class="p">{</span>
+			<span class="kd">var</span> <span class="nx">schema</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">responseSchema</span><span class="p">,</span>
+				<span class="nx">fields</span>          <span class="o">=</span> <span class="nx">schema</span><span class="p">.</span><span class="nx">fields</span><span class="p">,</span>
+				<span class="nx">resultsList</span>     <span class="o">=</span> <span class="nx">oFullResponse</span><span class="p">,</span>
+				<span class="nx">results</span>         <span class="o">=</span> <span class="p">[],</span>
+				<span class="nx">metaFields</span>      <span class="o">=</span> <span class="nx">schema</span><span class="p">.</span><span class="nx">metaFields</span> <span class="o">||</span> <span class="p">{},</span>
+				<span class="nx">fieldParsers</span>    <span class="o">=</span> <span class="p">[],</span>
+				<span class="nx">fieldPaths</span>      <span class="o">=</span> <span class="p">[],</span>
+				<span class="nx">simpleFields</span>    <span class="o">=</span> <span class="p">[],</span>
+				<span class="nx">bError</span>          <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
+				<span class="nx">i</span><span class="p">,</span><span class="nx">len</span><span class="p">,</span><span class="nx">j</span><span class="p">,</span><span class="nx">v</span><span class="p">,</span><span class="nx">key</span><span class="p">,</span><span class="nx">parser</span><span class="p">,</span><span class="nx">path</span><span class="p">;</span>
+
+			<span class="c1">// Function to convert the schema&#39;s fields into walk paths</span>
+			<span class="kd">var</span> <span class="nx">buildPath</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">needle</span><span class="p">)</span> <span class="p">{</span>
+				<span class="kd">var</span> <span class="nx">path</span> <span class="o">=</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">keys</span> <span class="o">=</span> <span class="p">[],</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+				<span class="k">if</span> <span class="p">(</span><span class="nx">needle</span><span class="p">)</span> <span class="p">{</span>
+					<span class="c1">// Strip the [&quot;string keys&quot;] and [1] array indexes</span>
+					<span class="nx">needle</span> <span class="o">=</span> <span class="nx">needle</span><span class="p">.</span>
+						<span class="nx">replace</span><span class="p">(</span><span class="sr">/\[([&#39;&quot;])(.*?)\1\]/g</span><span class="p">,</span>
+						<span class="kd">function</span> <span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">$1</span><span class="p">,</span><span class="nx">$2</span><span class="p">)</span> <span class="p">{</span><span class="nx">keys</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">=</span><span class="nx">$2</span><span class="p">;</span><span class="k">return</span> <span class="s1">&#39;.@&#39;</span><span class="o">+</span><span class="p">(</span><span class="nx">i</span><span class="o">++</span><span class="p">);}).</span>
+						<span class="nx">replace</span><span class="p">(</span><span class="sr">/\[(\d+)\]/g</span><span class="p">,</span>
+						<span class="kd">function</span> <span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="nx">$1</span><span class="p">)</span> <span class="p">{</span><span class="nx">keys</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">=</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">$1</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span><span class="o">|</span><span class="mi">0</span><span class="p">;</span><span class="k">return</span> <span class="s1">&#39;.@&#39;</span><span class="o">+</span><span class="p">(</span><span class="nx">i</span><span class="o">++</span><span class="p">);}).</span>
+						<span class="nx">replace</span><span class="p">(</span><span class="sr">/^\./</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">);</span> <span class="c1">// remove leading dot</span>
+
+					<span class="c1">// If the cleaned needle contains invalid characters, the</span>
+					<span class="c1">// path is invalid</span>
+					<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="sr">/[^\w\.\$@]/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">needle</span><span class="p">))</span> <span class="p">{</span>
+						<span class="nx">path</span> <span class="o">=</span> <span class="nx">needle</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">);</span>
+						<span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="nx">path</span><span class="p">.</span><span class="nx">length</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+							<span class="k">if</span> <span class="p">(</span><span class="nx">path</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">===</span> <span class="s1">&#39;@&#39;</span><span class="p">)</span> <span class="p">{</span>
+								<span class="nx">path</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">keys</span><span class="p">[</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">path</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">substr</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="mi">10</span><span class="p">)];</span>
+							<span class="p">}</span>
+						<span class="p">}</span>
+					<span class="p">}</span>
+					<span class="k">else</span> <span class="p">{</span>
+					<span class="p">}</span>
+				<span class="p">}</span>
+				<span class="k">return</span> <span class="nx">path</span><span class="p">;</span>
+			<span class="p">};</span>
+
+
+			<span class="c1">// Function to walk a path and return the pot of gold</span>
+			<span class="kd">var</span> <span class="nx">walkPath</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">origin</span><span class="p">)</span> <span class="p">{</span>
+				<span class="kd">var</span> <span class="nx">v</span><span class="o">=</span><span class="nx">origin</span><span class="p">,</span><span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="nx">len</span><span class="o">=</span><span class="nx">path</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+				<span class="k">for</span> <span class="p">(;</span><span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span> <span class="o">&amp;&amp;</span> <span class="nx">v</span><span class="p">;</span><span class="o">++</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+					<span class="nx">v</span> <span class="o">=</span> <span class="nx">v</span><span class="p">[</span><span class="nx">path</span><span class="p">[</span><span class="nx">i</span><span class="p">]];</span>
+				<span class="p">}</span>
+				<span class="k">return</span> <span class="nx">v</span><span class="p">;</span>
+			<span class="p">};</span>
+
+			<span class="c1">// Parse the response</span>
+			<span class="c1">// Step 1. Pull the resultsList from oFullResponse (default assumes</span>
+			<span class="c1">// oFullResponse IS the resultsList)</span>
+			<span class="nx">path</span> <span class="o">=</span> <span class="nx">buildPath</span><span class="p">(</span><span class="nx">schema</span><span class="p">.</span><span class="nx">resultsList</span><span class="p">);</span>
+			<span class="k">if</span> <span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+				<span class="nx">resultsList</span> <span class="o">=</span> <span class="nx">walkPath</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">oFullResponse</span><span class="p">);</span>
+				<span class="k">if</span> <span class="p">(</span><span class="nx">resultsList</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+					<span class="nx">bError</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+				<span class="p">}</span>
+			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+				<span class="nx">bError</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+			<span class="p">}</span>
+
+			<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">resultsList</span><span class="p">)</span> <span class="p">{</span>
+				<span class="nx">resultsList</span> <span class="o">=</span> <span class="p">[];</span>
+			<span class="p">}</span>
+
+			<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">lang</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">resultsList</span><span class="p">))</span> <span class="p">{</span>
+				<span class="nx">resultsList</span> <span class="o">=</span> <span class="p">[</span><span class="nx">resultsList</span><span class="p">];</span>
+			<span class="p">}</span>
+
+			<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">bError</span><span class="p">)</span> <span class="p">{</span>
+				<span class="c1">// Step 2. Parse out field data if identified</span>
+				<span class="k">if</span><span class="p">(</span><span class="nx">schema</span><span class="p">.</span><span class="nx">fields</span><span class="p">)</span> <span class="p">{</span>
+					<span class="kd">var</span> <span class="nx">field</span><span class="p">;</span>
+					<span class="c1">// Build the field parser map and location paths</span>
+					<span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nx">len</span><span class="o">=</span><span class="nx">fields</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">len</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+						<span class="nx">field</span> <span class="o">=</span> <span class="nx">fields</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+						<span class="nx">key</span>    <span class="o">=</span> <span class="nx">field</span><span class="p">.</span><span class="nx">key</span> <span class="o">||</span> <span class="nx">field</span><span class="p">;</span>
+						<span class="nx">parser</span> <span class="o">=</span> <span class="p">((</span><span class="k">typeof</span> <span class="nx">field</span><span class="p">.</span><span class="nx">parser</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span><span class="p">)</span> <span class="o">?</span>
+							<span class="nx">field</span><span class="p">.</span><span class="nx">parser</span> <span class="o">:</span>
+							<span class="nx">DS</span><span class="p">.</span><span class="nx">Parser</span><span class="p">[</span><span class="nx">field</span><span class="p">.</span><span class="nx">parser</span><span class="o">+</span><span class="s1">&#39;&#39;</span><span class="p">])</span> <span class="o">||</span> <span class="nx">field</span><span class="p">.</span><span class="nx">converter</span><span class="p">;</span>
+						<span class="nx">path</span>   <span class="o">=</span> <span class="nx">buildPath</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+
+						<span class="k">if</span> <span class="p">(</span><span class="nx">parser</span><span class="p">)</span> <span class="p">{</span>
+							<span class="nx">fieldParsers</span><span class="p">[</span><span class="nx">fieldParsers</span><span class="p">.</span><span class="nx">length</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="nx">key</span><span class="o">:</span><span class="nx">key</span><span class="p">,</span><span class="nx">parser</span><span class="o">:</span><span class="nx">parser</span><span class="p">};</span>
+						<span class="p">}</span>
+
+						<span class="k">if</span> <span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+							<span class="k">if</span> <span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+								<span class="nx">fieldPaths</span><span class="p">[</span><span class="nx">fieldPaths</span><span class="p">.</span><span class="nx">length</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="nx">key</span><span class="o">:</span><span class="nx">key</span><span class="p">,</span><span class="nx">path</span><span class="o">:</span><span class="nx">path</span><span class="p">};</span>
+							<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+								<span class="nx">simpleFields</span><span class="p">[</span><span class="nx">simpleFields</span><span class="p">.</span><span class="nx">length</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="nx">key</span><span class="o">:</span><span class="nx">key</span><span class="p">,</span><span class="nx">path</span><span class="o">:</span><span class="nx">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]};</span>
+							<span class="p">}</span>
+						<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+						<span class="p">}</span>
+					<span class="p">}</span>
+
+					<span class="c1">// Process the results, flattening the records and/or applying parsers if needed</span>
+					<span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="nx">resultsList</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+						<span class="kd">var</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">resultsList</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">rec</span> <span class="o">=</span> <span class="p">{};</span>
+						<span class="k">if</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span> <span class="p">{</span>
+							<span class="k">for</span> <span class="p">(</span><span class="nx">j</span> <span class="o">=</span> <span class="nx">simpleFields</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">j</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="nx">j</span><span class="p">)</span> <span class="p">{</span>
+								<span class="c1">// Bug 1777850: data might be held in an array</span>
+								<span class="nx">rec</span><span class="p">[</span><span class="nx">simpleFields</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span>
+										<span class="p">(</span><span class="nx">r</span><span class="p">[</span><span class="nx">simpleFields</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">path</span><span class="p">]</span> <span class="o">!==</span> <span class="kc">undefined</span><span class="p">)</span> <span class="o">?</span>
+										<span class="nx">r</span><span class="p">[</span><span class="nx">simpleFields</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">path</span><span class="p">]</span> <span class="o">:</span> <span class="nx">r</span><span class="p">[</span><span class="nx">j</span><span class="p">];</span>
+							<span class="p">}</span>
+
+							<span class="k">for</span> <span class="p">(</span><span class="nx">j</span> <span class="o">=</span> <span class="nx">fieldPaths</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">j</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="nx">j</span><span class="p">)</span> <span class="p">{</span>
+								<span class="nx">rec</span><span class="p">[</span><span class="nx">fieldPaths</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">walkPath</span><span class="p">(</span><span class="nx">fieldPaths</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">path</span><span class="p">,</span><span class="nx">r</span><span class="p">);</span>
+							<span class="p">}</span>
+
+							<span class="k">for</span> <span class="p">(</span><span class="nx">j</span> <span class="o">=</span> <span class="nx">fieldParsers</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">j</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="nx">j</span><span class="p">)</span> <span class="p">{</span>
+								<span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">fieldParsers</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">key</span><span class="p">;</span>
+								<span class="nx">rec</span><span class="p">[</span><span class="nx">p</span><span class="p">]</span> <span class="o">=</span> <span class="nx">fieldParsers</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">parser</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">rec</span><span class="p">[</span><span class="nx">p</span><span class="p">]);</span>
+								<span class="k">if</span> <span class="p">(</span><span class="nx">rec</span><span class="p">[</span><span class="nx">p</span><span class="p">]</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+									<span class="nx">rec</span><span class="p">[</span><span class="nx">p</span><span class="p">]</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+								<span class="p">}</span>
+							<span class="p">}</span>
+						<span class="p">}</span>
+						<span class="nx">results</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">rec</span><span class="p">;</span>
+					<span class="p">}</span>
+				<span class="p">}</span>
+				<span class="k">else</span> <span class="p">{</span>
+					<span class="nx">results</span> <span class="o">=</span> <span class="nx">resultsList</span><span class="p">;</span>
+				<span class="p">}</span>
+
+				<span class="k">for</span> <span class="p">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">metaFields</span><span class="p">)</span> <span class="p">{</span>
+					<span class="k">if</span> <span class="p">(</span><span class="nx">lang</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">metaFields</span><span class="p">,</span><span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
+						<span class="nx">path</span> <span class="o">=</span> <span class="nx">buildPath</span><span class="p">(</span><span class="nx">metaFields</span><span class="p">[</span><span class="nx">key</span><span class="p">]);</span>
+						<span class="k">if</span> <span class="p">(</span><span class="nx">path</span><span class="p">)</span> <span class="p">{</span>
+							<span class="nx">v</span> <span class="o">=</span> <span class="nx">walkPath</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">oFullResponse</span><span class="p">);</span>
+							<span class="nx">oParsedResponse</span><span class="p">.</span><span class="nx">meta</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">v</span><span class="p">;</span>
+						<span class="p">}</span>
+					<span class="p">}</span>
+				<span class="p">}</span>
+
+			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+
+				<span class="nx">oParsedResponse</span><span class="p">.</span><span class="nx">error</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+			<span class="p">}</span>
+
+			<span class="nx">oParsedResponse</span><span class="p">.</span><span class="nx">results</span> <span class="o">=</span> <span class="nx">results</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="k">else</span> <span class="p">{</span>
+			<span class="nx">oParsedResponse</span><span class="p">.</span><span class="nx">error</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+		<span class="p">}</span>
+
+		<span class="k">return</span> <span class="nx">oParsedResponse</span><span class="p">;</span>
+	<span class="p">};</span>
+
+	<span class="cm">/*</span>
+<span class="cm">	 * DT overrides are only needed for local data sources or when</span>
+<span class="cm">	 * paginating only top-level nodes.</span>
+<span class="cm">	 */</span>
+
+	<span class="nx">DT</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">load</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">oConfig</span><span class="p">)</span> <span class="p">{</span>
 		<span class="nx">oConfig</span> <span class="o">=</span> <span class="nx">oConfig</span> <span class="o">||</span> <span class="p">{};</span>
 
 		<span class="p">(</span><span class="nx">oConfig</span><span class="p">.</span><span class="nx">datasource</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">_oDataSource</span><span class="p">).</span><span class="nx">sendRequest</span><span class="p">(</span>
@@ -83,8 +244,8 @@
 		<span class="p">);</span>
 	<span class="p">};</span>
 
-	<span class="kd">var</span> <span class="nx">origInitAttributes</span> <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">DataTable</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">initAttributes</span><span class="p">;</span>
-	<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">DataTable</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">initAttributes</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span>
+	<span class="kd">var</span> <span class="nx">origInitAttributes</span> <span class="o">=</span> <span class="nx">DT</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">initAttributes</span><span class="p">;</span>
+	<span class="nx">DT</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">initAttributes</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span>
 	<span class="p">{</span>
 		<span class="nx">origInitAttributes</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
 
@@ -101,13 +262,11 @@
 		<span class="p">});</span>
 	<span class="p">};</span>
 
-	<span class="cm">/**</span>
+	<span class="cm">/*</span>
 <span class="cm">	 * Override to provide option to display all returned records, even if</span>
 <span class="cm">	 * that is more than what paginator says is visible.</span>
-<span class="cm">	 *</span>
-<span class="cm">	 * @method render</span>
 <span class="cm">	 */</span>
-	<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">widget</span><span class="p">.</span><span class="nx">DataTable</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span> <span class="nx">render</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">DT</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">render</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
 
 		<span class="k">this</span><span class="p">.</span><span class="nx">_oChainRender</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
 
@@ -250,6 +409,7 @@
                         <h4>Classes</h4>
                         <ul class="content">
                                 <li class=""><a href="YAHOO.util.TreebleDataSource.html" title="YAHOO.util.TreebleDataSource">YAHOO.util.TreebleDataSource</a></li>
+                                <li class=""><a href="YAHOO.widget.DataSource,DataTable.html" title="YAHOO.widget.DataSource,DataTable">YAHOO.widget.DataSource,DataTable</a></li>
                                 <li class=""><a href="YAHOO.widget.DataTable.html" title="YAHOO.widget.DataTable">YAHOO.widget.DataTable</a></li>
                         </ul>
                     </div>
@@ -272,12 +432,12 @@
 	</div>
 	<div id="ft">
         <hr />
-        Copyright &copy; 2010 Yahoo! Inc. All rights reserved.
+        Copyright &copy; 2011 Yahoo! Inc. All rights reserved.
 	</div>
 </div>
 <script type="text/javascript">
-    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.DataTable.html#event_beforeDisplayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "beforeDisplayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_DataSourceBase.parseDataSource", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "DataSourceBase.parseDataSource"}, {"url": "YAHOO.widget.DataTable.html#method_DataTable.generateTreebleDataSourceRequest", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "DataTable.generateTreebleDataSourceRequest"}, {"url": "YAHOO.widget.DataTable.html#config_displayAllRecords", "access": "", "host": "YAHOO.widget.DataTable", "type": "config", "name": "displayAllRecords"}, {"url": "YAHOO.widget.DataTable.html#event_displayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "displayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_isOpen", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "isOpen"}, {"url": "YAHOO.widget.DataTable.html#method_render", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "render"}, {"url": "YAHOO.widget.DataTable.html#method_rowIsOpen", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "rowIsOpen"}, {"url": "YAHOO.util.TreebleDataSource.html#method_toggle", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "toggle"}, {"url": "YAHOO.widget.DataTable.html#method_toggleRow", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "toggleRow"}];
-    YAHOO.yuidoc.init();
+
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.DataSource,DataTable.html#event_beforeDisplayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataSource,DataTable", "type": "event", "name": "beforeDisplayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_DataSourceBase.parseDataSource", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "DataSourceBase.parseDataSource"}, {"url": "YAHOO.widget.DataTable.html#method_DataTable.generateTreebleDataSourceRequest", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "DataTable.generateTreebleDataSourceRequest"}, {"url": "YAHOO.widget.DataSource,DataTable.html#config_displayAllRecords", "access": "", "host": "YAHOO.widget.DataSource,DataTable", "type": "config", "name": "displayAllRecords"}, {"url": "YAHOO.widget.DataSource,DataTable.html#event_displayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataSource,DataTable", "type": "event", "name": "displayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_isOpen", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "isOpen"}, {"url": "YAHOO.widget.DataTable.html#method_rowIsOpen", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "rowIsOpen"}, {"url": "YAHOO.util.TreebleDataSource.html#method_toggle", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "toggle"}, {"url": "YAHOO.widget.DataTable.html#method_toggleRow", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "toggleRow"}];
 </script>
 </body>
 </html>

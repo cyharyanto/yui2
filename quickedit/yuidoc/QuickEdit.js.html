@@ -909,7 +909,7 @@
                 <span class="nx">yiv</span><span class="o">:</span> <span class="nx">oColumn</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span> <span class="o">?</span> <span class="p">(</span><span class="nx">oColumn</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span><span class="p">.</span><span class="nx">css</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span>
             <span class="p">});</span>
 
-            <span class="nx">el</span><span class="p">.</span><span class="nx">firstChild</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">oData</span><span class="p">;</span>
+            <span class="nx">el</span><span class="p">.</span><span class="nx">firstChild</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="p">(</span><span class="nx">oData</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
 
             <span class="nx">QEDT</span><span class="p">.</span><span class="nx">copyDownFormatter</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
         <span class="p">},</span>
@@ -921,8 +921,8 @@
 <span class="cm">         * @method textareaQuickEditFormatter</span>
 <span class="cm">         * @static</span>
 <span class="cm">         */</span>
-        <span class="nx">textareaQuickEditFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span> <span class="p">{</span>
-
+        <span class="nx">textareaQuickEditFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span>
+        <span class="p">{</span>
             <span class="kd">var</span> <span class="nx">markup</span> <span class="o">=</span>
                 <span class="s1">&#39;&lt;textarea class=&quot;{yiv} yui-quick-edit yui-quick-edit-key:{key}&quot;/&gt;&#39;</span> <span class="o">+</span>
                 <span class="nx">QEDT</span><span class="p">.</span><span class="nx">MARKUP_QE_ERROR_DISPLAY</span><span class="p">;</span>
@@ -933,7 +933,7 @@
                 <span class="nx">yiv</span><span class="o">:</span> <span class="nx">oColumn</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span> <span class="o">?</span> <span class="p">(</span><span class="nx">oColumn</span><span class="p">.</span><span class="nx">quickEdit</span><span class="p">.</span><span class="nx">validation</span><span class="p">.</span><span class="nx">css</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span>
             <span class="p">});</span>
 
-            <span class="nx">el</span><span class="p">.</span><span class="nx">firstChild</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">oData</span><span class="p">;</span>
+            <span class="nx">el</span><span class="p">.</span><span class="nx">firstChild</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="p">(</span><span class="nx">oData</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
 
             <span class="nx">QEDT</span><span class="p">.</span><span class="nx">copyDownFormatter</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
         <span class="p">},</span>
@@ -949,7 +949,7 @@
 <span class="cm">         */</span>
         <span class="nx">readonlyEmailQuickEditFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span>
         <span class="p">{</span>
-            <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="p">(</span><span class="nx">oData</span> <span class="o">?</span> <span class="nx">oData</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+            <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="p">(</span><span class="nx">oData</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
         <span class="p">},</span>
 
         <span class="cm">/**</span>
@@ -961,9 +961,9 @@
 <span class="cm">         * @method readonlyLinkQuickEditFormatter</span>
 <span class="cm">         * @static</span>
 <span class="cm">         */</span>
-         <span class="nx">readonlyLinkQuickEditFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span>
-         <span class="p">{</span>
-            <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">oData</span><span class="p">;</span>
+        <span class="nx">readonlyLinkQuickEditFormatter</span> <span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">,</span> <span class="nx">oRecord</span><span class="p">,</span> <span class="nx">oColumn</span><span class="p">,</span> <span class="nx">oData</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="p">(</span><span class="nx">oData</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
         <span class="p">},</span>
 
         <span class="cm">/**</span>
@@ -983,7 +983,7 @@
             <span class="p">{</span>
                 <span class="kd">var</span> <span class="nx">button</span>       <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;button&#39;</span><span class="p">);</span>
                 <span class="nx">button</span><span class="p">.</span><span class="nx">title</span>     <span class="o">=</span> <span class="s1">&#39;Copy down&#39;</span><span class="p">;</span>
-                <span class="nx">button</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">&#39;&amp;darr;&#39;</span>
+                <span class="nx">button</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">&#39;&amp;darr;&#39;</span><span class="p">;</span>
 
                 <span class="kd">var</span> <span class="nx">msg</span> <span class="o">=</span> <span class="nx">Dom</span><span class="p">.</span><span class="nx">getElementsByClassName</span><span class="p">(</span><span class="nx">QEDT</span><span class="p">.</span><span class="nx">CLASS_QE_ERROR_TEXT</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">el</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
                 <span class="nx">el</span><span class="p">.</span><span class="nx">insertBefore</span><span class="p">(</span><span class="nx">button</span><span class="p">,</span> <span class="nx">msg</span><span class="p">);</span>
@@ -1037,8 +1037,8 @@
 	</div>
 </div>
 <script type="text/javascript">
+
     var ALL_YUI_PROPS = [{"url": "YAHOO.widget.QuickEditDataTable.html#event_beforeQuickEditChangesAlwaysIncludeChange", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "event", "name": "beforeQuickEditChangesAlwaysIncludeChange"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_cancelQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "cancelQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_clearQuickEditMessages", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "clearQuickEditMessages"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_copyDownFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "copyDownFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_displayQuickEditMessage", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "displayQuickEditMessage"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_getQuickEditChanges", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "getQuickEditChanges"}, {"url": "YAHOO.widget.QuickEditDataTable.html#config_quickEditChangesAlwaysInclude", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "config", "name": "quickEditChangesAlwaysInclude"}, {"url": "YAHOO.widget.QuickEditDataTable.html#event_quickEditChangesAlwaysIncludeChange", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "event", "name": "quickEditChangesAlwaysIncludeChange"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_readonlyLinkQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "readonlyLinkQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_startQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "startQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textareaQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textareaQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_textQuickEditFormatter", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "textQuickEditFormatter"}, {"url": "YAHOO.widget.QuickEditDataTable.html#method_validateQuickEdit", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "method", "name": "validateQuickEdit"}, {"url": "YAHOO.widget.QuickEditDataTable.html#config_YAHOO.widget.QuickEditDataTable.status_order", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "config", "name": "YAHOO.widget.QuickEditDataTable.status_order"}, {"url": "YAHOO.widget.QuickEditDataTable.html#config_YAHOO.widget.QuickEditDataTable.Strings", "access": "", "host": "YAHOO.widget.QuickEditDataTable", "type": "config", "name": "YAHOO.widget.QuickEditDataTable.Strings"}];
-    YAHOO.yuidoc.init();
 </script>
 </body>
 </html>

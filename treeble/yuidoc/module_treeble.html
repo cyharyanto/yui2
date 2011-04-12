@@ -65,12 +65,13 @@ each DataSource must remain constant.</p>
 
                             <p>This module contains the following classes:</p>
                             <script>
-                            //var YUI_CLASS_LIST = [{"extends": {"superclass": {}, "events": {}, "configs": {}, "properties": {}, "methods": {}}, "description": "<p>TreebleDataSource converts a tree of DataSources into a flat list of\nvisible items.  This list of items can then be paginated by DataTable.\nThe merged list must be paginated if the number of child nodes might be\nvery large.  To turn on this feature, set paginateChildren:true.</p>\n<p>The tree must be immutable.  The total number of items available from\neach DataSource must remain constant.</p>", "guessedname": "TreebleDataSource", "name": "YAHOO.util.TreebleDataSource"}, {"extends": {"superclass": {}, "events": {}, "configs": {}, "properties": {}, "methods": {}}, "description": "This is only needed for local data sources or when paginating only\ntop-level nodes, and it will be obsolete when YUI 2.9 is released.", "guessedname": "DataTable", "name": "YAHOO.widget.DataTable"}];
+                            //var YUI_CLASS_LIST = [{"extends": {"superclass": {}, "events": {}, "configs": {}, "properties": {}, "methods": {}}, "description": "<p>TreebleDataSource converts a tree of DataSources into a flat list of\nvisible items.  This list of items can then be paginated by DataTable.\nThe merged list must be paginated if the number of child nodes might be\nvery large.  To turn on this feature, set paginateChildren:true.</p>\n<p>The tree must be immutable.  The total number of items available from\neach DataSource must remain constant.</p>", "guessedname": "TreebleDataSource", "name": "YAHOO.util.TreebleDataSource"}, {"extends": {"superclass": {}, "events": {}, "configs": {}, "properties": {}, "methods": {}}, "description": "This will hopefully be obsolete when YUI 2.9 is released.", "guessedname": "DataSource,DataTable", "name": "YAHOO.widget.DataSource,DataTable"}, {"extends": {"superclass": {}, "events": {}, "configs": {}, "properties": {}, "methods": {}}, "description": "Treeble extensions to DataTable.\nWe don't create a new DataTreeble class because that complicates\nexisting extensions to DataTable.  Existing extensions should work\ntransparently when given a TreebleDataSource.", "guessedname": "DataTable", "name": "YAHOO.widget.DataTable"}];
                             </script>
                             <div id="splash_classList">
                                 <ul>
                                     <li><a href="YAHOO.util.TreebleDataSource.html" title="YAHOO.util.TreebleDataSource" id="class_0">TreebleDataSource</a></li>
-                                    <li><a href="YAHOO.widget.DataTable.html" title="YAHOO.widget.DataTable" id="class_1">DataTable</a></li>
+                                    <li><a href="YAHOO.widget.DataSource,DataTable.html" title="YAHOO.widget.DataSource,DataTable" id="class_1">DataSource,DataTable</a></li>
+                                    <li><a href="YAHOO.widget.DataTable.html" title="YAHOO.widget.DataTable" id="class_2">DataTable</a></li>
                                 </ul>
                             </div>
                     </div>
@@ -95,6 +96,7 @@ each DataSource must remain constant.</p>
                         <h4>Classes</h4>
                         <ul class="content">
                                 <li class=""><a href="YAHOO.util.TreebleDataSource.html" title="YAHOO.util.TreebleDataSource">YAHOO.util.TreebleDataSource</a></li>
+                                <li class=""><a href="YAHOO.widget.DataSource,DataTable.html" title="YAHOO.widget.DataSource,DataTable">YAHOO.widget.DataSource,DataTable</a></li>
                                 <li class=""><a href="YAHOO.widget.DataTable.html" title="YAHOO.widget.DataTable">YAHOO.widget.DataTable</a></li>
                         </ul>
                     </div>
@@ -117,12 +119,12 @@ each DataSource must remain constant.</p>
 	</div>
 	<div id="ft">
         <hr />
-        Copyright &copy; 2010 Yahoo! Inc. All rights reserved.
+        Copyright &copy; 2011 Yahoo! Inc. All rights reserved.
 	</div>
 </div>
 <script type="text/javascript">
-    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.DataTable.html#event_beforeDisplayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "beforeDisplayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_DataSourceBase.parseDataSource", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "DataSourceBase.parseDataSource"}, {"url": "YAHOO.widget.DataTable.html#method_DataTable.generateTreebleDataSourceRequest", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "DataTable.generateTreebleDataSourceRequest"}, {"url": "YAHOO.widget.DataTable.html#config_displayAllRecords", "access": "", "host": "YAHOO.widget.DataTable", "type": "config", "name": "displayAllRecords"}, {"url": "YAHOO.widget.DataTable.html#event_displayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "displayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_isOpen", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "isOpen"}, {"url": "YAHOO.widget.DataTable.html#method_render", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "render"}, {"url": "YAHOO.widget.DataTable.html#method_rowIsOpen", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "rowIsOpen"}, {"url": "YAHOO.util.TreebleDataSource.html#method_toggle", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "toggle"}, {"url": "YAHOO.widget.DataTable.html#method_toggleRow", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "toggleRow"}];
-    YAHOO.yuidoc.init();
+
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.DataSource,DataTable.html#event_beforeDisplayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataSource,DataTable", "type": "event", "name": "beforeDisplayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_DataSourceBase.parseDataSource", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "DataSourceBase.parseDataSource"}, {"url": "YAHOO.widget.DataTable.html#method_DataTable.generateTreebleDataSourceRequest", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "DataTable.generateTreebleDataSourceRequest"}, {"url": "YAHOO.widget.DataSource,DataTable.html#config_displayAllRecords", "access": "", "host": "YAHOO.widget.DataSource,DataTable", "type": "config", "name": "displayAllRecords"}, {"url": "YAHOO.widget.DataSource,DataTable.html#event_displayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataSource,DataTable", "type": "event", "name": "displayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_isOpen", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "isOpen"}, {"url": "YAHOO.widget.DataTable.html#method_rowIsOpen", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "rowIsOpen"}, {"url": "YAHOO.util.TreebleDataSource.html#method_toggle", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "toggle"}, {"url": "YAHOO.widget.DataTable.html#method_toggleRow", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "toggleRow"}];
 </script>
 </body>
 </html>

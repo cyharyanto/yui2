@@ -47,7 +47,12 @@
                         <style>
                             #doc3 .classopts { display:none; }
                         </style>
-                        <div class="highlight"><pre><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+                        <div class="highlight"><pre><span class="cm">/* Copyright (c) 2009, Yahoo! Inc. All rights reserved.</span>
+<span class="cm"> * Code licensed under the BSD License:</span>
+<span class="cm"> * http://developer.yahoo.net/yui/license.txt</span>
+<span class="cm"> */</span>
+
+<span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
 
 <span class="kd">var</span> <span class="nx">lang</span>   <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">lang</span><span class="p">,</span>
 	<span class="nx">util</span>   <span class="o">=</span> <span class="nx">YAHOO</span><span class="p">.</span><span class="nx">util</span><span class="p">,</span>
@@ -549,9 +554,9 @@
 				<span class="p">}</span>
 				<span class="k">else</span>
 				<span class="p">{</span>
-					<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">slice</span><span class="p">.</span><span class="nx">path</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span>
+					<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">j</span><span class="o">&lt;</span><span class="nx">slice</span><span class="p">.</span><span class="nx">path</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">j</span><span class="o">++</span><span class="p">)</span>
 					<span class="p">{</span>
-						<span class="k">if</span> <span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">path</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">!=</span> <span class="nx">slice</span><span class="p">.</span><span class="nx">path</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+						<span class="k">if</span> <span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">path</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">!=</span> <span class="nx">slice</span><span class="p">.</span><span class="nx">path</span><span class="p">[</span><span class="nx">j</span><span class="p">])</span>
 						<span class="p">{</span>
 							<span class="nx">YAHOO</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;TreebleDataSource found path mismatch&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;TreebleDataSource&#39;</span><span class="p">);</span>
 							<span class="k">break</span><span class="p">;</span>
@@ -780,6 +785,10 @@
 	<span class="p">{</span>
 		<span class="nx">copy</span> <span class="o">=</span> <span class="nx">o</span><span class="p">;</span>
 	<span class="p">}</span>
+	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">o</span> <span class="k">instanceof</span> <span class="nb">Date</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="nx">copy</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">o</span><span class="p">);</span>
+	<span class="p">}</span>
 	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">lang</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">o</span><span class="p">))</span>
 	<span class="p">{</span>
 		<span class="kd">var</span> <span class="nx">array</span> <span class="o">=</span> <span class="p">[];</span>
@@ -944,7 +953,8 @@
 			<span class="kd">var</span> <span class="nx">r</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_callback</span><span class="p">.</span><span class="nx">request</span><span class="p">;</span>
 			<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">key</span> <span class="k">in</span> <span class="nx">r</span><span class="p">)</span>
 			<span class="p">{</span>
-				<span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">==</span> <span class="s1">&#39;startIndex&#39;</span> <span class="o">||</span> <span class="nx">key</span> <span class="o">==</span> <span class="s1">&#39;results&#39;</span><span class="p">)</span>
+				<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">YAHOO</span><span class="p">.</span><span class="nx">lang</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="o">||</span>
+					<span class="nx">key</span> <span class="o">==</span> <span class="s1">&#39;startIndex&#39;</span> <span class="o">||</span> <span class="nx">key</span> <span class="o">==</span> <span class="s1">&#39;results&#39;</span><span class="p">)</span>
 				<span class="p">{</span>
 					<span class="k">continue</span><span class="p">;</span>
 				<span class="p">}</span>
@@ -952,6 +962,7 @@
 				<span class="k">if</span> <span class="p">(</span><span class="nx">r</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">!==</span> <span class="nx">oRequest</span><span class="p">[</span><span class="nx">key</span><span class="p">])</span>
 				<span class="p">{</span>
 					<span class="k">this</span><span class="p">.</span><span class="nx">_open</span> <span class="o">=</span> <span class="p">[];</span>
+					<span class="k">break</span><span class="p">;</span>
 				<span class="p">}</span>
 			<span class="p">}</span>
 		<span class="p">}</span>
@@ -964,6 +975,7 @@
 		<span class="p">};</span>
 
 		<span class="nx">requestTree</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+		<span class="k">return</span> <span class="nx">tId</span><span class="p">;</span>
 	<span class="p">},</span>
 
 	<span class="nx">_cancelAllRequests</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span>
@@ -1179,6 +1191,7 @@
                         <h4>Classes</h4>
                         <ul class="content">
                                 <li class=""><a href="YAHOO.util.TreebleDataSource.html" title="YAHOO.util.TreebleDataSource">YAHOO.util.TreebleDataSource</a></li>
+                                <li class=""><a href="YAHOO.widget.DataSource,DataTable.html" title="YAHOO.widget.DataSource,DataTable">YAHOO.widget.DataSource,DataTable</a></li>
                                 <li class=""><a href="YAHOO.widget.DataTable.html" title="YAHOO.widget.DataTable">YAHOO.widget.DataTable</a></li>
                         </ul>
                     </div>
@@ -1201,12 +1214,12 @@
 	</div>
 	<div id="ft">
         <hr />
-        Copyright &copy; 2010 Yahoo! Inc. All rights reserved.
+        Copyright &copy; 2011 Yahoo! Inc. All rights reserved.
 	</div>
 </div>
 <script type="text/javascript">
-    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.DataTable.html#event_beforeDisplayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "beforeDisplayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_DataSourceBase.parseDataSource", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "DataSourceBase.parseDataSource"}, {"url": "YAHOO.widget.DataTable.html#method_DataTable.generateTreebleDataSourceRequest", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "DataTable.generateTreebleDataSourceRequest"}, {"url": "YAHOO.widget.DataTable.html#config_displayAllRecords", "access": "", "host": "YAHOO.widget.DataTable", "type": "config", "name": "displayAllRecords"}, {"url": "YAHOO.widget.DataTable.html#event_displayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataTable", "type": "event", "name": "displayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_isOpen", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "isOpen"}, {"url": "YAHOO.widget.DataTable.html#method_render", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "render"}, {"url": "YAHOO.widget.DataTable.html#method_rowIsOpen", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "rowIsOpen"}, {"url": "YAHOO.util.TreebleDataSource.html#method_toggle", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "toggle"}, {"url": "YAHOO.widget.DataTable.html#method_toggleRow", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "toggleRow"}];
-    YAHOO.yuidoc.init();
+
+    var ALL_YUI_PROPS = [{"url": "YAHOO.widget.DataSource,DataTable.html#event_beforeDisplayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataSource,DataTable", "type": "event", "name": "beforeDisplayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_DataSourceBase.parseDataSource", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "DataSourceBase.parseDataSource"}, {"url": "YAHOO.widget.DataTable.html#method_DataTable.generateTreebleDataSourceRequest", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "DataTable.generateTreebleDataSourceRequest"}, {"url": "YAHOO.widget.DataSource,DataTable.html#config_displayAllRecords", "access": "", "host": "YAHOO.widget.DataSource,DataTable", "type": "config", "name": "displayAllRecords"}, {"url": "YAHOO.widget.DataSource,DataTable.html#event_displayAllRecordsChange", "access": "", "host": "YAHOO.widget.DataSource,DataTable", "type": "event", "name": "displayAllRecordsChange"}, {"url": "YAHOO.util.TreebleDataSource.html#method_isOpen", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "isOpen"}, {"url": "YAHOO.widget.DataTable.html#method_rowIsOpen", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "rowIsOpen"}, {"url": "YAHOO.util.TreebleDataSource.html#method_toggle", "access": "", "host": "YAHOO.util.TreebleDataSource", "type": "method", "name": "toggle"}, {"url": "YAHOO.widget.DataTable.html#method_toggleRow", "access": "", "host": "YAHOO.widget.DataTable", "type": "method", "name": "toggleRow"}];
 </script>
 </body>
 </html>
