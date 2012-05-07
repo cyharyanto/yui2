@@ -689,8 +689,11 @@ function checkFinished()
 		return;
 	}
 
-	var response = {};
-	lang.augmentObject(response, this._topResponse);
+	var response = { meta: {} };
+	if (this._topResponse)
+	{
+		lang.augmentObject(response, this._topResponse, true);
+	}
 	response.results = [];
 	response         = cloneObject(response);
 
@@ -793,7 +796,7 @@ function toggleSuccess(oRequest, oParsedResponse, args)
 	complete(completion);
 }
 
-function toggleFailure(oRequest, oParsedResponse, node)
+function toggleFailure(oRequest, oParsedResponse, args)
 {
 	var node       = args[0];
 	var completion = args[1];
@@ -932,6 +935,7 @@ lang.extend(util.TreebleDataSource, DS,
 	_cancelAllRequests: function()
 	{
 		this._req = [];
+		delete this._topResponse;
 	}
 });
 
