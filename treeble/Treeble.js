@@ -190,10 +190,11 @@ function populateOpen(
 					item.childTotal = cached_item.childTotal;
 					this._redo      = this._redo || item.open;
 				}
+
+				this._open_cache[ data[k][ this.uniqueIdKey ] ] = item;
 			}
 
 			open.splice(j, 0, item);
-			this._open_cache[ data[k][ this.uniqueIdKey ] ] = item;
 		}
 
 		j++;
@@ -820,6 +821,43 @@ function complete(f)
 	}
 }
 
+function keys(o)
+{
+	var keys = [];
+
+	for (var k in o)
+	{
+		if (o.hasOwnProperty(k))
+		{
+			keys.push(k);
+		}
+	}
+
+	return keys;
+}
+
+function compareRequests(r1, r2)
+{
+	var k1 = keys(r1),
+		k2 = keys(r2);
+
+	if (k1.length != k2.length)
+	{
+		return false;
+	}
+
+	for (var i=0; i<k1.length; i++)
+	{
+		var k = k1[i];
+		if (k != 'startIndex' && k != 'results' && r1[k] !== r2[k])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 // TreebleDataSource extends DataSourceBase
 lang.extend(util.TreebleDataSource, DS,
 {
@@ -902,23 +940,9 @@ lang.extend(util.TreebleDataSource, DS,
 		var tId = DS._nTransactionId++;
 		this.fireEvent("requestEvent", {tId:tId, request:oRequest,callback:oCallback,caller:oCaller});
 
-		if (this._callback)
+		if (this._callback && !compareRequests(this._callback.request, oRequest))
 		{
-			var r = this._callback.request;
-			for (var key in r)
-			{
-				if (!YAHOO.lang.hasOwnProperty(r, key) ||
-					key == 'startIndex' || key == 'results')
-				{
-					continue;
-				}
-
-				if (r[key] !== oRequest[key])
-				{
-					this._open = [];
-					break;
-				}
-			}
+			this._open = [];
 		}
 
 		this._callback =
