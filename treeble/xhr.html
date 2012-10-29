@@ -1,0 +1,174 @@
+<!DOCTYPE html public '-//w3c//dtd html 4.01//en' http://www.w3.org/tr/html4/strict.dtd'>
+<html>
+<head>
+	<title>YUI 2 Treeble Example</title>
+	<meta http-equiv=content-type content="text/html; charset=utf-8">
+
+	<!-- Combo-handled YUI CSS files: -->
+	<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.8.1/build/paginator/assets/skins/sam/paginator.css&2.8.1/build/datatable/assets/skins/sam/datatable.css">
+	<!-- Combo-handled YUI JS files: -->
+	<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.8.1/build/yahoo-dom-event/yahoo-dom-event.js&2.8.1/build/json/json-min.js&2.8.1/build/connection/connection-min.js&2.8.1/build/dragdrop/dragdrop-min.js&2.8.1/build/element/element-min.js&2.8.1/build/paginator/paginator.js&2.8.1/build/datasource/datasource.js&2.8.1/build/datatable/datatable.js"></script>
+
+	<script type="text/javascript" src="Treeble-280patch.js"></script>
+	<script type="text/javascript" src="Treeble.js"></script>
+
+	<style type="text/css">
+	.yui-dt td.treeble-nub
+	{
+		border-right-color: transparent;
+	}
+
+	.yui-dt .row-toggle a.treeble-collapse-nub
+	{
+		padding:0 8px;
+		height:14px;
+		margin-left:2px;
+		*display:inline-block;
+	}
+
+	.yui-dt .row-closed a.treeble-collapse-nub
+	{
+		background:url(closed.png) no-repeat;
+	}
+	.yui-dt .row-open a.treeble-collapse-nub
+	{
+		background:url(open.png) no-repeat;
+	}
+
+	.yui-dt td .treeble-depth-1
+	{
+		padding-left: 15px;
+	}
+	.yui-dt td .treeble-depth-2
+	{
+		padding-left: 30px;
+	}
+	.yui-dt td .treeble-depth-3
+	{
+		padding-left: 45px;
+	}
+	</style>
+</head>
+<body class="yui-skin-sam">
+
+<script type="text/javascript">
+YAHOO.util.Event.onDOMReady(function()
+{
+	YAHOO.namespace('example');
+
+	var Dom = YAHOO.util.Dom,
+		Event = YAHOO.util.Event,
+		DT = YAHOO.widget.DataTable;
+
+	// XHR datasource
+
+	function xhrGenerateRequest(state, path)
+	{
+		return '';
+	};
+
+	YAHOO.example.xhrDataTable = new YAHOO.widget.DataTable(
+
+		//Root element id
+		"table", 
+
+		//Column configuration
+		[
+			{key:"toggle_column", label:"", formatter:
+				function(elCell, oRecord, oColumn, oData)
+				{
+					Dom.addClass(elCell.parentNode, 'treeble-nub');
+					if (oRecord.getData('kiddies'))
+					{
+						var path  = oRecord.getData('_yui_node_path');
+						var open  = this.rowIsOpen(path);
+						var clazz = open ? 'row-open' : 'row-closed';
+
+						Dom.addClass(elCell, 'row-toggle');
+						Dom.replaceClass(elCell, /row-(open|closed)/, clazz);
+						elCell.innerHTML = '<a class="treeble-collapse-nub" href="javascript:void(0);"></a>';
+
+						Event.on(elCell, 'click', function(e, path)
+						{
+							this.toggleRow(path);
+						},
+						path, this);
+					}
+				}
+			},
+			{key:"title", label:"Title", resizeable:true, sortable:true,
+				formatter: function(elCell, oRecord, oColumn, oData)
+				{
+					var depth_class  = 'treeble-depth-'+oRecord.getData('_yui_node_depth');
+					elCell.innerHTML = '<span class="'+depth_class+'">'+oData+'</span>';
+				}},
+			{key:"year", label:"Year", resizeable:true, sortable:true},
+			{key:"quantity", label:"Quantity", resizeable:true, sortable:true, editor:new YAHOO.widget.TextboxCellEditor({validator:DT.validateNumber})}
+		],
+
+		//Data Source 
+		new YAHOO.util.TreebleDataSource(
+			new YAHOO.util.DataSource(
+				'data/root.json',
+				{
+					responseType: YAHOO.util.DataSource.TYPE_JSON,
+					responseSchema:
+					{
+						resultsList: 'items',
+						fields:
+						[
+							"quantity","year","title",
+							{key: 'kiddies', parser: 'datasource'}
+						]
+					},
+					treebleConfig:
+					{
+						generateRequest:        xhrGenerateRequest,
+						totalRecordsReturnExpr: '.meta.totalRecords'
+					}
+				}
+			),
+			{
+				paginateChildren: false,
+				uniqueIdKey:      'title'	// normally, it would a database row id, but title happens to be unique in this example
+			}
+		),
+
+		//Attribute Config
+		{
+			paginator: new YAHOO.widget.Paginator({
+				rowsPerPage:1,
+				rowsPerPageOptions:[1,2,5,10,25,50],
+				containers:'table-pagination',
+				template:'{FirstPageLink}{PreviousPageLink}{PageLinks}{NextPageLink}{LastPageLink}{RowsPerPageDropdown}'
+			}),
+			initialLoad: false,
+			initialRequest: {startIndex:0,results:1},
+			dynamicData: true,
+			displayAllRecords: true,
+			generateRequest: DT.generateTreebleDataSourceRequest
+		}
+	);
+
+	YAHOO.example.xhrDataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload)
+	{
+		oPayload.totalRecords = oResponse.meta.totalRecords;
+		return oPayload;
+	};
+
+	YAHOO.example.xhrDataTable.load();
+});
+</script>
+
+
+<h1>YUI 2 Treeble Example</h1>
+
+<div id="table-pagination"></div>
+<div id="table"></div>
+<p><a href="pg_all.html">I want to paginate all nodes instead</a></p>
+<p><a href="yuidoc">Show me the documentation</a></p>
+<p><a href="/yui3-gallery/treeble/index.html">Show me the YUI 3 example</a></p>
+<p><a href="/yui2/">Back to YUI 2 project list</a></p>
+
+</body>
+</html>
