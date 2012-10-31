@@ -1,0 +1,76 @@
+{
+   "total_records": "3",
+   "first_index": "0",
+   "bookorders":
+   [
+{
+   "nodeRef": "workspace:\/\/SpacesStore\/7ee9eecf-971c-4f5f-824c-91b06896448a",
+   "parentNodeRef":"workspace:\/\/SpacesStore\/e00f3422-fc8b-4fed-a9be-18acc4f369d5",
+   "isContainer":"true",
+   "name": "level2a",
+   "type": "folder",
+   "path":"\/aaa\/level2a",
+   "title": "",
+   "description": "",
+   "mimeType": "",
+   "size": "0",
+   "sizeStr": "0 B",
+   "likeCount": "0",
+   "creator": "admin",
+   "modifier": "admin",
+   "created":"2012-09-14", 
+   "modified":"2012-09-25"
+   ,
+   "children":"alex/3.json"
+   ,
+   "kiddies":
+   [
+   ]
+}
+      ,
+{
+   "nodeRef": "workspace:\/\/SpacesStore\/1ffbfc88-cc48-4359-ac18-83447ec92312",
+   "parentNodeRef":"workspace:\/\/SpacesStore\/e00f3422-fc8b-4fed-a9be-18acc4f369d5",
+   "isContainer":"true",
+   "name": "level2b",
+   "type": "folder",
+   "path":"\/aaa\/level2b",
+   "title": "",
+   "description": "",
+   "mimeType": "",
+   "size": "0",
+   "sizeStr": "0 B",
+   "likeCount": "0",
+   "creator": "admin",
+   "modifier": "admin",
+   "created":"2012-09-14", 
+   "modified":"2012-09-14"
+   ,
+   "children":"http:\/\/localhost:9080\/share\/proxy\/alfresco\/api\/treeble\/sample\/site\/test?"
+   ,
+   "kiddies":
+   [
+   ]
+}
+      ,
+{
+   "nodeRef": "workspace:\/\/SpacesStore\/ae032f75-73a5-4e45-959d-4d48878f6163",
+   "parentNodeRef":"workspace:\/\/SpacesStore\/e00f3422-fc8b-4fed-a9be-18acc4f369d5",
+   "isContainer":"false",
+   "name": "pentaho_architecture.jpg",
+   "type": "content",
+   "path":"\/aaa\/pentaho_architecture.jpg",
+   "title": "",
+   "description": "",
+   "mimeType": "image\/jpeg",
+   "size": "29267",
+   "sizeStr": "28.58 KB",
+   "likeCount": "0",
+   "creator": "admin",
+   "modifier": "admin",
+   "created":"2012-09-12", 
+   "modified":"2012-09-12"
+}
+      
+   ]
+}

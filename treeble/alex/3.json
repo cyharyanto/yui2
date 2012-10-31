@@ -1,0 +1,26 @@
+{
+   "total_records": "1",
+   "first_index": "0",
+   "bookorders":
+   [
+{
+   "nodeRef": "workspace:\/\/SpacesStore\/70733a79-d6ea-42a3-8bd3-fde681e67301",
+   "parentNodeRef":"workspace:\/\/SpacesStore\/7ee9eecf-971c-4f5f-824c-91b06896448a",
+   "isContainer":"false",
+   "name": "CRH1\u521d\u8bc4",
+   "type": "content",
+   "path":"\/aaa\/level2a\/CRH1\u521d\u8bc4",
+   "title": "CRH1\u521d\u8bc4",
+   "description": "\u53c2\u4e0e\u4eba\uff1a\u5f20\u6052\u5fd7 \u9648\u8273 ",
+   "mimeType": "text\/plain",
+   "size": "30",
+   "sizeStr": "30 B",
+   "likeCount": "0",
+   "creator": "admin",
+   "modifier": "admin",
+   "created":"2012-09-25", 
+   "modified":"2012-09-25"
+}
+      
+   ]
+}

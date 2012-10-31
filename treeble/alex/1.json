@@ -1,0 +1,76 @@
+{
+   "total_records": "3",
+   "first_index": "0",
+   "bookorders":
+   [
+{
+   "nodeRef": "workspace:\/\/SpacesStore\/e00f3422-fc8b-4fed-a9be-18acc4f369d5",
+   "parentNodeRef":"workspace:\/\/SpacesStore\/db03152f-2aa1-449f-aea4-112704f3caf7",
+   "isContainer":"true",
+   "name": "aaa",
+   "type": "folder",
+   "path":"\/aaa",
+   "title": "",
+   "description": "",
+   "mimeType": "",
+   "size": "0",
+   "sizeStr": "0 B",
+   "likeCount": "0",
+   "creator": "admin",
+   "modifier": "admin",
+   "created":"2012-09-11", 
+   "modified":"2012-09-14"
+   ,
+   "children":"alex/2.json"
+   ,
+   "kiddies":
+   [
+   ]
+}
+      ,
+{
+   "nodeRef": "workspace:\/\/SpacesStore\/e7a8e264-b540-4b1e-8134-69a726e9fa2d",
+   "parentNodeRef":"workspace:\/\/SpacesStore\/db03152f-2aa1-449f-aea4-112704f3caf7",
+   "isContainer":"true",
+   "name": "bbb",
+   "type": "folder",
+   "path":"\/bbb",
+   "title": "",
+   "description": "",
+   "mimeType": "",
+   "size": "0",
+   "sizeStr": "0 B",
+   "likeCount": "0",
+   "creator": "admin",
+   "modifier": "admin",
+   "created":"2012-09-11", 
+   "modified":"2012-09-14"
+   ,
+   "children":"http:\/\/localhost:9080\/share\/proxy\/alfresco\/api\/treeble\/sample\/site\/test?"
+   ,
+   "kiddies":
+   [
+   ]
+}
+      ,
+{
+   "nodeRef": "workspace:\/\/SpacesStore\/d39b5050-a269-4cf7-b19a-01d8e80dc5af",
+   "parentNodeRef":"workspace:\/\/SpacesStore\/db03152f-2aa1-449f-aea4-112704f3caf7",
+   "isContainer":"false",
+   "name": "test-check-1",
+   "type": "content",
+   "path":"\/test-check-1",
+   "title": "\u6d4b\u8bd5\u8bc4\u5ba1\u5185\u5bb9\u4e00",
+   "description": "\u5f20\u4e09\uff0c\u674e\u56db\uff0c\u738b\u4e94",
+   "mimeType": "text\/html",
+   "size": "137",
+   "sizeStr": "137 B",
+   "likeCount": "0",
+   "creator": "admin",
+   "modifier": "admin",
+   "created":"2012-09-25", 
+   "modified":"2012-09-25"
+}
+      
+   ]
+}

@@ -78,7 +78,7 @@ YAHOO.util.Event.onDOMReady(function()
 				function(elCell, oRecord, oColumn, oData)
 				{
 					Dom.addClass(elCell.parentNode, 'treeble-nub');
-					if (oRecord.getData('kiddies'))
+					if (oRecord.getData('children'))
 					{
 						var path  = oRecord.getData('_yui_node_path');
 						var open  = this.rowIsOpen(path);
@@ -96,54 +96,56 @@ YAHOO.util.Event.onDOMReady(function()
 					}
 				}
 			},
-			{key:"title", label:"Title", resizeable:true,
+			{key:"name", label:"Name", resizeable:true,
 				formatter: function(elCell, oRecord, oColumn, oData)
 				{
 					var depth_class  = 'treeble-depth-'+oRecord.getData('_yui_node_depth');
 					elCell.innerHTML = '<span class="'+depth_class+'">'+oData+'</span>';
 				}},
-			{key:"year", label:"Year", resizeable:true},
-			{key:"quantity", label:"Quantity", resizeable:true, editor:new YAHOO.widget.TextboxCellEditor({validator:DT.validateNumber})}
+			{key:"type", label:"Type", resizeable:true},
+			{key:"mimeType", label:"Mime Type", resizeable:true}
 		],
 
 		//Data Source 
 		new YAHOO.util.TreebleDataSource(
 			new YAHOO.util.DataSource(
-				'data/root.json',
+				'alex/1.json',
 				{
 					responseType: YAHOO.util.DataSource.TYPE_JSON,
 					responseSchema:
 					{
-						resultsList: 'items',
+						resultsList: 'bookorders',
 						fields:
 						[
-							"quantity","year","title",
-							{key: 'kiddies', parser: 'datasource'}
-						]
+							"name","isContainer","nodeRef","title","type","mimeType","description","likeCount","created","creator","modified","modifier","size","sizeStr","parentNodeRef","path",
+							{key: 'children', parser: 'datasource'}
+						],
+						metaFields: { startIndex: 'first_index', totalRecords: 'total_records' }
 					},
 					treebleConfig:
 					{
-						generateRequest:        xhrGenerateRequest,
-						totalRecordsReturnExpr: '.meta.totalRecords'
+						generateRequest:  xhrGenerateRequest,
+						totalRecordsExpr: '.meta.totalRecords',
+						startIndexExpr:   '.meta.startIndex'
 					}
 				}
 			),
 			{
 				paginateChildren: false,
-				uniqueIdKey:      'title'	// normally, it would a database row id, but title happens to be unique in this example
+				uniqueIdKey:      'nodeRef'
 			}
 		),
 
 		//Attribute Config
 		{
 			paginator: new YAHOO.widget.Paginator({
-				rowsPerPage:1,
+				rowsPerPage:50,
 				rowsPerPageOptions:[1,2,5,10,25,50],
 				containers:'table-pagination',
 				template:'{FirstPageLink}{PreviousPageLink}{PageLinks}{NextPageLink}{LastPageLink}{RowsPerPageDropdown}'
 			}),
 			initialLoad: false,
-			initialRequest: {startIndex:0,results:1},
+			initialRequest: {startIndex:0,results:50},
 			dynamicData: true,
 			displayAllRecords: true,
 			generateRequest: DT.generateTreebleDataSourceRequest
