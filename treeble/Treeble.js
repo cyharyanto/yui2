@@ -942,7 +942,7 @@ lang.extend(util.TreebleDataSource, DS,
 
 		if (this._callback && !compareRequests(this._callback.request, oRequest))
 		{
-			this._open = [];
+			sortOrderChanged();
 		}
 
 		this._callback =
@@ -954,6 +954,17 @@ lang.extend(util.TreebleDataSource, DS,
 
 		requestTree.call(this);
 		return tId;
+	},
+
+	/**
+	 * Call this if the data ordering changes for any reason other than the
+	 * user explicitly modifying the sort order via the column headers.
+	 * 
+	 * @method sortOrderChanged
+	 */
+	sortOrderChanged: function()
+	{
+		this._open = [];
 	},
 
 	_cancelAllRequests: function()
