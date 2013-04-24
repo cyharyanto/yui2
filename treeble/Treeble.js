@@ -942,7 +942,7 @@ lang.extend(util.TreebleDataSource, DS,
 
 		if (this._callback && !compareRequests(this._callback.request, oRequest))
 		{
-			sortOrderChanged();
+			this.sortOrderChanged();
 		}
 
 		this._callback =
